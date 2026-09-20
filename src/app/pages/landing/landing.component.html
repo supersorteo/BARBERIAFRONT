@@ -1,0 +1,153 @@
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-warning sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold fs-4 text-warning" href="#">✂️ El Corte</a>
+    <button class="navbar-toggler border-warning" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item"><a class="nav-link text-light" href="#servicios">Servicios</a></li>
+        <li class="nav-item"><a class="nav-link text-light" href="#reservar">Reservar</a></li>
+        <li class="nav-item"><a class="nav-link text-light" href="#contacto">Contacto</a></li>
+        <li class="nav-item"><a class="nav-link text-warning fw-semibold" routerLink="/admin">Panel Admin</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero d-flex align-items-center">
+  <div class="container text-center">
+    <p class="text-warning text-uppercase letter-spacing mb-3 fw-semibold">Barbería · Montevideo</p>
+    <h1 class="display-2 fw-black text-white mb-4 lh-1">
+      Tu próximo corte,<br>
+      <span class="text-warning">a un mensaje</span><br>
+      de distancia
+    </h1>
+    <p class="lead text-muted mb-5">Reservá tu turno online en segundos. Sin llamadas, sin esperas.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="#servicios" class="btn btn-warning btn-lg px-4 fw-semibold">Ver servicios</a>
+      <a href="#reservar" class="btn btn-outline-light btn-lg px-4">Reservar ahora</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios" class="py-5 bg-dark">
+  <div class="container">
+    <div class="text-center mb-5">
+      <p class="text-warning text-uppercase fw-semibold letter-spacing">Lo que hacemos</p>
+      <h2 class="text-white fw-bold fs-1">Nuestros Servicios</h2>
+    </div>
+    <div class="row g-4">
+      @for (s of servicios; track s.id) {
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="card service-card h-100 border-0">
+            <div class="card-body d-flex flex-column text-center p-4">
+              <div class="service-emoji mb-3">{{ s.emoji }}</div>
+              <h5 class="card-title text-white fw-bold mb-2">{{ s.nombre }}</h5>
+              <p class="card-text text-muted small flex-grow-1">{{ s.descripcion }}</p>
+              <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                <span class="text-warning fw-bold fs-5">${{ s.precio | number:'1.0-0' }} UYU</span>
+                <span class="badge bg-secondary text-light">{{ s.duracionMinutos }} min</span>
+              </div>
+              <button class="btn btn-warning fw-semibold w-100" (click)="seleccionarServicio(s)">
+                Reservar este servicio
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+      @if (servicios.length === 0) {
+        <div class="col-12 text-center text-muted py-5">Cargando servicios...</div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- RESERVA -->
+<section id="reservar" class="py-5 bg-black">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="text-center mb-5">
+          <p class="text-warning text-uppercase fw-semibold letter-spacing">Sin complicaciones</p>
+          <h2 class="text-white fw-bold fs-1">Reservá tu turno</h2>
+        </div>
+        <div class="booking-card p-4 p-md-5 rounded-4">
+          @if (mensajeReserva) {
+            <div class="alert" [class.alert-success]="exito" [class.alert-danger]="!exito">
+              {{ mensajeReserva }}
+            </div>
+          }
+          <div class="mb-3">
+            <label class="form-label text-muted small">Nombre completo *</label>
+            <input type="text" class="form-control form-dark" [(ngModel)]="reservaForm.paciente" placeholder="Juan García">
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-muted small">Teléfono</label>
+            <input type="tel" class="form-control form-dark" [(ngModel)]="reservaForm.telefono" placeholder="099 123 456">
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-muted small">Servicio</label>
+            <select class="form-select form-dark" [(ngModel)]="reservaForm.servicio">
+              <option value="">— Seleccioná un servicio —</option>
+              @for (s of servicios; track s.id) {
+                <option [value]="s.nombre">{{ s.emoji }} {{ s.nombre }} — ${{ s.precio | number:'1.0-0' }} UYU</option>
+              }
+            </select>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="form-label text-muted small">Fecha *</label>
+              <input type="date" class="form-control form-dark" [(ngModel)]="reservaForm.fecha">
+            </div>
+            <div class="col-6">
+              <label class="form-label text-muted small">Hora *</label>
+              <select class="form-select form-dark" [(ngModel)]="reservaForm.hora">
+                <option value="">— Hora —</option>
+                @for (h of horasDisponibles; track h) {
+                  <option [value]="h">{{ h }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-warning w-100 btn-lg fw-bold" (click)="enviarReserva()" [disabled]="enviando">
+            {{ enviando ? 'Reservando...' : '✅ Confirmar turno' }}
+          </button>
+          <p class="text-muted text-center small mt-3">O usá el chat ✂️ abajo a la derecha para reservar con nuestro asistente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO / FOOTER -->
+<footer id="contacto" class="bg-dark border-top border-secondary py-5">
+  <div class="container">
+    <div class="row g-4 text-center text-md-start">
+      <div class="col-12 col-md-4">
+        <h5 class="text-warning fw-bold mb-3">✂️ Barbería El Corte</h5>
+        <p class="text-muted small">Barbería moderna en el corazón de Montevideo. Más de 10 años dando el mejor corte de la ciudad.</p>
+      </div>
+      <div class="col-12 col-md-4">
+        <h6 class="text-white fw-semibold mb-3">Horarios</h6>
+        <p class="text-muted small mb-1">Mar — Sáb: 9:00 — 20:00</p>
+        <p class="text-muted small mb-1">Dom: 10:00 — 15:00</p>
+        <p class="text-muted small">Lun: Cerrado</p>
+      </div>
+      <div class="col-12 col-md-4">
+        <h6 class="text-white fw-semibold mb-3">Contacto</h6>
+        <p class="text-muted small mb-1">📍 Av. General Rivera 2500, Mvd</p>
+        <p class="text-muted small mb-1">📞 2708-3456</p>
+        <p class="text-muted small">📸 &#64;elcortemvd</p>
+      </div>
+    </div>
+    <hr class="border-secondary mt-4">
+    <p class="text-center text-muted small mb-0">© 2026 Barbería El Corte · Reservas online disponibles 24/7</p>
+  </div>
+</footer>
+
+<!-- CHAT FLOTANTE -->
+<app-chat-widget />

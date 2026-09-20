@@ -1,0 +1,151 @@
+<!-- NAVBAR ADMIN -->
+<nav class="navbar navbar-dark bg-black border-bottom border-warning">
+  <div class="container-fluid px-4">
+    <span class="navbar-brand fw-bold text-warning">✂️ El Corte · Panel Admin</span>
+    <a routerLink="/" class="btn btn-sm btn-outline-warning">← Volver al sitio</a>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 py-4" style="background:#0f0f0f; min-height:calc(100vh - 57px)">
+
+  <!-- TABS -->
+  <ul class="nav nav-tabs nav-tabs-dark mb-4">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">
+        📅 Reservas
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">
+        ✂️ Servicios
+      </button>
+    </li>
+  </ul>
+
+  <!-- TAB TURNOS -->
+  @if (tabActiva === 'turnos') {
+    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+      <label class="text-muted small">Filtrar por fecha:</label>
+      <input type="date" class="form-control form-dark w-auto" [(ngModel)]="fechaFiltro" (change)="cargarTurnos()">
+      @if (fechaFiltro) {
+        <button class="btn btn-sm btn-outline-secondary" (click)="limpiarFecha()">✕ Ver todas</button>
+      }
+      <span class="text-muted small">{{ turnos.length }} reserva(s)</span>
+    </div>
+
+    @if (turnos.length === 0) {
+      <div class="text-center text-muted py-5">No hay reservas para esta fecha.</div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+          <thead class="border-bottom border-warning">
+            <tr>
+              <th class="text-warning">Fecha</th>
+              <th class="text-warning">Hora</th>
+              <th class="text-warning">Cliente</th>
+              <th class="text-warning">Teléfono</th>
+              <th class="text-warning">Servicio</th>
+              <th class="text-warning">Estado</th>
+              <th class="text-warning">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of turnos; track t.id) {
+              <tr>
+                <td class="text-muted">{{ t.fecha }}</td>
+                <td><span class="fw-bold text-white">{{ t.hora }}</span></td>
+                <td class="text-light">{{ t.paciente }}</td>
+                <td class="text-muted">{{ t.telefono || '—' }}</td>
+                <td class="text-muted">{{ t.servicio || '—' }}</td>
+                <td><span class="badge" [class]="estadoBadge(t.estado || '')">{{ t.estado }}</span></td>
+                <td>
+                  <div class="d-flex gap-2">
+                    @if (t.estado !== 'COMPLETADO') {
+                      <button class="btn btn-sm btn-success" (click)="cambiarEstado(t, 'COMPLETADO')">✓ Completado</button>
+                    }
+                    @if (t.estado !== 'CANCELADO') {
+                      <button class="btn btn-sm btn-secondary" (click)="cambiarEstado(t, 'CANCELADO')">✕ Cancelar</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  <!-- TAB SERVICIOS -->
+  @if (tabActiva === 'servicios') {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <span class="text-muted small">{{ servicios.length }} servicio(s) activos</span>
+      <button class="btn btn-warning fw-semibold" (click)="abrirModalNuevo()">+ Agregar servicio</button>
+    </div>
+
+    <div class="row g-3">
+      @for (s of servicios; track s.id) {
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card bg-dark border-secondary">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="fs-2">{{ s.emoji }}</span>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-warning" (click)="abrirModalEditar(s)">✏️</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarServicio(s.id!)">🗑️</button>
+                </div>
+              </div>
+              <h6 class="text-white fw-bold">{{ s.nombre }}</h6>
+              <p class="text-muted small mb-2">{{ s.descripcion }}</p>
+              <div class="d-flex justify-content-between">
+                <span class="text-warning fw-bold">${{ s.precio | number:'1.0-0' }} UYU</span>
+                <span class="badge bg-secondary">{{ s.duracionMinutos }} min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- MODAL SERVICIO -->
+@if (mostrarModal) {
+  <div class="modal-backdrop-custom" (click)="mostrarModal=false"></div>
+  <div class="modal-custom">
+    <div class="modal-content-custom">
+      <div class="modal-header-custom">
+        <h5 class="text-white mb-0">{{ editando ? 'Editar' : 'Nuevo' }} servicio</h5>
+        <button class="btn-close-custom" (click)="mostrarModal=false">✕</button>
+      </div>
+      <div class="p-4">
+        <div class="mb-3">
+          <label class="form-label text-muted small">Emoji</label>
+          <input class="form-control form-dark" [(ngModel)]="servicioForm.emoji" placeholder="✂️">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">Nombre *</label>
+          <input class="form-control form-dark" [(ngModel)]="servicioForm.nombre" placeholder="Corte de cabello">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small">Descripción</label>
+          <textarea class="form-control form-dark" [(ngModel)]="servicioForm.descripcion" rows="2"></textarea>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label text-muted small">Precio (UYU) *</label>
+            <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.precio">
+          </div>
+          <div class="col-6">
+            <label class="form-label text-muted small">Duración (min)</label>
+            <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.duracionMinutos">
+          </div>
+        </div>
+        <div class="d-flex gap-2 justify-content-end">
+          <button class="btn btn-secondary" (click)="mostrarModal=false">Cancelar</button>
+          <button class="btn btn-warning fw-semibold" (click)="guardarServicio()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

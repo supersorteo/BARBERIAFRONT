@@ -1,0 +1,37 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <div class="avatar">✂️</div>
+    <div class="header-info">
+      <h3>Barbería El Corte</h3>
+      <span>Reservas online · En línea</span>
+    </div>
+  </div>
+
+  <div class="messages" #messagesContainer>
+    @for (msg of mensajes; track $index) {
+      <div class="message" [class.user]="msg.rol === 'user'" [class.bot]="msg.rol === 'bot'">
+        <p style="white-space: pre-line">{{ msg.texto }}</p>
+        <span class="hora">{{ msg.hora }}</span>
+      </div>
+    }
+    @if (escribiendo) {
+      <div class="message bot typing">
+        <span></span><span></span><span></span>
+      </div>
+    }
+  </div>
+
+  <div class="input-area">
+    <textarea
+      [(ngModel)]="inputTexto"
+      (keydown)="onKeyDown($event)"
+      placeholder="Escribí tu consulta..."
+      rows="1"
+    ></textarea>
+    <button class="send-btn" (click)="enviar()" [disabled]="escribiendo">
+      <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+        <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+</div>
