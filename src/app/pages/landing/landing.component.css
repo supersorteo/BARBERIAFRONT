@@ -38,3 +38,13 @@
 .form-dark option { background: #111; color: #eee; }
 
 body { background: #0a0a0a; }
+
+.gallery-item { cursor: pointer; }
+.gallery-item img { transition: transform 0.3s; }
+.gallery-item:hover img { transform: scale(1.05); }
+.gallery-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.gallery-item:hover .gallery-overlay { opacity: 1; }
