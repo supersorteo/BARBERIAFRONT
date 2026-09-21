@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'RAILWAY_BACKEND_URL/api/v1/chat',
-  apiBase: 'RAILWAY_BACKEND_URL/api/v1'
+  apiUrl: 'https://agenteatencionback-production.up.railway.app/api/v1/chat',
+  apiBase: 'https://agenteatencionback-production.up.railway.app/api/v1'
 };
