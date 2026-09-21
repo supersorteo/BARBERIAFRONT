@@ -38,7 +38,7 @@ export class ChatWidgetComponent {
     this.chatService.enviar({ tenantId: this.tenantId, sessionId: this.sessionId, mensaje: texto })
       .subscribe({
         next: (res) => { this.escribiendo = false; this.agregar('bot', res.respuesta); this.cdr.detectChanges(); },
-        error: () => { this.escribiendo = false; this.agregar('bot', 'Error de conexión.'); this.cdr.detectChanges(); }
+        error: () => { this.escribiendo = false; this.agregar('bot', 'No pudimos contactar al asistente. Intentá de nuevo más tarde.'); this.cdr.detectChanges(); }
       });
   }
 
