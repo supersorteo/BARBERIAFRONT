@@ -1,5 +1,5 @@
 {
   "buildCommand": "node node_modules/@angular/cli/bin/ng.js build --configuration production",
-  "outputDirectory": "dist/browser",
+  "outputDirectory": "dist/browser/browser",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
