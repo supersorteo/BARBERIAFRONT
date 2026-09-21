@@ -1,0 +1,240 @@
+<!-- TOPBAR -->
+<div class="admin-topbar">
+  <div class="container admin-topbar-inner">
+    <span class="admin-brand">✂️ Mi Panel</span>
+    <div class="admin-user-badge">
+      <span class="admin-user-dot"></span>
+      <span>{{ usuario?.username }}</span>
+      <button class="btn-icon ms-2" (click)="cerrarSesion()">Salir →</button>
+      <a routerLink="/" class="btn-icon">← Sitio</a>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="admin-tabs">
+  <button class="admin-tab" [class.active]="tabActiva === 'agenda'" (click)="tabActiva = 'agenda'">
+    📅 Mi Agenda
+  </button>
+  <button class="admin-tab" [class.active]="tabActiva === 'horario'" (click)="tabActiva = 'horario'">
+    🚫 Mi Horario
+  </button>
+  <button class="admin-tab" [class.active]="tabActiva === 'perfil'" (click)="tabActiva = 'perfil'">
+    👤 Mi Perfil
+  </button>
+</div>
+
+<div class="admin-content">
+  <div class="container">
+
+    <!-- ── TAB: AGENDA ──────────────────────────────────────────── -->
+    @if (tabActiva === 'agenda') {
+
+      <div class="section-head mb-4">
+        <h3>Mis turnos</h3>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <input type="date" class="form-control form-dark w-auto"
+                 [(ngModel)]="fechaFiltro" (change)="cargar()">
+          @if (fechaFiltro) {
+            <button class="btn-icon" (click)="limpiarFecha()">Ver todos →</button>
+          }
+          <button class="btn-icon primary" (click)="cargar()">🔄 Actualizar</button>
+        </div>
+      </div>
+
+      @if (cargando) {
+        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando turnos...</div>
+      } @else if (turnos.length === 0) {
+        <div class="empty-state">
+          <span class="empty-state-icon">📅</span>
+          No hay turnos {{ fechaFiltro ? 'para esta fecha' : 'registrados' }}.
+        </div>
+      } @else {
+        <div class="admin-table-wrap">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Fin</th>
+                  <th>Cliente</th>
+                  <th>Teléfono</th>
+                  <th>Servicio</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (t of turnos; track t.id) {
+                  <tr>
+                    <td><strong>{{ t.hora }}</strong></td>
+                    <td>{{ t.horaFin || '—' }}</td>
+                    <td>{{ t.paciente }}</td>
+                    <td>
+                      @if (t.telefono) {
+                        <a [href]="'https://wa.me/598' + t.telefono.replace(/\D/g,'')"
+                           target="_blank" class="whatsapp-link">
+                          📱 {{ t.telefono }}
+                        </a>
+                      } @else { — }
+                    </td>
+                    <td>{{ t.servicio }}</td>
+                    <td><span [class]="estadoBadge(t.estado || '')">{{ t.estado }}</span></td>
+                    <td>
+                      <div class="d-flex gap-2">
+                        @if (t.estado !== 'COMPLETADO') {
+                          <button class="btn-icon primary" (click)="cambiarEstado(t, 'COMPLETADO')">✓ Listo</button>
+                        }
+                        @if (t.estado !== 'CANCELADO') {
+                          <button class="btn-icon danger" (click)="cambiarEstado(t, 'CANCELADO')">✕</button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- ── TAB: MI HORARIO (bloqueos) ──────────────────────────── -->
+    @if (tabActiva === 'horario') {
+
+      <div class="section-head mb-4">
+        <h3>Mis bloqueos de horario</h3>
+        <button class="btn-gold-sm" (click)="abrirFormBloqueo()">+ Agregar bloqueo</button>
+      </div>
+
+      <p class="text-muted small mb-4">
+        Usá los bloqueos para marcar días libres, llegadas tarde o cualquier horario en que no estés disponible.
+        El sistema no mostrará turnos en esos horarios.
+      </p>
+
+      <!-- Form nuevo bloqueo -->
+      @if (mostrarFormBloqueo) {
+        <div class="bloqueo-form-card mb-4">
+          <h5 class="mb-3" style="color:var(--gold)">Nuevo bloqueo</h5>
+
+          @if (errorBloqueo) {
+            <div class="alert alert-danger py-2 mb-3">{{ errorBloqueo }}</div>
+          }
+
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label">Fecha *</label>
+              <input type="date" class="form-control form-dark" [(ngModel)]="bloqueoForm.fecha">
+            </div>
+            <div class="col-12 col-md-8 d-flex align-items-end">
+              <div class="form-check ms-2 mb-2">
+                <input type="checkbox" class="form-check-input" id="diaLibre"
+                       [(ngModel)]="bloqueoForm['diaLibre']" (change)="onDiaLibreChange()">
+                <label class="form-check-label" for="diaLibre" style="color:var(--text-muted)">
+                  Día libre completo
+                </label>
+              </div>
+            </div>
+            @if (!bloqueoForm['diaLibre']) {
+              <div class="col-6 col-md-3">
+                <label class="form-label">Hora inicio</label>
+                <input type="time" class="form-control form-dark" [(ngModel)]="bloqueoForm.horaInicio">
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Hora fin</label>
+                <input type="time" class="form-control form-dark" [(ngModel)]="bloqueoForm.horaFin">
+              </div>
+            }
+            <div class="col-12 col-md-6">
+              <label class="form-label">Motivo <span style="color:var(--text-muted)">(opcional)</span></label>
+              <input type="text" class="form-control form-dark" [(ngModel)]="bloqueoForm.motivo"
+                     placeholder="Ej: llegada tarde, cita médica...">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn-gold-sm" (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
+              {{ guardandoBloqueo ? 'Guardando...' : 'Guardar' }}
+            </button>
+            <button class="btn-icon" (click)="mostrarFormBloqueo = false">Cancelar</button>
+          </div>
+        </div>
+      }
+
+      <!-- Lista de bloqueos -->
+      @if (cargandoBloqueos) {
+        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando...</div>
+      } @else if (bloqueos.length === 0) {
+        <div class="empty-state">
+          <span class="empty-state-icon">✅</span>
+          No tenés bloqueos activos. Tu horario está disponible por completo.
+        </div>
+      } @else {
+        <div class="bloqueos-list">
+          @for (b of bloqueos; track b.id) {
+            <div class="bloqueo-item">
+              <div class="bloqueo-fecha">
+                <span class="bloqueo-dia">{{ b.fecha }}</span>
+                @if (esDiaLibre(b)) {
+                  <span class="badge-dia-libre">Día libre</span>
+                } @else {
+                  <span class="bloqueo-horas">{{ b.horaInicio }} — {{ b.horaFin }}</span>
+                }
+              </div>
+              <div class="bloqueo-motivo">{{ b.motivo || 'Sin motivo especificado' }}</div>
+              <button class="btn-icon danger" (click)="eliminarBloqueo(b.id!)">✕ Eliminar</button>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- ── TAB: MI PERFIL ──────────────────────────────────────── -->
+    @if (tabActiva === 'perfil') {
+
+      <div class="section-head mb-4">
+        <h3>Mi perfil público</h3>
+      </div>
+
+      <p class="text-muted small mb-4">
+        Los clientes ven tu nombre, especialidad y foto al reservar turno. Actualizalos cuando quieras.
+      </p>
+
+      @if (mensajePerfil) {
+        <div class="alert mb-4 py-2" [class.alert-success]="exitoPerfil" [class.alert-danger]="!exitoPerfil">
+          {{ mensajePerfil }}
+        </div>
+      }
+
+      <div class="bloqueo-form-card" style="max-width:520px">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Especialidad</label>
+            <input type="text" class="form-control form-dark"
+                   [(ngModel)]="perfilForm.especialidad"
+                   placeholder="Ej: Cortes clásicos, degradados, barbas...">
+          </div>
+          <div class="col-12">
+            <label class="form-label">URL de foto de perfil</label>
+            <input type="url" class="form-control form-dark"
+                   [(ngModel)]="perfilForm.foto"
+                   placeholder="https://...">
+          </div>
+          @if (perfilForm.foto) {
+            <div class="col-12">
+              <img [src]="perfilForm.foto" alt="Preview"
+                   style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)"
+                   onerror="this.style.display='none'">
+            </div>
+          }
+          <div class="col-12 mt-2">
+            <button class="btn-gold-sm" (click)="guardarPerfil()" [disabled]="guardandoPerfil">
+              {{ guardandoPerfil ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

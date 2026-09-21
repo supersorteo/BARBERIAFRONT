@@ -1,0 +1,71 @@
+.login-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-void);
+  position: relative;
+  padding: 24px;
+}
+
+.login-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,160,58,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.login-card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  animation: loginIn 0.35s var(--ease-bounce);
+}
+@keyframes loginIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.login-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad-gold);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.login-brand {
+  font-size: 3rem; text-align: center; margin-bottom: 8px;
+}
+.login-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem; font-weight: 700;
+  text-align: center; margin-bottom: 4px;
+  background: var(--grad-gold);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.login-subtitle {
+  text-align: center; font-size: 13px; color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--grad-gold);
+  border: none; border-radius: var(--radius);
+  color: var(--text-inverse);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+  font-family: var(--font-body);
+}
+.login-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 24px var(--gold-glow-strong); }
+.login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.login-back {
+  display: block; text-align: center; margin-top: 20px;
+  font-size: 13px; color: var(--text-muted); text-decoration: none;
+  transition: color var(--dur-fast);
+}
+.login-back:hover { color: var(--gold); }

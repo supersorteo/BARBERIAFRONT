@@ -1,164 +1,389 @@
-<!-- NAVBAR ADMIN -->
-<nav class="navbar navbar-dark bg-black border-bottom border-warning">
-  <div class="container-fluid px-4">
-    <span class="navbar-brand fw-bold text-warning">✂️ El Corte · Panel Admin</span>
-    <a routerLink="/" class="btn btn-sm btn-outline-warning">← Volver al sitio</a>
+<!-- TOPBAR ADMIN -->
+<div class="admin-topbar">
+  <div class="container admin-topbar-inner">
+    <span class="admin-brand">El Corte · Panel Admin</span>
+    <div class="admin-user-badge">
+      <span class="admin-user-dot"></span>
+      <span>{{ usuario?.username || 'Admin' }}</span>
+      <button class="btn-icon ms-2" (click)="cerrarSesion()" title="Cerrar sesión">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Salir
+      </button>
+      <a routerLink="/" class="btn-icon" title="Ver sitio">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Sitio
+      </a>
+    </div>
   </div>
-</nav>
+</div>
 
-<div class="container-fluid px-4 py-4" style="background:#0f0f0f; min-height:calc(100vh - 57px)">
+<div class="admin-content">
+  <div class="container">
 
   <!-- TABS -->
-  <ul class="nav nav-tabs nav-tabs-dark mb-4 flex-wrap">
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">📅 Reservas</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="tabActiva==='barberos'" (click)="tabActiva='barberos'">💈 Barberos</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="tabActiva==='bloqueos'" (click)="tabActiva='bloqueos'">🚫 Bloqueos</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">🖼️ Galería</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">✂️ Servicios</button>
-    </li>
-  </ul>
+  <div class="admin-tabs">
+    <button class="admin-tab" [class.active]="tabActiva==='dashboard'" (click)="tabActiva='dashboard'">Dashboard</button>
+    <button class="admin-tab" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">Reservas</button>
+    <button class="admin-tab" [class.active]="tabActiva==='clientes'" (click)="tabActiva='clientes'; cargarClientes()">Clientes</button>
+    <button class="admin-tab" [class.active]="tabActiva==='barberos'" (click)="tabActiva='barberos'">Barberos</button>
+    <button class="admin-tab" [class.active]="tabActiva==='bloqueos'" (click)="tabActiva='bloqueos'">Bloqueos</button>
+    <button class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
+    <button class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
+  </div>
+
+  <!-- ─── TAB DASHBOARD ─── -->
+  @if (tabActiva === 'dashboard') {
+    <div class="admin-tab-panel">
+      @if (!dashboardHoy) {
+        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando resumen...</div>
+      } @else {
+        <div class="action-bar mb-4">
+          <div>
+            <h3 class="section-title">Resumen de hoy</h3>
+            <span class="count-badge">{{ dashboardHoy.fecha }}</span>
+          </div>
+          <button class="btn-icon" (click)="cargarDashboard()" title="Actualizar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Actualizar
+          </button>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="dashboard-stats mb-5">
+          <div class="stat-card">
+            <div class="stat-card-icon">📅</div>
+            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.total">{{ dashboardHoy.total }}</div>
+            <div class="stat-card-label">Turnos hoy</div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-card-icon">⏳</div>
+            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.reservados">{{ dashboardHoy.reservados }}</div>
+            <div class="stat-card-label">Pendientes</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-card-icon">✅</div>
+            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.completados">{{ dashboardHoy.completados }}</div>
+            <div class="stat-card-label">Completados</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimadoUYU" data-prefix="$">$0</div>
+            <div class="stat-card-label">Ingresos estimados</div>
+          </div>
+        </div>
+
+        @if (dashboardHoy.porBarbero.length > 0) {
+          <div class="section-head mb-3">
+            <h3>Por barbero</h3>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="table table-dark align-middle">
+              <thead>
+                <tr>
+                  <th>Barbero</th>
+                  <th class="text-center">Asignados</th>
+                  <th class="text-center">Completados</th>
+                  <th class="text-center">% completado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (b of dashboardHoy.porBarbero; track b.barberoId) {
+                  <tr>
+                    <td><strong style="color:var(--text-primary)">{{ b.nombre }}</strong></td>
+                    <td class="text-center">{{ b.total }}</td>
+                    <td class="text-center">
+                      <span class="status-badge status-completado">{{ b.completados }}</span>
+                    </td>
+                    <td class="text-center" style="color:var(--text-secondary)">
+                      {{ b.total > 0 ? ((b.completados / b.total) * 100 | number:'1.0-0') : 0 }}%
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <!-- ─── TAB CLIENTES ─── -->
+  @if (tabActiva === 'clientes') {
+    <div class="admin-tab-panel">
+      <div class="action-bar mb-4">
+        <div class="search-wrap">
+          <input type="search" class="admin-search" placeholder="Buscar por nombre o teléfono..."
+                 [(ngModel)]="clientesFiltro">
+          <span class="count-badge ms-2">{{ clientesFiltrados.length }} cliente(s)</span>
+        </div>
+        <button class="btn-icon" (click)="cargarClientes()" title="Actualizar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+
+      @if (cargandoClientes) {
+        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando clientes...</div>
+      } @else if (clientesFiltrados.length === 0) {
+        <div class="empty-state">
+          <span class="empty-state-icon">👥</span>
+          {{ clientesFiltro ? 'Sin resultados para "' + clientesFiltro + '"' : 'No hay clientes registrados aún.' }}
+        </div>
+      } @else {
+        <div class="clientes-list">
+          @for (c of clientesFiltrados; track c.nombre) {
+            <div class="cliente-item" [class.expanded]="clienteExpandido === c.nombre">
+              <div class="cliente-row" (click)="toggleHistorial(c.nombre)">
+                <div class="cliente-avatar">{{ c.nombre.charAt(0).toUpperCase() }}</div>
+                <div class="cliente-info">
+                  <span class="cliente-nombre">{{ c.nombre }}</span>
+                  @if (c.telefono) {
+                    <a [href]="'https://wa.me/598' + c.telefono.replace(/\D/g,'')"
+                       target="_blank" class="whatsapp-mini" (click)="$event.stopPropagation()">
+                      📱 {{ c.telefono }}
+                    </a>
+                  }
+                </div>
+                <div class="cliente-stats">
+                  <span class="stat-badge">{{ c.totalVisitas }} visita{{ c.totalVisitas !== 1 ? 's' : '' }}</span>
+                  <span style="color:var(--text-muted);font-size:11px">Última: {{ c.ultimaVisita }}</span>
+                </div>
+                <span class="cliente-chevron">{{ clienteExpandido === c.nombre ? '▲' : '▼' }}</span>
+              </div>
+
+              @if (clienteExpandido === c.nombre) {
+                <div class="cliente-historial">
+                  @if (cargandoHistorial) {
+                    <div style="color:var(--text-muted);font-size:13px;padding:12px 0;text-align:center">Cargando historial...</div>
+                  } @else {
+                    <table class="table table-dark table-sm mb-0">
+                      <thead>
+                        <tr>
+                          <th>Fecha</th><th>Hora</th><th>Servicio</th><th>Barbero</th><th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (t of historialCliente; track t.id) {
+                          <tr>
+                            <td>{{ t.fecha }}</td>
+                            <td>{{ t.hora }}</td>
+                            <td>{{ t.servicio || '—' }}</td>
+                            <td>{{ nombreBarbero(t.barberoId) }}</td>
+                            <td><span [class]="estadoBadge(t.estado || '')">{{ t.estado }}</span></td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
 
   <!-- ─── TAB RESERVAS ─── -->
   @if (tabActiva === 'turnos') {
-    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-      <label class="text-muted small">Filtrar por fecha:</label>
-      <input type="date" class="form-control form-dark w-auto" [(ngModel)]="fechaFiltro" (change)="cargarTurnos()">
-      @if (fechaFiltro) {
-        <button class="btn btn-sm btn-outline-secondary" (click)="limpiarFecha()">✕ Ver todas</button>
-      }
-      <span class="text-muted small">{{ turnos.length }} reserva(s)</span>
-      <button class="btn btn-sm btn-outline-warning ms-auto" (click)="cargarTurnos()" [disabled]="cargandoTurnos">
-        {{ cargandoTurnos ? '⏳' : '🔄' }} Actualizar
-      </button>
-    </div>
-
-    @if (errorTurnos) {
-      <div class="alert alert-danger small">{{ errorTurnos }}</div>
-    }
-    @if (cargandoTurnos) {
-      <div class="text-center text-muted py-4">Cargando reservas...</div>
-    } @else if (turnos.length === 0) {
-      <div class="text-center text-muted py-5">No hay reservas.</div>
-    } @else {
-      <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle">
-          <thead class="border-bottom border-warning">
-            <tr>
-              <th class="text-warning">Fecha</th>
-              <th class="text-warning">Hora</th>
-              <th class="text-warning">Fin</th>
-              <th class="text-warning">Cliente</th>
-              <th class="text-warning">Teléfono</th>
-              <th class="text-warning">Servicio</th>
-              <th class="text-warning">Barbero</th>
-              <th class="text-warning">Estado</th>
-              <th class="text-warning">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (t of turnos; track t.id) {
-              <tr>
-                <td class="text-muted">{{ t.fecha }}</td>
-                <td class="fw-bold text-white">{{ t.hora }}</td>
-                <td class="text-muted">{{ t.horaFin || '—' }}</td>
-                <td class="text-light">{{ t.paciente }}</td>
-                <td class="text-muted">{{ t.telefono || '—' }}</td>
-                <td class="text-muted">{{ t.servicio || '—' }}</td>
-                <td class="text-muted">{{ nombreBarbero(t.barberoId) }}</td>
-                <td><span class="badge" [class]="estadoBadge(t.estado || '')">{{ t.estado }}</span></td>
-                <td>
-                  <div class="d-flex gap-2">
-                    @if (t.estado !== 'COMPLETADO') {
-                      <button class="btn btn-sm btn-success" (click)="cambiarEstado(t, 'COMPLETADO')">✓</button>
-                    }
-                    @if (t.estado !== 'CANCELADO') {
-                      <button class="btn btn-sm btn-secondary" (click)="cambiarEstado(t, 'CANCELADO')">✕</button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+    <div class="admin-tab-panel">
+      <div class="action-bar mb-4">
+        <div class="search-wrap">
+          <label style="color:var(--text-muted);font-size:12px">Filtrar por fecha</label>
+          <input type="date" class="form-control form-dark" style="width:auto;min-width:160px"
+                 [(ngModel)]="fechaFiltro" (change)="cargarTurnos()">
+          @if (fechaFiltro) {
+            <button class="btn-icon" (click)="limpiarFecha()" title="Quitar filtro">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          }
+          <span class="count-badge">{{ turnos.length }} reserva(s)</span>
+        </div>
+        <div class="btn-group-admin">
+          <button class="btn-primary-admin" (click)="abrirModalReserva()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nueva reserva
+          </button>
+          <button class="btn-icon" (click)="cargarTurnos()" [disabled]="cargandoTurnos" title="Actualizar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+          @if (turnos.length > 0) {
+            <button class="btn-icon" (click)="exportarCSV()" title="Descargar CSV">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV
+            </button>
+          }
+        </div>
       </div>
-    }
+
+      @if (errorTurnos) {
+        <div class="error-msg mb-3">{{ errorTurnos }}</div>
+      }
+      @if (cargandoTurnos) {
+        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando reservas...</div>
+      } @else if (turnos.length === 0) {
+        <div class="empty-state"><span class="empty-state-icon">📅</span>No hay reservas.</div>
+      } @else {
+        <div class="admin-table-wrap table-responsive">
+          <table class="table table-dark table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Hora</th><th>Fin</th><th>Cliente</th><th>Teléfono</th>
+                <th>Servicio</th><th>Barbero</th><th>Estado</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of turnos; track t.id) {
+                <tr>
+                  <td>{{ t.fecha }}</td>
+                  <td style="font-weight:600;color:var(--text-primary)">{{ t.hora }}</td>
+                  <td>{{ t.horaFin || '—' }}</td>
+                  <td style="color:var(--text-primary)">{{ t.paciente }}</td>
+                  <td>{{ t.telefono || '—' }}</td>
+                  <td>{{ t.servicio || '—' }}</td>
+                  <td>
+                    @if (reasignandoId === t.id) {
+                      <div style="display:flex;gap:6px;align-items:center">
+                        <select class="form-select form-dark" style="min-width:130px;font-size:12px;padding:6px 10px"
+                                [(ngModel)]="reasignarBarberoId">
+                          <option value="">— Elegir —</option>
+                          @for (b of barberos; track b.id) {
+                            <option [value]="b.id">{{ b.nombre }}</option>
+                          }
+                        </select>
+                        <button class="btn-action btn-action-success" (click)="confirmarReasignar(t)"
+                                [disabled]="!reasignarBarberoId" title="Confirmar">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                        <button class="btn-action btn-action-neutral" (click)="cancelarReasignar()" title="Cancelar">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                      </div>
+                    } @else {
+                      <span>{{ nombreBarbero(t.barberoId) }}</span>
+                    }
+                  </td>
+                  <td><span [class]="estadoBadge(t.estado || '')">{{ t.estado }}</span></td>
+                  <td>
+                    <div class="table-actions">
+                      @if (t.estado !== 'COMPLETADO') {
+                        <button class="btn-action btn-action-success" (click)="cambiarEstado(t, 'COMPLETADO')" title="Completar">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                      }
+                      @if (t.estado !== 'CANCELADO') {
+                        <button class="btn-action btn-action-danger" (click)="cambiarEstado(t, 'CANCELADO')" title="Cancelar">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                      }
+                      @if (t.estado !== 'CANCELADO' && t.estado !== 'COMPLETADO') {
+                        <button class="btn-action btn-action-neutral" title="Reasignar barbero" (click)="abrirReasignar(t)">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                        </button>
+                      }
+                      <button class="btn-action btn-action-delete" (click)="eliminarTurno(t.id!)" title="Eliminar reserva">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
   }
 
   <!-- ─── TAB BARBEROS ─── -->
   @if (tabActiva === 'barberos') {
-    @if (barberoHorariosId === null) {
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <span class="text-muted small">{{ barberos.length }} barbero(s)</span>
-        <button class="btn btn-warning fw-semibold" (click)="abrirModalNuevoBarbero()">+ Agregar barbero</button>
-      </div>
-      <div class="row g-3">
-        @for (b of barberos; track b.id) {
-          <div class="col-12 col-md-6 col-lg-4">
-            <div class="card bg-dark border-secondary h-100">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="fs-3">💈</span>
-                  <span class="badge" [class]="b.activo ? 'bg-success' : 'bg-secondary'">{{ b.activo ? 'Activo' : 'Inactivo' }}</span>
+    <div class="admin-tab-panel">
+      @if (barberoHorariosId === null) {
+        <div class="action-bar mb-4">
+          <div>
+            <h3 class="section-title">Barberos del equipo</h3>
+            <span class="count-badge">{{ barberos.length }} barbero(s)</span>
+          </div>
+          <button class="btn-primary-admin" (click)="abrirModalNuevoBarbero()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar barbero
+          </button>
+        </div>
+
+        @if (barberos.length === 0) {
+          <div class="empty-state"><span class="empty-state-icon">💈</span>No hay barberos registrados.</div>
+        } @else {
+          <div class="barbers-grid">
+            @for (b of barberos; track b.id) {
+              <div class="barber-admin-card">
+                <div class="barber-admin-avatar">
+                  @if (b.foto) {
+                    <img [src]="img(b.foto)" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="">
+                  } @else {
+                    💈
+                  }
                 </div>
-                <h6 class="text-white fw-bold mb-1">{{ b.nombre }}</h6>
-                @if (b.especialidad) { <p class="text-muted small mb-3">{{ b.especialidad }}</p> }
-                <div class="d-flex gap-2 flex-wrap">
-                  <button class="btn btn-sm btn-outline-warning" (click)="verHorarios(b)">📅 Horarios</button>
-                  <button class="btn btn-sm btn-outline-light" (click)="abrirModalEditarBarbero(b)">✏️</button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarBarbero(b.id!)">🗑️</button>
+                <div class="barber-admin-info">
+                  <div class="barber-admin-name">{{ b.nombre }}</div>
+                  <div class="barber-admin-role">{{ b.especialidad || 'Barbero' }}</div>
+                  <span class="status-badge" [class]="b.activo ? 'status-active' : 'status-inactive'">
+                    {{ b.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+                <div class="barber-admin-actions">
+                  <button class="btn-icon primary" title="Ver horarios" (click)="verHorarios(b)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </button>
+                  <button class="btn-icon" title="Editar" (click)="abrirModalEditarBarbero(b)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="btn-icon danger" title="Eliminar" (click)="eliminarBarbero(b.id!)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  </button>
                 </div>
               </div>
-            </div>
+            }
           </div>
         }
-      </div>
-    } @else {
-      <!-- Panel de horarios del barbero -->
-      <div class="mb-3">
-        <button class="btn btn-sm btn-outline-secondary" (click)="cerrarHorarios()">← Volver a barberos</button>
-        <span class="ms-3 text-white fw-bold">Horarios de {{ barberos.find(b => b.id === barberoHorariosId)?.nombre }}</span>
-      </div>
-      <div class="card bg-dark border-secondary" style="max-width:600px">
-        <div class="card-body">
+      } @else {
+        <!-- Panel de horarios del barbero -->
+        <div class="action-bar mb-4">
+          <div>
+            <button class="btn-icon" (click)="cerrarHorarios()" title="Volver">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Volver
+            </button>
+          </div>
+          <h3 class="section-title">Horarios · {{ barberos.find(b => b.id === barberoHorariosId)?.nombre }}</h3>
+        </div>
+        <div class="horario-panel" style="max-width:600px">
           <table class="table table-dark table-sm align-middle mb-0">
-            <thead><tr>
-              <th class="text-warning">Día</th>
-              <th class="text-warning">Entrada</th>
-              <th class="text-warning">Salida</th>
-              <th></th>
-            </tr></thead>
+            <thead>
+              <tr>
+                <th>Día</th><th>Entrada</th><th>Salida</th><th></th>
+              </tr>
+            </thead>
             <tbody>
               @for (dia of diasSemana; track dia) {
                 <tr>
-                  <td class="text-light">{{ nombreDia(dia) }}</td>
+                  <td style="color:var(--text-secondary);font-weight:500">{{ nombreDia(dia) }}</td>
                   <td>
-                    <input type="time" class="form-control form-dark form-control-sm"
-                      style="width:110px"
-                      [value]="horarioDelDia(dia)?.horaInicio || ''"
-                      #inputInicio>
+                    <input type="time" class="form-control form-dark" style="width:110px;padding:6px 10px;font-size:13px"
+                      [value]="horarioDelDia(dia)?.horaInicio || ''" #inputInicio>
                   </td>
                   <td>
-                    <input type="time" class="form-control form-dark form-control-sm"
-                      style="width:110px"
-                      [value]="horarioDelDia(dia)?.horaFin || ''"
-                      #inputFin>
+                    <input type="time" class="form-control form-dark" style="width:110px;padding:6px 10px;font-size:13px"
+                      [value]="horarioDelDia(dia)?.horaFin || ''" #inputFin>
                   </td>
                   <td>
-                    <div class="d-flex gap-1">
-                      <button class="btn btn-sm btn-success px-2"
-                        (click)="guardarHorarioDia(dia, inputInicio.value, inputFin.value)">💾</button>
+                    <div class="table-actions">
+                      <button class="btn-action btn-action-success"
+                        (click)="guardarHorarioDia(dia, inputInicio.value, inputFin.value)" title="Guardar">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </button>
                       @if (horarioDelDia(dia)) {
-                        <button class="btn btn-sm btn-outline-danger px-2"
-                          (click)="eliminarHorarioDia(dia)">✕</button>
+                        <button class="btn-action btn-action-danger" (click)="eliminarHorarioDia(dia)" title="Eliminar">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
                       }
                     </div>
                   </td>
@@ -167,73 +392,92 @@
             </tbody>
           </table>
         </div>
-      </div>
-    }
+      }
+    </div>
   }
 
   <!-- ─── TAB BLOQUEOS ─── -->
   @if (tabActiva === 'bloqueos') {
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <span class="text-muted small">{{ bloqueos.length }} bloqueo(s)</span>
-      <button class="btn btn-warning fw-semibold" (click)="abrirModalBloqueo()">+ Nuevo bloqueo</button>
-    </div>
-
-    @if (bloqueos.length === 0) {
-      <div class="text-center text-muted py-5">No hay bloqueos registrados.</div>
-    } @else {
-      <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle">
-          <thead class="border-bottom border-warning">
-            <tr>
-              <th class="text-warning">Barbero</th>
-              <th class="text-warning">Fecha</th>
-              <th class="text-warning">Desde</th>
-              <th class="text-warning">Hasta</th>
-              <th class="text-warning">Motivo</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (b of bloqueos; track b.id) {
-              <tr>
-                <td class="text-light">{{ nombreBarbero(b.barberoId) }}</td>
-                <td class="text-muted">{{ b.fecha }}</td>
-                <td class="text-white">{{ b.horaInicio }}</td>
-                <td class="text-white">{{ b.horaFin }}</td>
-                <td class="text-muted">{{ b.motivo || '—' }}</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarBloqueo(b.id!)">🗑️</button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+    <div class="admin-tab-panel">
+      <div class="action-bar mb-4">
+        <div>
+          <h3 class="section-title">Bloqueos de horario</h3>
+          <span class="count-badge">{{ bloqueos.length }} bloqueo(s)</span>
+        </div>
+        <button class="btn-primary-admin" (click)="abrirModalBloqueo()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo bloqueo
+        </button>
       </div>
-    }
+
+      @if (bloqueos.length === 0) {
+        <div class="empty-state"><span class="empty-state-icon">🚫</span>No hay bloqueos registrados.</div>
+      } @else {
+        <div class="admin-table-wrap table-responsive">
+          <table class="table table-dark table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Barbero</th><th>Fecha</th><th>Desde</th><th>Hasta</th><th>Motivo</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (b of bloqueos; track b.id) {
+                <tr>
+                  <td style="color:var(--text-primary);font-weight:500">{{ nombreBarbero(b.barberoId) }}</td>
+                  <td>{{ b.fecha }}</td>
+                  <td style="color:var(--text-primary)">{{ b.horaInicio }}</td>
+                  <td style="color:var(--text-primary)">{{ b.horaFin }}</td>
+                  <td>{{ b.motivo || '—' }}</td>
+                  <td>
+                    <button class="btn-action btn-action-danger" (click)="eliminarBloqueo(b.id!)" title="Eliminar bloqueo">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
   }
 
   <!-- ─── TAB GALERÍA ─── -->
   @if (tabActiva === 'galeria') {
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <span class="text-muted small">{{ galeria.length }} imagen(es)</span>
-      <button class="btn btn-warning fw-semibold" (click)="abrirModalNuevaGaleria()">+ Agregar imagen</button>
-    </div>
+    <div class="admin-tab-panel">
+      <div class="action-bar mb-4">
+        <div>
+          <h3 class="section-title">Galería de fotos</h3>
+          <span class="count-badge">{{ galeria.length }} imagen(es)</span>
+        </div>
+        <button class="btn-primary-admin" (click)="abrirModalNuevaGaleria()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar imagen
+        </button>
+      </div>
 
-    <div class="row g-3">
-      @for (g of galeria; track g.id) {
-        <div class="col-6 col-md-4 col-lg-3">
-          <div class="card bg-dark border-secondary h-100">
-            <img [src]="g.imagenUrl" class="card-img-top" style="height:160px;object-fit:cover"
-                 onerror="this.src='https://placehold.co/400x300/1a1a1a/666?text=Sin+imagen'">
-            <div class="card-body p-2">
-              <p class="text-white small fw-bold mb-1 text-truncate">{{ g.titulo }}</p>
-              @if (g.categoria) { <span class="badge bg-secondary mb-2">{{ g.categoria }}</span> }
-              <div class="d-flex gap-1">
-                <button class="btn btn-sm btn-outline-warning flex-fill" (click)="abrirModalEditarGaleria(g)">✏️</button>
-                <button class="btn btn-sm btn-outline-danger flex-fill" (click)="eliminarGaleria(g.id!)">🗑️</button>
+      @if (galeria.length === 0) {
+        <div class="empty-state"><span class="empty-state-icon">🖼️</span>La galería está vacía.</div>
+      } @else {
+        <div class="gallery-admin-grid">
+          @for (g of galeria; track g.id) {
+            <div class="gallery-admin-item">
+              <img [src]="img(g.imagenUrl)" alt="{{ g.titulo }}"
+                   onerror="this.src='https://placehold.co/400x300/14141F/5C5448?text=Sin+imagen'">
+              <div class="gallery-admin-info">
+                <span class="gallery-item-title">{{ g.titulo }}</span>
+                @if (g.categoria) { <span class="gallery-cat-badge">{{ g.categoria }}</span> }
+              </div>
+              <div class="gallery-admin-actions">
+                <button class="btn-action btn-action-neutral" title="Editar" (click)="abrirModalEditarGaleria(g)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-action btn-action-danger" title="Eliminar" (click)="eliminarGaleria(g.id!)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                </button>
               </div>
             </div>
-          </div>
+          }
         </div>
       }
     </div>
@@ -241,36 +485,84 @@
 
   <!-- ─── TAB SERVICIOS ─── -->
   @if (tabActiva === 'servicios') {
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <span class="text-muted small">{{ servicios.length }} servicio(s) activos</span>
-      <button class="btn btn-warning fw-semibold" (click)="abrirModalNuevoServicio()">+ Agregar servicio</button>
-    </div>
+    <div class="admin-tab-panel">
+      <div class="action-bar mb-5">
+        <div>
+          <h3 class="section-title">Servicios ofrecidos</h3>
+          <span class="count-badge">{{ servicios.length }} servicio(s) · {{ serviciosPorCategoria.length }} categoría(s)</span>
+        </div>
+        <button class="btn-primary-admin" (click)="abrirModalNuevoServicio()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar servicio
+        </button>
+      </div>
 
-    <div class="row g-3">
-      @for (s of servicios; track s.id) {
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="card bg-dark border-secondary">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="fs-2">{{ s.emoji }}</span>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-sm btn-outline-warning" (click)="abrirModalEditarServicio(s)">✏️</button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarServicio(s.id!)">🗑️</button>
+      @if (servicios.length === 0) {
+        <div class="empty-state"><span class="empty-state-icon">✂️</span>No hay servicios registrados.</div>
+      } @else {
+        @for (grupo of serviciosPorCategoria; track grupo.categoria) {
+          <div class="cat-group">
+            <div class="cat-group-header">
+              <span class="cat-group-emoji">{{ grupo.emoji }}</span>
+              <h4 class="cat-group-name">{{ grupo.categoria }}</h4>
+              <span class="cat-group-count">{{ grupo.items.length }} servicio{{ grupo.items.length !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="servicios-grid">
+              @for (s of grupo.items; track s.id) {
+                @let imgs = servicioImagenes(s);
+                <div class="servicio-card">
+                  @if (imgs.length > 0) {
+                    <div class="servicio-carousel">
+                      @for (url of imgs; track $index; let i = $index) {
+                        <img [src]="img(url)" class="servicio-carousel-img" [class.active]="carruselIdx(s.id!) === i"
+                             onerror="this.style.display='none'" alt="">
+                      }
+                      @if (imgs.length > 1) {
+                        <button class="carousel-nav carousel-prev" (click)="carruselPrev(s.id!, imgs.length, $event)">‹</button>
+                        <button class="carousel-nav carousel-next" (click)="carruselNext(s.id!, imgs.length, $event)">›</button>
+                        <div class="carousel-dots">
+                          @for (url of imgs; track $index; let i = $index) {
+                            <span class="carousel-dot" [class.active]="carruselIdx(s.id!) === i"></span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="servicio-no-img">
+                      <span style="font-size:2rem;opacity:0.35">{{ s.emoji }}</span>
+                    </div>
+                  }
+                  <div class="servicio-card-body">
+                    <div class="servicio-card-header">
+                      <div class="servicio-meta">
+                        <span style="font-size:1.4rem">{{ s.emoji }}</span>
+                      </div>
+                      <div class="card-actions">
+                        <button class="btn-icon" title="Editar" (click)="abrirModalEditarServicio(s)">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="btn-icon danger" title="Eliminar" (click)="eliminarServicio(s.id!)">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="servicio-card-name">{{ s.nombre }}</div>
+                    <div class="servicio-card-desc">{{ s.descripcion }}</div>
+                    <div class="servicio-card-footer">
+                      <span class="servicio-price">${{ s.precio | number:'1.0-0' }} UYU</span>
+                      <span class="servicio-duration">{{ s.duracionMinutos }} min</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <h6 class="text-white fw-bold">{{ s.nombre }}</h6>
-              <p class="text-muted small mb-2">{{ s.descripcion }}</p>
-              <div class="d-flex justify-content-between">
-                <span class="text-warning fw-bold">${{ s.precio | number:'1.0-0' }} UYU</span>
-                <span class="badge bg-secondary">{{ s.duracionMinutos }} min</span>
-              </div>
+              }
             </div>
           </div>
-        </div>
+        }
       }
     </div>
   }
 
+  </div>
 </div>
 
 <!-- ─── MODAL BARBERO ─── -->
@@ -279,29 +571,29 @@
   <div class="modal-custom">
     <div class="modal-content-custom">
       <div class="modal-header-custom">
-        <h5 class="text-white mb-0">{{ editandoBarbero ? 'Editar' : 'Nuevo' }} barbero</h5>
+        <h5>{{ editandoBarbero ? 'Editar' : 'Nuevo' }} barbero</h5>
         <button class="btn-close-custom" (click)="mostrarModalBarbero=false">✕</button>
       </div>
       <div class="p-4">
         <div class="mb-3">
-          <label class="form-label text-muted small">Nombre *</label>
+          <label class="form-label">Nombre *</label>
           <input class="form-control form-dark" [(ngModel)]="barberoForm.nombre" placeholder="Juan García">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Especialidad</label>
+          <label class="form-label">Especialidad</label>
           <input class="form-control form-dark" [(ngModel)]="barberoForm.especialidad" placeholder="Cortes modernos y barba">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Foto URL</label>
+          <label class="form-label">Foto URL</label>
           <input class="form-control form-dark" [(ngModel)]="barberoForm.foto" placeholder="https://...">
         </div>
-        <div class="form-check mb-4">
+        <div class="modal-check mb-4">
           <input class="form-check-input" type="checkbox" [(ngModel)]="barberoForm.activo" id="barberoActivo">
-          <label class="form-check-label text-muted" for="barberoActivo">Activo</label>
+          <label class="form-check-label" for="barberoActivo" style="color:var(--text-secondary);font-size:13px">Activo</label>
         </div>
-        <div class="d-flex gap-2 justify-content-end">
-          <button class="btn btn-secondary" (click)="mostrarModalBarbero=false">Cancelar</button>
-          <button class="btn btn-warning fw-semibold" (click)="guardarBarbero()">Guardar</button>
+        <div class="modal-footer-actions">
+          <button class="btn-cancel-admin" (click)="mostrarModalBarbero=false">Cancelar</button>
+          <button class="btn-primary-admin" (click)="guardarBarbero()">Guardar</button>
         </div>
       </div>
     </div>
@@ -314,12 +606,12 @@
   <div class="modal-custom">
     <div class="modal-content-custom">
       <div class="modal-header-custom">
-        <h5 class="text-white mb-0">Nuevo bloqueo de horario</h5>
+        <h5>Nuevo bloqueo de horario</h5>
         <button class="btn-close-custom" (click)="mostrarModalBloqueo=false">✕</button>
       </div>
       <div class="p-4">
         <div class="mb-3">
-          <label class="form-label text-muted small">Barbero *</label>
+          <label class="form-label">Barbero *</label>
           <select class="form-control form-dark" [(ngModel)]="bloqueoForm.barberoId">
             <option [value]="0" disabled>— Seleccionar —</option>
             @for (b of barberos; track b.id) {
@@ -328,26 +620,26 @@
           </select>
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Fecha *</label>
+          <label class="form-label">Fecha *</label>
           <input type="date" class="form-control form-dark" [(ngModel)]="bloqueoForm.fecha">
         </div>
         <div class="row g-3 mb-3">
           <div class="col-6">
-            <label class="form-label text-muted small">Desde</label>
+            <label class="form-label">Desde</label>
             <input type="time" class="form-control form-dark" [(ngModel)]="bloqueoForm.horaInicio">
           </div>
           <div class="col-6">
-            <label class="form-label text-muted small">Hasta</label>
+            <label class="form-label">Hasta</label>
             <input type="time" class="form-control form-dark" [(ngModel)]="bloqueoForm.horaFin">
           </div>
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Motivo</label>
+          <label class="form-label">Motivo</label>
           <input class="form-control form-dark" [(ngModel)]="bloqueoForm.motivo" placeholder="Ej: Feriado, vacaciones...">
         </div>
-        <div class="d-flex gap-2 justify-content-end">
-          <button class="btn btn-secondary" (click)="mostrarModalBloqueo=false">Cancelar</button>
-          <button class="btn btn-warning fw-semibold" (click)="guardarBloqueo()">Guardar</button>
+        <div class="modal-footer-actions">
+          <button class="btn-cancel-admin" (click)="mostrarModalBloqueo=false">Cancelar</button>
+          <button class="btn-primary-admin" (click)="guardarBloqueo()">Guardar</button>
         </div>
       </div>
     </div>
@@ -360,29 +652,29 @@
   <div class="modal-custom">
     <div class="modal-content-custom">
       <div class="modal-header-custom">
-        <h5 class="text-white mb-0">{{ editandoGaleria ? 'Editar' : 'Nueva' }} imagen</h5>
+        <h5>{{ editandoGaleria ? 'Editar' : 'Nueva' }} imagen</h5>
         <button class="btn-close-custom" (click)="mostrarModalGaleria=false">✕</button>
       </div>
       <div class="p-4">
         <div class="mb-3">
-          <label class="form-label text-muted small">Título *</label>
+          <label class="form-label">Título *</label>
           <input class="form-control form-dark" [(ngModel)]="galeriaForm.titulo" placeholder="Corte degradado">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">URL de imagen *</label>
+          <label class="form-label">URL de imagen *</label>
           <input class="form-control form-dark" [(ngModel)]="galeriaForm.imagenUrl" placeholder="https://...">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Categoría</label>
+          <label class="form-label">Categoría</label>
           <input class="form-control form-dark" [(ngModel)]="galeriaForm.categoria" placeholder="cortes, barba, afeitado...">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Descripción</label>
+          <label class="form-label">Descripción</label>
           <textarea class="form-control form-dark" [(ngModel)]="galeriaForm.descripcion" rows="2"></textarea>
         </div>
-        <div class="d-flex gap-2 justify-content-end">
-          <button class="btn btn-secondary" (click)="mostrarModalGaleria=false">Cancelar</button>
-          <button class="btn btn-warning fw-semibold" (click)="guardarGaleria()">Guardar</button>
+        <div class="modal-footer-actions">
+          <button class="btn-cancel-admin" (click)="mostrarModalGaleria=false">Cancelar</button>
+          <button class="btn-primary-admin" (click)="guardarGaleria()">Guardar</button>
         </div>
       </div>
     </div>
@@ -395,36 +687,173 @@
   <div class="modal-custom">
     <div class="modal-content-custom">
       <div class="modal-header-custom">
-        <h5 class="text-white mb-0">{{ editandoServicio ? 'Editar' : 'Nuevo' }} servicio</h5>
+        <h5>{{ editandoServicio ? 'Editar' : 'Nuevo' }} servicio</h5>
         <button class="btn-close-custom" (click)="mostrarModalServicio=false">✕</button>
       </div>
       <div class="p-4">
         <div class="mb-3">
-          <label class="form-label text-muted small">Emoji</label>
-          <input class="form-control form-dark" [(ngModel)]="servicioForm.emoji" placeholder="✂️">
-        </div>
-        <div class="mb-3">
-          <label class="form-label text-muted small">Nombre *</label>
+          <label class="form-label">Nombre *</label>
           <input class="form-control form-dark" [(ngModel)]="servicioForm.nombre" placeholder="Corte de cabello">
         </div>
         <div class="mb-3">
-          <label class="form-label text-muted small">Descripción</label>
+          <label class="form-label">Descripción</label>
           <textarea class="form-control form-dark" [(ngModel)]="servicioForm.descripcion" rows="2"></textarea>
         </div>
         <div class="row g-3 mb-3">
           <div class="col-6">
-            <label class="form-label text-muted small">Precio (UYU) *</label>
+            <label class="form-label">Categoría</label>
+            <select class="form-control form-dark" [(ngModel)]="servicioForm.categoria">
+              <option value="">— Seleccionar —</option>
+              <option>Corte</option>
+              <option>Barba</option>
+              <option>Combo</option>
+              <option>Coloración</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Emoji</label>
+            <input class="form-control form-dark" [(ngModel)]="servicioForm.emoji" placeholder="✂️">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Fotos del servicio (hasta 3)</label>
+          <div class="foto-slots">
+            @for (slot of servicioFotos; track $index; let i = $index) {
+              <div class="foto-slot">
+                @if (slot.preview) {
+                  <img [src]="slot.preview" class="foto-preview" alt="foto">
+                  <button type="button" class="foto-remove" (click)="eliminarFoto(i)">✕</button>
+                } @else {
+                  <label class="foto-add-btn">
+                    <span>+</span>
+                    <input type="file" accept="image/*" style="display:none"
+                           (change)="onFotoSeleccionada(i, $event)">
+                  </label>
+                }
+              </div>
+            }
+          </div>
+          <p style="color:var(--text-muted);font-size:11px;margin-top:8px">PNG, JPG, WEBP · Máx. 5 MB por imagen</p>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <label class="form-label">Precio (UYU) *</label>
             <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.precio">
           </div>
           <div class="col-6">
-            <label class="form-label text-muted small">Duración (min)</label>
+            <label class="form-label">Duración (min)</label>
             <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.duracionMinutos">
           </div>
         </div>
-        <div class="d-flex gap-2 justify-content-end">
-          <button class="btn btn-secondary" (click)="mostrarModalServicio=false">Cancelar</button>
-          <button class="btn btn-warning fw-semibold" (click)="guardarServicio()">Guardar</button>
+        <div class="modal-footer-actions">
+          <button class="btn-cancel-admin" (click)="mostrarModalServicio=false" [disabled]="subiendoFotos">Cancelar</button>
+          <button class="btn-primary-admin" (click)="guardarServicio()" [disabled]="subiendoFotos">
+            {{ subiendoFotos ? 'Subiendo fotos...' : 'Guardar' }}
+          </button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── MODAL NUEVA RESERVA (admin) ─── -->
+@if (mostrarModalReserva) {
+  <div class="modal-backdrop-custom" (click)="cerrarModalReserva()"></div>
+  <div class="modal-custom">
+    <div class="modal-content-custom" style="max-width:560px">
+      <div class="modal-header-custom">
+        <h5>{{ turnoConfirmado ? 'Reserva confirmada' : 'Nueva reserva manual' }}</h5>
+        <button class="btn-close-custom" (click)="cerrarModalReserva()">✕</button>
+      </div>
+      <div class="p-4">
+
+        @if (turnoConfirmado) {
+          <div style="text-align:center;padding:16px 0">
+            <div style="width:56px;height:56px;border-radius:50%;background:rgba(62,207,142,0.15);border:1px solid rgba(62,207,142,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px">✅</div>
+            <p style="color:var(--text-primary);font-weight:600;font-size:16px;margin-bottom:4px">{{ turnoConfirmado.paciente }}</p>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px">{{ turnoConfirmado.fecha }} · {{ turnoConfirmado.hora }} · {{ turnoConfirmado.barberoNombre }}</p>
+            @if (turnoConfirmado.telefono) {
+              <a [href]="whatsappConfirmacion" target="_blank" class="btn-primary-admin" style="width:100%;justify-content:center;text-decoration:none;display:flex;margin-bottom:10px">
+                📱 Enviar confirmación por WhatsApp
+              </a>
+            } @else {
+              <p style="color:var(--text-muted);font-size:12px;margin-bottom:10px">Sin teléfono — no se puede enviar confirmación.</p>
+            }
+            <button class="btn-cancel-admin" style="width:100%;justify-content:center" (click)="abrirModalReserva()">+ Otra reserva</button>
+          </div>
+        } @else {
+
+          @if (errorReservaManual) {
+            <div class="error-msg mb-3">{{ errorReservaManual }}</div>
+          }
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Nombre del cliente *</label>
+              <input class="form-control form-dark" [(ngModel)]="reservaManualForm.paciente" placeholder="Juan Pérez">
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Teléfono</label>
+              <input class="form-control form-dark" [(ngModel)]="reservaManualForm.telefono" placeholder="099 123 456">
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Servicio *</label>
+              <select class="form-select form-dark" [(ngModel)]="reservaManualForm.servicio" (change)="onCambioSlotManual()">
+                <option value="">— Seleccioná —</option>
+                @for (s of servicios; track s.id) {
+                  <option [value]="s.nombre">{{ s.emoji }} {{ s.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Barbero</label>
+              <select class="form-select form-dark" [(ngModel)]="reservaManualForm.barberoId" (change)="onCambioSlotManual()">
+                <option value="">— Cualquiera —</option>
+                @for (b of barberos; track b.id) {
+                  <option [value]="b.id">{{ b.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Fecha *</label>
+              <input type="date" class="form-control form-dark" [(ngModel)]="reservaManualForm.fecha"
+                     [min]="minDate" (change)="onCambioSlotManual()">
+            </div>
+          </div>
+
+          @if (cargandoSlotsManual) {
+            <div style="color:var(--text-muted);font-size:13px;margin-top:12px">Consultando disponibilidad...</div>
+          }
+          @if (!cargandoSlotsManual && reservaManualForm.fecha && reservaManualForm.servicio) {
+            <div style="margin-top:16px">
+              @if (slotsReservaManual.length > 0) {
+                <label class="form-label">Horario disponible *</label>
+                <div class="slots-container">
+                  @for (slot of slotsReservaManual; track slot.hora + slot.barberoId) {
+                    <button type="button" class="slot-btn"
+                      [class.selected]="reservaManualForm.hora === slot.hora && +reservaManualForm.barberoId === slot.barberoId"
+                      (click)="reservaManualForm.hora = slot.hora; reservaManualForm.barberoId = '' + slot.barberoId">
+                      {{ slot.hora }}
+                      @if (!reservaManualForm.barberoId || reservaManualForm.barberoId === '0') {
+                        <span class="slot-barber">· {{ slot.barberoNombre }}</span>
+                      }
+                    </button>
+                  }
+                </div>
+              } @else {
+                <div class="error-msg">Sin turnos disponibles para esta fecha y servicio.</div>
+              }
+            </div>
+          }
+
+          <div class="modal-footer-actions mt-4">
+            <button class="btn-cancel-admin" (click)="cerrarModalReserva()">Cancelar</button>
+            <button class="btn-primary-admin" (click)="confirmarReservaManual()"
+                    [disabled]="enviandoReservaManual || !reservaManualForm.hora">
+              {{ enviandoReservaManual ? 'Guardando...' : 'Confirmar reserva' }}
+            </button>
+          </div>
+        }
       </div>
     </div>
   </div>
