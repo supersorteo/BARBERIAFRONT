@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
+import { environment } from '../environments/environment';
 
-const API = 'http://localhost:8080/api/auth';
+const API = environment.apiBase.replace('/api/v1', '/api/auth');
 const TOKEN_KEY = 'agente_token';
 const USER_KEY  = 'agente_user';
 

@@ -86,6 +86,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.negocio.getBarberos().subscribe({
       next: b => { this.barberos = b; this.cdr.detectChanges(); this.refreshScrollTrigger(); }
     });
+    this.heroBgUrl = '/categorias/combo.jpg';
+    setTimeout(() => { this.heroBgLoaded = true; }, 80);
     this.negocio.getGaleria().subscribe({
       next: g => {
         this.galeria = g;
