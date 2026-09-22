@@ -23,10 +23,11 @@ const DIAS = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado
 export class AdminComponent implements OnInit, AfterViewInit {
   usuario: AuthUser | null = null;
 
-  private _tabActiva: 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' = 'dashboard';
+  private _tabActiva: 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente' = 'dashboard';
   get tabActiva() { return this._tabActiva; }
   set tabActiva(v: typeof this._tabActiva) {
     this._tabActiva = v;
+    if (v === 'agente' && !this.agenteContextoOriginal) this.cargarContextoAgente();
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
         gsap.from('.admin-tab-panel', { y: 28, opacity: 0, duration: 0.38, ease: 'power2.out' });
@@ -94,6 +95,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
   galeriaEditandoId: number | null = null;
   galeriaFoto: FotoSlot = { file: null, preview: '', url: '' };
   subiendoGaleriaFoto = false;
+
+  // Configuración agente
+  agenteContexto = '';
+  agenteContextoOriginal = '';
+  guardandoContexto = false;
+  cargandoContexto = false;
 
   constructor(
     private negocio: NegocioService,
@@ -502,6 +509,35 @@ export class AdminComponent implements OnInit, AfterViewInit {
   eliminarGaleria(id: number) {
     if (!confirm('¿Ocultar esta imagen?')) return;
     this.negocio.eliminarGaleria(id).subscribe({ next: () => this.cargarGaleria() });
+  }
+
+  // ── Configuración agente ─────────────────────────────────────────
+  cargarContextoAgente() {
+    this.cargandoContexto = true;
+    this.negocio.getNegocio().subscribe({
+      next: n => {
+        this.agenteContexto = n.contexto;
+        this.agenteContextoOriginal = n.contexto;
+        this.cargandoContexto = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.cargandoContexto = false; }
+    });
+  }
+  guardarContextoAgente() {
+    if (!this.agenteContexto.trim()) return;
+    this.guardandoContexto = true;
+    this.negocio.updateContexto(this.agenteContexto).subscribe({
+      next: () => {
+        this.agenteContextoOriginal = this.agenteContexto;
+        this.guardandoContexto = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.guardandoContexto = false; alert('Error al guardar el prompt.'); }
+    });
+  }
+  get agenteContextoCambiado(): boolean {
+    return this.agenteContexto !== this.agenteContextoOriginal;
   }
 
   // ── Exportar CSV ────────────────────────────────────────────────

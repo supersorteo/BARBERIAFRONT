@@ -29,6 +29,7 @@
     <button class="admin-tab" [class.active]="tabActiva==='bloqueos'" (click)="tabActiva='bloqueos'">Bloqueos</button>
     <button class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
     <button class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
+    <button class="admin-tab" [class.active]="tabActiva==='agente'" (click)="tabActiva='agente'">Agente IA</button>
   </div>
 
   <!-- ─── TAB DASHBOARD ─── -->
@@ -564,6 +565,44 @@
 
   </div>
 </div>
+
+<!-- ─── TAB AGENTE IA ─── -->
+@if (tabActiva === 'agente') {
+  <div class="admin-tab-panel">
+    <div class="section-header">
+      <h2 class="section-title">Configuración del agente IA</h2>
+    </div>
+    <div class="agente-config-card">
+      <p class="agente-config-desc">
+        Este es el prompt (instrucciones) que recibe el agente en cada conversación. Podés personalizarlo para ajustar el tono, los datos del negocio o las reglas de atención. Los cambios se aplican en el próximo mensaje del agente, sin necesidad de redesplegar.
+      </p>
+      @if (cargandoContexto) {
+        <div style="text-align:center;padding:32px;color:var(--text-secondary)">Cargando...</div>
+      } @else {
+        <div class="mb-3">
+          <label class="form-label">Prompt del agente</label>
+          <textarea
+            class="form-control form-dark agente-textarea"
+            [(ngModel)]="agenteContexto"
+            rows="20"
+            placeholder="Instrucciones del agente...">
+          </textarea>
+        </div>
+        <div class="agente-config-actions">
+          <span class="agente-cambios-badge" [class.visible]="agenteContextoCambiado">
+            Cambios sin guardar
+          </span>
+          <button class="btn-cancel-admin" (click)="agenteContexto = agenteContextoOriginal" [disabled]="!agenteContextoCambiado">
+            Descartar
+          </button>
+          <button class="btn-primary-admin" (click)="guardarContextoAgente()" [disabled]="!agenteContextoCambiado || guardandoContexto">
+            {{ guardandoContexto ? 'Guardando...' : 'Guardar prompt' }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
 
 <!-- ─── MODAL BARBERO ─── -->
 @if (mostrarModalBarbero) {

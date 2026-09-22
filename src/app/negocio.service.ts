@@ -244,4 +244,14 @@ export class NegocioService {
     if (barberoId) url += `&barberoId=${barberoId}`;
     return this.http.get<SlotDisponible[]>(url);
   }
+
+  // Configuración del negocio / agente
+  getNegocio(): Observable<{ id: string; nombre: string; contexto: string }> {
+    return this.http.get<{ id: string; nombre: string; contexto: string }>(`${this.base}/negocio/${this.tenantId}`);
+  }
+  updateContexto(contexto: string): Observable<{ id: string; nombre: string; contexto: string }> {
+    return this.http.patch<{ id: string; nombre: string; contexto: string }>(
+      `${this.base}/negocio/${this.tenantId}/contexto`, { contexto }
+    );
+  }
 }

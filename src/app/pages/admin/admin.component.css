@@ -558,3 +558,43 @@
 
 /* ─── LEGACY COMPAT ────────────────────────────────────────────── */
 .servicio-fotos-strip { display: none; }
+
+/* ─── AGENTE IA ─────────────────────────────────────────────────── */
+.agente-config-card {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.agente-config-desc {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: rgba(212,175,55,.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.agente-textarea {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 320px;
+}
+.agente-config-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.agente-cambios-badge {
+  font-size: 12px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-right: auto;
+}
+.agente-cambios-badge.visible { opacity: 1; }
