@@ -77,6 +77,18 @@ export interface SlotDisponible {
   barberoNombre: string;
 }
 
+export interface UsuarioAdmin {
+  id: number;
+  username: string;
+  rol: string;
+  barberoId: number;
+  activo: boolean;
+}
+
+export interface UsuarioConPassword extends UsuarioAdmin {
+  password: string;
+}
+
 export interface ClienteResumen {
   nombre: string;
   telefono: string;
@@ -243,6 +255,25 @@ export class NegocioService {
     let url = `${this.base}/disponibilidad/${this.tenantId}?fecha=${fecha}&servicio=${encodeURIComponent(servicio)}`;
     if (barberoId) url += `&barberoId=${barberoId}`;
     return this.http.get<SlotDisponible[]>(url);
+  }
+
+  // Usuarios (admin)
+  getUsuarios(): Observable<UsuarioAdmin[]> {
+    return this.http.get<UsuarioAdmin[]>(`${this.base}/admin/${this.tenantId}/usuarios`);
+  }
+  crearUsuarioBarbero(data: { username: string; password: string; barberoId: number }): Observable<UsuarioConPassword> {
+    return this.http.post<UsuarioConPassword>(`${this.base}/admin/${this.tenantId}/usuarios`, data);
+  }
+  resetearPassword(userId: number, password: string): Observable<{ username: string; password: string }> {
+    return this.http.patch<{ username: string; password: string }>(
+      `${this.base}/admin/${this.tenantId}/usuarios/${userId}/password`, { password }
+    );
+  }
+  eliminarUsuario(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/admin/${this.tenantId}/usuarios/${userId}`);
+  }
+  cambiarMiPassword(actual: string, nueva: string): Observable<void> {
+    return this.http.patch<void>(`${this.base.replace('/api/v1', '/api/auth')}/cambiar-password`, { actual, nueva });
   }
 
   // Configuración del negocio / agente

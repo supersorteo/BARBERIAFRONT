@@ -26,6 +26,11 @@ export class MiAgendaComponent implements OnInit {
   guardandoPerfil = false;
   mensajePerfil = '';
   exitoPerfil = false;
+  // Cambio de contraseña
+  cambioPassForm = { actual: '', nueva: '', confirmar: '' };
+  guardandoPass = false;
+  mensajePass = '';
+  exitoPass = false;
 
   // Bloqueos propios
   bloqueos: BloqueoHorario[] = [];
@@ -142,6 +147,27 @@ export class MiAgendaComponent implements OnInit {
         this.exitoPerfil = false;
         this.mensajePerfil = 'Error al guardar. Intentá de nuevo.';
         this.guardandoPerfil = false;
+      }
+    });
+  }
+
+  guardarPassword() {
+    const { actual, nueva, confirmar } = this.cambioPassForm;
+    if (!actual || !nueva) { this.mensajePass = 'Completá todos los campos.'; this.exitoPass = false; return; }
+    if (nueva !== confirmar) { this.mensajePass = 'Las contraseñas nuevas no coinciden.'; this.exitoPass = false; return; }
+    this.guardandoPass = true;
+    this.mensajePass = '';
+    this.negocio.cambiarMiPassword(actual, nueva).subscribe({
+      next: () => {
+        this.exitoPass = true;
+        this.mensajePass = 'Contraseña actualizada correctamente.';
+        this.cambioPassForm = { actual: '', nueva: '', confirmar: '' };
+        this.guardandoPass = false;
+      },
+      error: err => {
+        this.exitoPass = false;
+        this.mensajePass = err.error?.error || 'Contraseña actual incorrecta.';
+        this.guardandoPass = false;
       }
     });
   }

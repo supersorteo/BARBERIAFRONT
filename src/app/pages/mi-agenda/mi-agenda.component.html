@@ -234,6 +234,37 @@
           </div>
         </div>
       </div>
+
+      <!-- Cambio de contraseña -->
+      <div class="section-head mt-5 mb-3">
+        <h3>Cambiar contraseña</h3>
+      </div>
+      @if (mensajePass) {
+        <div class="alert mb-3 py-2" [class.alert-success]="exitoPass" [class.alert-danger]="!exitoPass">
+          {{ mensajePass }}
+        </div>
+      }
+      <div class="bloqueo-form-card" style="max-width:520px">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Contraseña actual</label>
+            <input type="password" class="form-control form-dark" [(ngModel)]="cambioPassForm.actual" placeholder="Tu contraseña actual">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Nueva contraseña</label>
+            <input type="password" class="form-control form-dark" [(ngModel)]="cambioPassForm.nueva" placeholder="Nueva contraseña">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Confirmar nueva contraseña</label>
+            <input type="password" class="form-control form-dark" [(ngModel)]="cambioPassForm.confirmar" placeholder="Repetí la nueva contraseña">
+          </div>
+          <div class="col-12 mt-2">
+            <button class="btn-gold-sm" (click)="guardarPassword()" [disabled]="guardandoPass">
+              {{ guardandoPass ? 'Guardando...' : 'Cambiar contraseña' }}
+            </button>
+          </div>
+        </div>
+      </div>
     }
 
   </div>

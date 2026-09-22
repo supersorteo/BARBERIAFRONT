@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin, tap } from 'rxjs';
 import {
-  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible
+  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible, UsuarioAdmin
 } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
 
@@ -28,6 +28,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   set tabActiva(v: typeof this._tabActiva) {
     this._tabActiva = v;
     if (v === 'agente' && !this.agenteContextoOriginal) this.cargarContextoAgente();
+    if (v === 'barberos') this.cargarUsuarios();
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
         gsap.from('.admin-tab-panel', { y: 28, opacity: 0, duration: 0.38, ease: 'power2.out' });
@@ -81,6 +82,23 @@ export class AdminComponent implements OnInit, AfterViewInit {
   horariosActivos: HorarioBarbero[] = [];
   diasSemana = [2, 3, 4, 5, 6, 7];
   nombreDia = (d: number) => DIAS[d];
+
+  // Usuarios de barberos
+  usuariosBarbero: UsuarioAdmin[] = [];
+  mostrarModalCrearUsuario = false;
+  mostrarModalResetPass = false;
+  mostrarModalCredencial = false;
+  barberoParaUsuario: Barbero | null = null;
+  usuarioParaReset: UsuarioAdmin | null = null;
+  nuevoUsuarioForm = { username: '', password: '' };
+  nuevaPassForm = { password: '' };
+  credencialMostrada: { username: string; password: string } | null = null;
+  errorUsuario = '';
+  // Cambio de contraseña del admin
+  mostrarCambioPassAdmin = false;
+  cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
+  errorCambioPassAdmin = '';
+  exitoCambioPassAdmin = false;
 
   // Bloqueos
   bloqueos: BloqueoHorario[] = [];
@@ -440,6 +458,76 @@ export class AdminComponent implements OnInit, AfterViewInit {
     if (!this.barberoHorariosId) return;
     this.negocio.eliminarHorario(this.barberoHorariosId, dia).subscribe({
       next: () => { this.horariosActivos = this.horariosActivos.filter(h => h.diaSemana !== dia); this.cdr.detectChanges(); }
+    });
+  }
+
+  // ── Usuarios de barberos ─────────────────────────────────
+  cargarUsuarios() {
+    this.negocio.getUsuarios().subscribe({ next: u => { this.usuariosBarbero = u; this.cdr.detectChanges(); } });
+  }
+  usuarioDelBarbero(barberoId: number): UsuarioAdmin | undefined {
+    return this.usuariosBarbero.find(u => u.barberoId === barberoId);
+  }
+  abrirCrearUsuario(b: Barbero) {
+    this.barberoParaUsuario = b;
+    this.nuevoUsuarioForm = { username: b.nombre.split(' ')[0].toLowerCase(), password: '' };
+    this.errorUsuario = '';
+    this.mostrarModalCrearUsuario = true;
+  }
+  crearUsuario() {
+    if (!this.nuevoUsuarioForm.username || !this.nuevoUsuarioForm.password) {
+      this.errorUsuario = 'Usuario y contraseña son obligatorios.'; return;
+    }
+    this.errorUsuario = '';
+    this.negocio.crearUsuarioBarbero({
+      username: this.nuevoUsuarioForm.username,
+      password: this.nuevoUsuarioForm.password,
+      barberoId: this.barberoParaUsuario!.id!
+    }).subscribe({
+      next: res => {
+        this.mostrarModalCrearUsuario = false;
+        this.credencialMostrada = { username: res.username, password: res.password };
+        this.mostrarModalCredencial = true;
+        this.cargarUsuarios();
+      },
+      error: err => { this.errorUsuario = err.error?.error || 'Error al crear usuario.'; }
+    });
+  }
+  abrirResetPass(u: UsuarioAdmin) {
+    this.usuarioParaReset = u;
+    this.nuevaPassForm = { password: '' };
+    this.errorUsuario = '';
+    this.mostrarModalResetPass = true;
+  }
+  resetearPassword() {
+    if (!this.nuevaPassForm.password) { this.errorUsuario = 'Ingresá la nueva contraseña.'; return; }
+    this.errorUsuario = '';
+    this.negocio.resetearPassword(this.usuarioParaReset!.id, this.nuevaPassForm.password).subscribe({
+      next: res => {
+        this.mostrarModalResetPass = false;
+        this.credencialMostrada = { username: res.username, password: res.password };
+        this.mostrarModalCredencial = true;
+      },
+      error: () => { this.errorUsuario = 'Error al resetear contraseña.'; }
+    });
+  }
+  eliminarUsuario(id: number) {
+    if (!confirm('¿Revocar el acceso a este barbero?')) return;
+    this.negocio.eliminarUsuario(id).subscribe({ next: () => this.cargarUsuarios() });
+  }
+  // Cambio de contraseña del admin
+  guardarCambioPassAdmin() {
+    const { actual, nueva, confirmar } = this.cambioPassAdminForm;
+    if (!actual || !nueva) { this.errorCambioPassAdmin = 'Completá todos los campos.'; return; }
+    if (nueva !== confirmar) { this.errorCambioPassAdmin = 'Las contraseñas nuevas no coinciden.'; return; }
+    this.errorCambioPassAdmin = '';
+    this.negocio.cambiarMiPassword(actual, nueva).subscribe({
+      next: () => {
+        this.exitoCambioPassAdmin = true;
+        this.cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
+        setTimeout(() => { this.exitoCambioPassAdmin = false; }, 4000);
+      },
+      error: err => { this.errorCambioPassAdmin = err.error?.error || 'Contraseña actual incorrecta.'; }
     });
   }
 
