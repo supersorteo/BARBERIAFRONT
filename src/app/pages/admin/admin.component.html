@@ -584,8 +584,21 @@
           <input class="form-control form-dark" [(ngModel)]="barberoForm.especialidad" placeholder="Cortes modernos y barba">
         </div>
         <div class="mb-3">
-          <label class="form-label">Foto URL</label>
-          <input class="form-control form-dark" [(ngModel)]="barberoForm.foto" placeholder="https://...">
+          <label class="form-label">Foto</label>
+          <div class="foto-slots">
+            @if (barberoFoto.preview) {
+              <div class="foto-slot">
+                <img [src]="barberoFoto.preview" alt="preview">
+                <button class="foto-remove" type="button" (click)="eliminarBarberoFoto()">×</button>
+              </div>
+            } @else {
+              <label class="foto-add-btn">
+                <input type="file" accept="image/*" hidden (change)="onBarberoFotoSeleccionada($event)">
+                <span>＋</span>
+              </label>
+            }
+          </div>
+          @if (subiendoBarberoFoto) { <small style="color:var(--accent)">Subiendo foto...</small> }
         </div>
         <div class="modal-check mb-4">
           <input class="form-check-input" type="checkbox" [(ngModel)]="barberoForm.activo" id="barberoActivo">
@@ -661,8 +674,21 @@
           <input class="form-control form-dark" [(ngModel)]="galeriaForm.titulo" placeholder="Corte degradado">
         </div>
         <div class="mb-3">
-          <label class="form-label">URL de imagen *</label>
-          <input class="form-control form-dark" [(ngModel)]="galeriaForm.imagenUrl" placeholder="https://...">
+          <label class="form-label">Imagen</label>
+          <div class="foto-slots">
+            @if (galeriaFoto.preview) {
+              <div class="foto-slot">
+                <img [src]="galeriaFoto.preview" alt="preview">
+                <button class="foto-remove" type="button" (click)="eliminarGaleriaFoto()">×</button>
+              </div>
+            } @else {
+              <label class="foto-add-btn">
+                <input type="file" accept="image/*" hidden (change)="onGaleriaFotoSeleccionada($event)">
+                <span>＋</span>
+              </label>
+            }
+          </div>
+          @if (subiendoGaleriaFoto) { <small style="color:var(--accent)">Subiendo imagen...</small> }
         </div>
         <div class="mb-3">
           <label class="form-label">Categoría</label>

@@ -74,6 +74,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   editandoBarbero = false;
   barberoForm: Barbero = this.barberoVacio();
   barberoEditandoId: number | null = null;
+  barberoFoto: FotoSlot = { file: null, preview: '', url: '' };
+  subiendoBarberoFoto = false;
   barberoHorariosId: number | null = null;
   horariosActivos: HorarioBarbero[] = [];
   diasSemana = [2, 3, 4, 5, 6, 7];
@@ -90,6 +92,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   editandoGaleria = false;
   galeriaForm: Galeria = this.galeriaVacia();
   galeriaEditandoId: number | null = null;
+  galeriaFoto: FotoSlot = { file: null, preview: '', url: '' };
+  subiendoGaleriaFoto = false;
 
   constructor(
     private negocio: NegocioService,
@@ -190,8 +194,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cargandoTurnos = true;
     this.errorTurnos = '';
     const fecha = this.fechaFiltro || undefined;
+    console.log('[Admin] cargarTurnos - filtro fecha:', fecha || 'SIN FILTRO (todos)');
     this.negocio.getTurnos(fecha).subscribe({
-      next: t => { this.turnos = t; this.cargandoTurnos = false; this.cdr.detectChanges(); },
+      next: t => {
+        console.log('[Admin] getTurnos response:', t.length, 'reservas', t.map(r => `#${r.id} ${r.fecha} ${r.hora} ${r.paciente}`));
+        this.turnos = t; this.cargandoTurnos = false; this.cdr.detectChanges();
+      },
       error: e => { this.errorTurnos = 'Error cargando reservas: ' + (e.message || e.status); this.cargandoTurnos = false; this.cdr.detectChanges(); }
     });
   }
@@ -360,14 +368,42 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
   abrirModalNuevoBarbero() {
     this.editandoBarbero = false; this.barberoEditandoId = null;
-    this.barberoForm = this.barberoVacio(); this.mostrarModalBarbero = true;
+    this.barberoForm = this.barberoVacio();
+    this.barberoFoto = { file: null, preview: '', url: '' };
+    this.mostrarModalBarbero = true;
   }
   abrirModalEditarBarbero(b: Barbero) {
     this.editandoBarbero = true; this.barberoEditandoId = b.id!;
-    this.barberoForm = { ...b }; this.mostrarModalBarbero = true;
+    this.barberoForm = { ...b };
+    this.barberoFoto = { file: null, preview: this.negocio.resolveImageUrl(b.foto), url: b.foto || '' };
+    this.mostrarModalBarbero = true;
   }
+  onBarberoFotoSeleccionada(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.barberoFoto = { file, preview: e.target!.result as string, url: '' };
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+  }
+  eliminarBarberoFoto() { this.barberoFoto = { file: null, preview: '', url: '' }; }
   guardarBarbero() {
     if (!this.barberoForm.nombre) return;
+    if (this.barberoFoto.file) {
+      this.subiendoBarberoFoto = true;
+      this.negocio.uploadImagen(this.barberoFoto.file).subscribe({
+        next: res => { this.subiendoBarberoFoto = false; this.barberoFoto.url = res.url; this.persistirBarbero(); },
+        error: () => { this.subiendoBarberoFoto = false; alert('Error al subir la foto.'); }
+      });
+    } else {
+      this.barberoFoto.url = this.barberoFoto.url || this.barberoForm.foto || '';
+      this.persistirBarbero();
+    }
+  }
+  private persistirBarbero() {
+    this.barberoForm.foto = this.barberoFoto.url || undefined;
     const obs = this.editandoBarbero
       ? this.negocio.actualizarBarbero(this.barberoEditandoId!, this.barberoForm)
       : this.negocio.crearBarbero(this.barberoForm);
@@ -422,14 +458,42 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
   abrirModalNuevaGaleria() {
     this.editandoGaleria = false; this.galeriaEditandoId = null;
-    this.galeriaForm = this.galeriaVacia(); this.mostrarModalGaleria = true;
+    this.galeriaForm = this.galeriaVacia();
+    this.galeriaFoto = { file: null, preview: '', url: '' };
+    this.mostrarModalGaleria = true;
   }
   abrirModalEditarGaleria(g: Galeria) {
     this.editandoGaleria = true; this.galeriaEditandoId = g.id!;
-    this.galeriaForm = { ...g }; this.mostrarModalGaleria = true;
+    this.galeriaForm = { ...g };
+    this.galeriaFoto = { file: null, preview: this.negocio.resolveImageUrl(g.imagenUrl), url: g.imagenUrl || '' };
+    this.mostrarModalGaleria = true;
   }
+  onGaleriaFotoSeleccionada(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.galeriaFoto = { file, preview: e.target!.result as string, url: '' };
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+  }
+  eliminarGaleriaFoto() { this.galeriaFoto = { file: null, preview: '', url: '' }; }
   guardarGaleria() {
-    if (!this.galeriaForm.titulo || !this.galeriaForm.imagenUrl) return;
+    if (!this.galeriaForm.titulo) return;
+    if (this.galeriaFoto.file) {
+      this.subiendoGaleriaFoto = true;
+      this.negocio.uploadImagen(this.galeriaFoto.file).subscribe({
+        next: res => { this.subiendoGaleriaFoto = false; this.galeriaFoto.url = res.url; this.persistirGaleria(); },
+        error: () => { this.subiendoGaleriaFoto = false; alert('Error al subir la imagen.'); }
+      });
+    } else {
+      this.galeriaFoto.url = this.galeriaFoto.url || this.galeriaForm.imagenUrl || '';
+      this.persistirGaleria();
+    }
+  }
+  private persistirGaleria() {
+    this.galeriaForm.imagenUrl = this.galeriaFoto.url || '';
     const obs = this.editandoGaleria
       ? this.negocio.actualizarGaleria(this.galeriaEditandoId!, this.galeriaForm)
       : this.negocio.crearGaleria(this.galeriaForm);
@@ -513,8 +577,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
       barberoId: f.barberoId ? +f.barberoId : undefined
     };
     const slotElegido = this.slotsReservaManual.find(s => s.hora === f.hora && String(s.barberoId) === String(f.barberoId));
+    console.log('[Admin] crearTurno (manual):', turno);
     this.negocio.crearTurno(turno).subscribe({
-      next: () => {
+      next: (resp) => {
+        console.log('[Admin] crearTurno OK:', resp);
         this.enviandoReservaManual = false;
         this.turnoConfirmado = {
           paciente: f.paciente,
