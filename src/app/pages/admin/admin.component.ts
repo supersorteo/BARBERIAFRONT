@@ -79,6 +79,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   barberoFoto: FotoSlot = { file: null, preview: '', url: '' };
   subiendoBarberoFoto = false;
   barberoHorariosId: number | null = null;
+  mostrarModalHorarios = false;
   horariosActivos: HorarioBarbero[] = [];
   diasSemana = [2, 3, 4, 5, 6, 7];
   nombreDia = (d: number) => DIAS[d];
@@ -440,9 +441,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
   verHorarios(b: Barbero) {
     this.barberoHorariosId = b.id!;
+    this.mostrarModalHorarios = true;
     this.negocio.getHorarios(b.id!).subscribe({ next: h => { this.horariosActivos = h; this.cdr.detectChanges(); } });
   }
-  cerrarHorarios() { this.barberoHorariosId = null; this.horariosActivos = []; }
+  cerrarHorarios() { this.barberoHorariosId = null; this.mostrarModalHorarios = false; this.horariosActivos = []; }
   horarioDelDia(dia: number): HorarioBarbero | undefined {
     return this.horariosActivos.find(h => h.diaSemana === dia);
   }
