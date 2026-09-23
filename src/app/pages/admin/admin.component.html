@@ -1,7 +1,7 @@
 <!-- TOPBAR ADMIN -->
 <div class="admin-topbar">
   <div class="container admin-topbar-inner">
-    <span class="admin-brand">El Corte · Panel Admin</span>
+    <span class="admin-brand">{{ configForm.nombre || 'El Corte' }} · Panel Admin</span>
     <div class="admin-user-badge">
       <span class="admin-user-dot"></span>
       <span>{{ usuario?.username || 'Admin' }}</span>
@@ -30,6 +30,7 @@
     <button class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
     <button class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
     <button class="admin-tab" [class.active]="tabActiva==='agente'" (click)="tabActiva='agente'">Agente IA</button>
+    <button class="admin-tab" (click)="abrirModalConfig()">Configuración</button>
   </div>
 
   <!-- ─── TAB DASHBOARD ─── -->
@@ -49,31 +50,40 @@
           </button>
         </div>
 
-        <!-- Stats cards -->
-        <div class="dashboard-stats mb-5">
-          <div class="stat-card">
-            <div class="stat-card-icon">📅</div>
-            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.total">{{ dashboardHoy.total }}</div>
-            <div class="stat-card-label">Turnos hoy</div>
+        @if (dashboardHoy.total === 0) {
+          <!-- Sin turnos hoy -->
+          <div class="dashboard-empty-day">
+            <div class="dashboard-empty-icon">📭</div>
+            <p class="dashboard-empty-title">Sin turnos para hoy</p>
+            <p class="dashboard-empty-sub">No hay reservas agendadas para el {{ dashboardHoy.fecha }}. Usá la pestaña <strong>Reservas</strong> para ver otros días o crear una reserva manual.</p>
           </div>
-          <div class="stat-card warning">
-            <div class="stat-card-icon">⏳</div>
-            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.reservados">{{ dashboardHoy.reservados }}</div>
-            <div class="stat-card-label">Pendientes</div>
+        } @else {
+          <!-- Stats cards -->
+          <div class="dashboard-stats mb-5">
+            <div class="stat-card">
+              <div class="stat-card-icon">📅</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.total">{{ dashboardHoy.total }}</div>
+              <div class="stat-card-label">Turnos hoy</div>
+            </div>
+            <div class="stat-card warning">
+              <div class="stat-card-icon">⏳</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.reservados">{{ dashboardHoy.reservados }}</div>
+              <div class="stat-card-label">Pendientes</div>
+            </div>
+            <div class="stat-card success">
+              <div class="stat-card-icon">✅</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.completados">{{ dashboardHoy.completados }}</div>
+              <div class="stat-card-label">Completados</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-card-icon">💰</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimadoUYU" data-prefix="$">${{ dashboardHoy.ingresoEstimadoUYU | number:'1.0-0' }}</div>
+              <div class="stat-card-label">Ingresos estimados</div>
+            </div>
           </div>
-          <div class="stat-card success">
-            <div class="stat-card-icon">✅</div>
-            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.completados">{{ dashboardHoy.completados }}</div>
-            <div class="stat-card-label">Completados</div>
-          </div>
-          <div class="stat-card gold">
-            <div class="stat-card-icon">💰</div>
-            <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimadoUYU" data-prefix="$">$0</div>
-            <div class="stat-card-label">Ingresos estimados</div>
-          </div>
-        </div>
+        }
 
-        @if (dashboardHoy.porBarbero.length > 0) {
+        @if (dashboardHoy.total > 0 && dashboardHoy.porBarbero.length > 0) {
           <div class="section-head mb-3">
             <h3>Por barbero</h3>
           </div>
@@ -323,9 +333,6 @@
       </div>
       @if (mostrarCambioPassAdmin) {
         <div class="credenciales-admin-form">
-          @if (exitoCambioPassAdmin) {
-            <div class="alert-success-inline">✓ Contraseña actualizada correctamente</div>
-          }
           @if (errorCambioPassAdmin) {
             <div class="alert-error-inline">{{ errorCambioPassAdmin }}</div>
           }
@@ -419,40 +426,30 @@
               </button>
             </div>
             <div class="modal-body-custom">
-              <div class="horario-panel">
-                <table class="table table-dark table-sm align-middle mb-0">
-                  <thead>
-                    <tr><th>Día</th><th>Entrada</th><th>Salida</th><th></th></tr>
-                  </thead>
-                  <tbody>
-                    @for (dia of diasSemana; track dia) {
-                      <tr>
-                        <td style="color:var(--text-secondary);font-weight:500">{{ nombreDia(dia) }}</td>
-                        <td>
-                          <input type="time" class="form-control form-dark" style="width:110px;padding:6px 10px;font-size:13px"
-                            [value]="horarioDelDia(dia)?.horaInicio || ''" #inputInicio>
-                        </td>
-                        <td>
-                          <input type="time" class="form-control form-dark" style="width:110px;padding:6px 10px;font-size:13px"
-                            [value]="horarioDelDia(dia)?.horaFin || ''" #inputFin>
-                        </td>
-                        <td>
-                          <div class="table-actions">
-                            <button class="btn-action btn-action-success"
-                              (click)="guardarHorarioDia(dia, inputInicio.value, inputFin.value)" title="Guardar">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            </button>
-                            @if (horarioDelDia(dia)) {
-                              <button class="btn-action btn-action-danger" (click)="eliminarHorarioDia(dia)" title="Eliminar">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                              </button>
-                            }
-                          </div>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+              <div class="horario-list">
+                @for (dia of diasSemana; track dia) {
+                  <div class="horario-row-card">
+                    <span class="horario-dia-label">{{ nombreDia(dia) }}</span>
+                    <div class="horario-inputs">
+                      <input type="time" class="form-control form-dark horario-time-input"
+                        [value]="horarioDelDia(dia)?.horaInicio || '09:00'" #inputInicio>
+                      <span class="horario-sep">—</span>
+                      <input type="time" class="form-control form-dark horario-time-input"
+                        [value]="horarioDelDia(dia)?.horaFin || '18:00'" #inputFin>
+                    </div>
+                    <div class="horario-row-actions">
+                      <button class="btn-action btn-action-success"
+                        (click)="guardarHorarioDia(dia, inputInicio.value, inputFin.value)" title="Guardar">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </button>
+                      @if (horarioDelDia(dia)) {
+                        <button class="btn-action btn-action-danger" (click)="eliminarHorarioDia(dia)" title="Limpiar">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
               </div>
             </div>
             <div class="modal-footer-custom">
@@ -765,6 +762,248 @@
   </div>
 }
 
+<!-- ─── MODAL CONFIGURACIÓN WIZARD ─── -->
+@if (mostrarModalConfig) {
+  <div class="modal-backdrop-custom" (click)="mostrarModalConfig=false"></div>
+  <div class="cfg-modal-wrap">
+    <div class="cfg-modal">
+
+      <!-- Header -->
+      <div class="cfg-modal-header">
+        <div>
+          <span class="cfg-eyebrow">Panel de Administración</span>
+          <h4 class="cfg-modal-title">Configuración del sitio</h4>
+        </div>
+        <button class="btn-close-custom" (click)="mostrarModalConfig=false">✕</button>
+      </div>
+
+      <!-- Steps indicator -->
+      <div class="cfg-steps">
+        @for (s of CONFIG_STEPS; track $index) {
+          <div class="cfg-step" [class.active]="configWizardStep === $index + 1" [class.done]="configWizardStep > $index + 1">
+            <div class="cfg-step-dot">
+              @if (configWizardStep > $index + 1) { <span>✓</span> } @else { <span>{{ $index + 1 }}</span> }
+            </div>
+            <span class="cfg-step-label">{{ s.label }}</span>
+          </div>
+          @if ($index < CONFIG_STEPS.length - 1) {
+            <div class="cfg-step-line" [class.done]="configWizardStep > $index + 1"></div>
+          }
+        }
+      </div>
+      <div class="cfg-progress">
+        <div class="cfg-progress-bar" [style.width.%]="(configWizardStep / CONFIG_STEPS.length) * 100"></div>
+      </div>
+
+      <!-- Body -->
+      <div class="cfg-modal-body">
+        @if (cargandoConfig) {
+          <div class="cfg-loading">
+            <div class="cfg-spinner"></div>
+            <span>Cargando configuración...</span>
+          </div>
+        } @else {
+
+          <!-- STEP 1: Identidad -->
+          @if (configWizardStep === 1) {
+            <div class="cfg-step-content">
+              <p class="cfg-step-desc">Textos principales que se muestran en el encabezado y pie de página.</p>
+              <div class="row g-3">
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Nombre del negocio <span class="cfg-required">*</span></label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.nombre" placeholder="El Corte">
+                  <div class="cfg-hint">Navbar, footer y título del sitio (3 lugares)</div>
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Badge del hero</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.tagline" placeholder="Barbería Premium · Montevideo">
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Título hero — línea 1</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.heroTitulo1" placeholder="El arte del">
+                  <div class="cfg-hint">Texto en blanco</div>
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Título hero — línea 2</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.heroTitulo2" placeholder="corte perfecto">
+                  <div class="cfg-hint">Texto dorado e itálico</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Descripción del hero</label>
+                  <textarea class="form-control form-dark" [(ngModel)]="configForm.heroDesc" rows="2"
+                            placeholder="Reservá tu turno online en segundos..."></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Descripción del footer</label>
+                  <textarea class="form-control form-dark" [(ngModel)]="configForm.footerDesc" rows="2"
+                            placeholder="Barbería moderna en el corazón de Montevideo..."></textarea>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- STEP 2: Contacto & Redes -->
+          @if (configWizardStep === 2) {
+            <div class="cfg-step-content">
+              <p class="cfg-step-desc">Datos de contacto y redes sociales visibles en el footer.</p>
+              <div class="row g-3">
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Dirección</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.direccion" placeholder="Av. General Rivera 2500, Mvd">
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control form-dark" [(ngModel)]="configForm.telefono" placeholder="2708-3456">
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Email de contacto</label>
+                  <input type="email" class="form-control form-dark" [(ngModel)]="configForm.email" placeholder="contacto@minegocio.com">
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">WhatsApp</label>
+                  <div class="cfg-input-group">
+                    <span class="cfg-input-prefix">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </span>
+                    <input type="tel" class="form-control form-dark cfg-has-prefix" [(ngModel)]="configForm.whatsapp" placeholder="598 99 000 000">
+                  </div>
+                  <div class="cfg-hint">Con código de país. Ej: 598 99 123 456</div>
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label">Instagram</label>
+                  <div class="cfg-input-group">
+                    <span class="cfg-input-prefix">&#64;</span>
+                    <input type="text" class="form-control form-dark cfg-has-prefix" [(ngModel)]="configForm.instagramHandle" placeholder="elnegocio">
+                  </div>
+                  <div class="cfg-hint">Solo el usuario, sin &#64;</div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- STEP 3: Horarios -->
+          @if (configWizardStep === 3) {
+            <div class="cfg-step-content">
+              <p class="cfg-step-desc">Tres líneas de horario que se muestran en el footer. Escribilas en formato libre.</p>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Horario 1</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.horario1" placeholder="Martes — Sábado: 9:00 — 20:00">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Horario 2</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.horario2" placeholder="Domingo: 10:00 — 15:00">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Horario 3</label>
+                  <input type="text" class="form-control form-dark" [(ngModel)]="configForm.horario3" placeholder="Lunes: Cerrado">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Zona horaria del negocio</label>
+                  <select class="form-control form-dark" [(ngModel)]="configForm.timeZone">
+                    <optgroup label="América del Sur">
+                      <option value="America/Montevideo">Uruguay — America/Montevideo</option>
+                      <option value="America/Argentina/Buenos_Aires">Argentina — America/Argentina/Buenos_Aires</option>
+                      <option value="America/Sao_Paulo">Brasil — America/Sao_Paulo</option>
+                      <option value="America/Santiago">Chile — America/Santiago</option>
+                      <option value="America/Bogota">Colombia — America/Bogota</option>
+                      <option value="America/Lima">Perú — America/Lima</option>
+                      <option value="America/Caracas">Venezuela — America/Caracas</option>
+                      <option value="America/La_Paz">Bolivia — America/La_Paz</option>
+                      <option value="America/Asuncion">Paraguay — America/Asuncion</option>
+                    </optgroup>
+                    <optgroup label="América Central y México">
+                      <option value="America/Mexico_City">México — America/Mexico_City</option>
+                      <option value="America/Guatemala">Guatemala — America/Guatemala</option>
+                    </optgroup>
+                    <optgroup label="América del Norte">
+                      <option value="America/New_York">EE.UU. Este — America/New_York</option>
+                      <option value="America/Chicago">EE.UU. Centro — America/Chicago</option>
+                      <option value="America/Denver">EE.UU. Montaña — America/Denver</option>
+                      <option value="America/Los_Angeles">EE.UU. Oeste — America/Los_Angeles</option>
+                    </optgroup>
+                    <optgroup label="Europa">
+                      <option value="Europe/Madrid">España — Europe/Madrid</option>
+                      <option value="Europe/London">Reino Unido — Europe/London</option>
+                      <option value="Europe/Paris">Francia — Europe/Paris</option>
+                    </optgroup>
+                  </select>
+                  <div class="cfg-hint">Afecta la fecha "hoy" del dashboard y la validación de turnos</div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- STEP 4: Testimonios -->
+          @if (configWizardStep === 4) {
+            <div class="cfg-step-content">
+              <p class="cfg-step-desc">Las tres reseñas de clientes que aparecen en la sección de testimonios.</p>
+              <div class="cfg-testimonios-grid">
+                @for (n of [1,2,3]; track n) {
+                  <div class="cfg-testimonio-card">
+                    <div class="cfg-testimonio-num">Testimonio {{ n }}</div>
+                    <div class="row g-2">
+                      <div class="col-8">
+                        <label class="form-label">Nombre</label>
+                        @if (n === 1) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t1Nombre" placeholder="Federico M."> }
+                        @if (n === 2) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t2Nombre" placeholder="Sebastián R."> }
+                        @if (n === 3) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t3Nombre" placeholder="Martín K."> }
+                      </div>
+                      <div class="col-4">
+                        <label class="form-label">Iniciales</label>
+                        @if (n === 1) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t1Iniciales" placeholder="FM" maxlength="3"> }
+                        @if (n === 2) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t2Iniciales" placeholder="SR" maxlength="3"> }
+                        @if (n === 3) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t3Iniciales" placeholder="MK" maxlength="3"> }
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label">Servicio</label>
+                        @if (n === 1) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t1Servicio" placeholder="Corte + Barba"> }
+                        @if (n === 2) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t2Servicio" placeholder="Perfilado de barba"> }
+                        @if (n === 3) { <input type="text" class="form-control form-dark" [(ngModel)]="configForm.t3Servicio" placeholder="Corte clásico"> }
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label">Reseña</label>
+                        @if (n === 1) { <textarea class="form-control form-dark" [(ngModel)]="configForm.t1Texto" rows="3" placeholder="Texto de la reseña..."></textarea> }
+                        @if (n === 2) { <textarea class="form-control form-dark" [(ngModel)]="configForm.t2Texto" rows="3" placeholder="Texto de la reseña..."></textarea> }
+                        @if (n === 3) { <textarea class="form-control form-dark" [(ngModel)]="configForm.t3Texto" rows="3" placeholder="Texto de la reseña..."></textarea> }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="cfg-modal-footer">
+        <button class="btn-cancel-admin" (click)="mostrarModalConfig=false">Cancelar</button>
+        <div class="cfg-nav-btns">
+          @if (configWizardStep > 1) {
+            <button class="btn-cancel-admin" (click)="configWizardStep = configWizardStep - 1">
+              ← Anterior
+            </button>
+          }
+          @if (configWizardStep < CONFIG_STEPS.length) {
+            <button class="btn-primary-admin" (click)="configWizardStep = configWizardStep + 1">
+              Siguiente →
+            </button>
+          }
+          @if (configWizardStep === CONFIG_STEPS.length) {
+            <button class="btn-primary-admin btn-gold-admin" (click)="guardarConfig()" [disabled]="guardandoConfig">
+              @if (guardandoConfig) { Guardando... }
+              @else { Guardar cambios }
+            </button>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
+
 <!-- ─── MODAL BARBERO ─── -->
 @if (mostrarModalBarbero) {
   <div class="modal-backdrop-custom" (click)="mostrarModalBarbero=false"></div>
@@ -788,7 +1027,7 @@
           <div class="foto-slots">
             @if (barberoFoto.preview) {
               <div class="foto-slot">
-                <img [src]="barberoFoto.preview" alt="preview">
+                <img [src]="barberoFoto.preview" class="foto-preview" alt="preview">
                 <button class="foto-remove" type="button" (click)="eliminarBarberoFoto()">×</button>
               </div>
             } @else {
@@ -878,7 +1117,7 @@
           <div class="foto-slots">
             @if (galeriaFoto.preview) {
               <div class="foto-slot">
-                <img [src]="galeriaFoto.preview" alt="preview">
+                <img [src]="galeriaFoto.preview" class="foto-preview" alt="preview">
                 <button class="foto-remove" type="button" (click)="eliminarGaleriaFoto()">×</button>
               </div>
             } @else {
@@ -1084,3 +1323,4 @@
     </div>
   </div>
 }
+

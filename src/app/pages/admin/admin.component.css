@@ -1,3 +1,160 @@
+/* ─── CONFIG WIZARD MODAL ───────────────────────────────────────── */
+.cfg-modal-wrap {
+  position: fixed; inset: 0; z-index: 1060;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+}
+.cfg-modal {
+  pointer-events: all;
+  background: var(--bg-card);
+  border: 1px solid var(--border-md);
+  border-radius: 20px;
+  width: 100%; max-width: 680px;
+  max-height: calc(100vh - 32px);
+  display: flex; flex-direction: column;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+.cfg-modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cfg-eyebrow {
+  display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 4px;
+}
+.cfg-modal-title {
+  font-family: var(--font-display); font-size: 1.3rem;
+  color: var(--text-primary); margin: 0;
+}
+
+/* Steps */
+.cfg-steps {
+  display: flex; align-items: center; padding: 16px 24px 12px;
+  flex-shrink: 0; gap: 0;
+}
+.cfg-step {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  flex-shrink: 0;
+}
+.cfg-step-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--border-md);
+  background: var(--bg-surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  transition: all 0.25s;
+}
+.cfg-step.active .cfg-step-dot {
+  border-color: var(--gold); background: var(--gold-glow);
+  color: var(--gold); box-shadow: 0 0 0 4px var(--gold-glow);
+}
+.cfg-step.done .cfg-step-dot {
+  border-color: var(--gold); background: var(--gold);
+  color: #0a0a10;
+}
+.cfg-step-label {
+  font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.cfg-step.active .cfg-step-label { color: var(--gold); font-weight: 600; }
+.cfg-step.done .cfg-step-label { color: var(--text-secondary); }
+.cfg-step-line {
+  flex: 1; height: 2px; background: var(--border);
+  margin: 0 6px; margin-bottom: 14px;
+  transition: background 0.25s;
+}
+.cfg-step-line.done { background: var(--gold); }
+
+/* Progress bar */
+.cfg-progress {
+  height: 2px; background: var(--border); flex-shrink: 0;
+  margin: 0 24px 0;
+}
+.cfg-progress-bar {
+  height: 100%; background: var(--grad-gold, linear-gradient(90deg,#C9A03A,#F5D06A));
+  transition: width 0.35s ease;
+}
+
+/* Body */
+.cfg-modal-body {
+  flex: 1; overflow-y: auto; padding: 24px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.cfg-loading {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 48px; color: var(--text-secondary);
+}
+.cfg-spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid var(--border-md);
+  border-top-color: var(--gold);
+  animation: cfg-spin 0.7s linear infinite;
+}
+@keyframes cfg-spin { to { transform: rotate(360deg); } }
+
+.cfg-step-content { animation: cfg-fade 0.2s ease; }
+@keyframes cfg-fade { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+
+.cfg-step-desc {
+  color: var(--text-secondary); font-size: 13px; margin-bottom: 20px; line-height: 1.5;
+}
+.cfg-hint {
+  font-size: 11px; color: var(--text-muted); margin-top: 4px;
+}
+
+/* Input with prefix */
+.cfg-input-group { position: relative; display: flex; }
+.cfg-input-prefix {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--gold); font-size: 13px; font-weight: 600; z-index: 1;
+  display: flex; align-items: center;
+}
+.cfg-has-prefix { padding-left: 32px !important; }
+
+/* Testimonios */
+.cfg-testimonios-grid {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.cfg-testimonio-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+.cfg-testimonio-num {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 12px;
+}
+
+/* Footer */
+.cfg-modal-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0; gap: 12px;
+}
+.cfg-nav-btns { display: flex; gap: 10px; }
+.btn-gold-admin {
+  background: var(--grad-gold, linear-gradient(135deg,#C9A03A,#F5D06A)) !important;
+  color: #0a0a10 !important; font-weight: 700;
+}
+.btn-gold-admin:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 480px) {
+  .cfg-modal-wrap { padding: 0; align-items: flex-end; }
+  .cfg-modal { border-radius: 20px 20px 0 0; max-height: 92vh; }
+  .cfg-steps { padding: 12px 16px 8px; }
+  .cfg-step-label { display: none; }
+  .cfg-modal-header, .cfg-modal-body, .cfg-modal-footer { padding-left: 16px; padding-right: 16px; }
+  .cfg-modal-footer { flex-direction: column; align-items: stretch; }
+  .cfg-nav-btns { justify-content: flex-end; }
+}
+
 /* ─── DASHBOARD ─────────────────────────────────────────────────── */
 .dashboard-header {
   display: flex;
@@ -297,6 +454,31 @@
 }
 .gallery-admin-item:hover .gallery-admin-actions { opacity: 1; }
 
+/* ─── DASHBOARD EMPTY DAY ───────────────────────────────────────── */
+.dashboard-empty-day {
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px dashed var(--border-md);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  margin-bottom: 32px;
+}
+.dashboard-empty-icon { font-size: 3rem; margin-bottom: 16px; display: block; opacity: 0.5; }
+.dashboard-empty-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+.dashboard-empty-sub {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.dashboard-empty-sub strong { color: var(--gold); }
+
 /* ─── EMPTY STATES ─────────────────────────────────────────────── */
 .empty-state {
   text-align: center; padding: 48px 24px;
@@ -385,6 +567,19 @@
   transition: all 0.2s; white-space: nowrap;
 }
 .btn-cancel-admin:hover { border-color: var(--border-gold); color: var(--gold); }
+.btn-danger-admin {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #c0392b;
+  border: 1px solid #c0392b;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 13px; font-weight: 600;
+  color: #fff;
+  cursor: pointer; font-family: var(--font-body);
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn-danger-admin:hover { background: #a93226; border-color: #a93226; }
+.btn-danger-admin:disabled { opacity: 0.55; pointer-events: none; }
 
 /* ─── ROUND ACTION BUTTONS (tables) ───────────────────────────── */
 .table-actions { display: flex; gap: 5px; align-items: center; }
@@ -705,6 +900,35 @@
 .bca-btn-warning:hover { background: rgba(251,191,36,.1) !important; border-color: #fbbf24 !important; color: #fbbf24 !important; }
 .bca-btn-danger { color: var(--danger); border-color: rgba(255,95,95,.25); }
 .bca-btn-danger:hover { background: rgba(255,95,95,.12) !important; border-color: var(--danger) !important; color: var(--danger) !important; }
+
+/* ─── HORARIOS RESPONSIVE LIST ─────────────────────────────────── */
+.horario-list { display: flex; flex-direction: column; gap: 8px; }
+.horario-row-card {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--bg-card-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.horario-dia-label {
+  width: 80px; flex-shrink: 0;
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+}
+.horario-inputs {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;
+}
+.horario-time-input {
+  width: 120px !important; flex-shrink: 0;
+  padding: 6px 10px !important; font-size: 13px !important;
+}
+.horario-sep { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+.horario-row-actions { display: flex; gap: 5px; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .horario-row-card { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .horario-dia-label { width: auto; }
+  .horario-inputs { min-width: 0; width: 100%; }
+  .horario-time-input { width: 100% !important; flex: 1; }
+}
 
 /* ─── MODAL BODY / FOOTER STANDARD ────────────────────────────── */
 .modal-body-custom { padding: 24px; }

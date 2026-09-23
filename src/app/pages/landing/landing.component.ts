@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible } from '../../negocio.service';
+import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible, NegocioConfig } from '../../negocio.service';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -47,6 +47,47 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   heroBgLoaded = false;
   reservaModalOpen = false;
 
+  config: NegocioConfig = {
+    nombre: 'El Corte',
+    tagline: 'Barbería Premium · Montevideo',
+    heroTitulo1: 'El arte del',
+    heroTitulo2: 'corte perfecto',
+    heroDesc: 'Reservá tu turno online en segundos. Sin llamadas, sin esperas. Tu barbero favorito, siempre disponible.',
+    footerDesc: 'Barbería moderna en el corazón de Montevideo. Más de 10 años dando el mejor corte de la ciudad.',
+    direccion: 'Av. General Rivera 2500, Mvd',
+    telefono: '2708-3456',
+    email: '',
+    whatsapp: '',
+    instagramHandle: '',
+    horario1: 'Martes — Sábado: 9:00 — 20:00',
+    horario2: 'Domingo: 10:00 — 15:00',
+    horario3: 'Lunes: Cerrado',
+    t1Nombre: 'Federico M.', t1Iniciales: 'FM', t1Servicio: 'Corte + Barba',
+    t1Texto: 'El mejor barbero de Montevideo sin dudas. Ya llevo 2 años viniendo cada mes y el resultado siempre supera las expectativas.',
+    t2Nombre: 'Sebastián R.', t2Iniciales: 'SR', t2Servicio: 'Perfilado de barba',
+    t2Texto: 'Ambiente premium, técnica profesional y atención de primer nivel. El único lugar donde confío mi barba.',
+    t3Nombre: 'Martín K.', t3Iniciales: 'MK', t3Servicio: 'Corte clásico',
+    t3Texto: 'Reservé online en 2 minutos, puntualidad total y el corte exactamente como lo pedí. 100% recomendado.',
+  };
+
+  get whatsappUrl(): string {
+    if (!this.config.whatsapp) return '#';
+    return `https://wa.me/${this.config.whatsapp.replace(/\D/g, '')}`;
+  }
+
+  get instagramUrl(): string {
+    if (!this.config.instagramHandle) return '#';
+    return `https://instagram.com/${this.config.instagramHandle.replace('@', '')}`;
+  }
+
+  get testimoniosList() {
+    return [
+      { iniciales: this.config.t1Iniciales, nombre: this.config.t1Nombre, servicio: this.config.t1Servicio, texto: this.config.t1Texto },
+      { iniciales: this.config.t2Iniciales, nombre: this.config.t2Nombre, servicio: this.config.t2Servicio, texto: this.config.t2Texto },
+      { iniciales: this.config.t3Iniciales, nombre: this.config.t3Nombre, servicio: this.config.t3Servicio, texto: this.config.t3Texto },
+    ].filter(t => !!t.texto);
+  }
+
   readonly testimonios = [
     {
       iniciales: 'FM', nombre: 'Federico M.', servicio: 'Corte + Barba',
@@ -75,6 +116,17 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   onEscape() { if (this.reservaModalOpen) this.cerrarReservaModal(); }
 
   ngOnInit() {
+    this.negocio.getConfig().subscribe({
+      next: c => {
+        // Merge: servidor sobreescribe solo campos con valor real; nulls/vacíos conservan el default
+        const noVacios = Object.fromEntries(
+          Object.entries(c).filter(([, v]) => v !== null && v !== undefined && v !== '')
+        );
+        this.config = { ...this.config, ...noVacios };
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
     this.negocio.getServicios().subscribe({
       next: s => {
         this.servicios = s;
@@ -350,10 +402,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   modalServCarruselMap = new Map<number, number>();
   servicioModalImgs(s: Servicio): string[] {
-    const cat = this.negocio.normalizarCategoria(s.categoria || '');
-    const catImg = this.CATEGORIA_IMGS[cat] ?? '';
-    const uploaded = [s.imagenUrl, s.imagenUrl2, s.imagenUrl3].filter(Boolean) as string[];
-    return catImg ? [catImg, ...uploaded] : uploaded;
+    return [s.imagenUrl, s.imagenUrl2, s.imagenUrl3].filter(Boolean) as string[];
   }
   modalCarruselIdx(id: number) { return this.modalServCarruselMap.get(id) ?? 0; }
   modalCarruselNext(id: number, max: number, e: Event) {

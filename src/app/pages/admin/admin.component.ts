@@ -5,9 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin, tap } from 'rxjs';
 import {
-  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible, UsuarioAdmin
+  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible, UsuarioAdmin, NegocioConfig
 } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
+import { AlertService } from '../../shared/alert.service';
 
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
@@ -29,6 +30,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this._tabActiva = v;
     if (v === 'agente' && !this.agenteContextoOriginal) this.cargarContextoAgente();
     if (v === 'barberos') this.cargarUsuarios();
+    if (v === 'turnos') this.cargarTurnos();
+    if (v === 'dashboard') this.cargarDashboard();
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
         gsap.from('.admin-tab-panel', { y: 28, opacity: 0, duration: 0.38, ease: 'power2.out' });
@@ -99,7 +102,6 @@ export class AdminComponent implements OnInit, AfterViewInit {
   mostrarCambioPassAdmin = false;
   cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
   errorCambioPassAdmin = '';
-  exitoCambioPassAdmin = false;
 
   // Bloqueos
   bloqueos: BloqueoHorario[] = [];
@@ -121,12 +123,80 @@ export class AdminComponent implements OnInit, AfterViewInit {
   guardandoContexto = false;
   cargandoContexto = false;
 
+  // Configuración dinámica del landing — wizard modal
+  mostrarModalConfig = false;
+  configWizardStep = 1;
+  readonly CONFIG_STEPS = [
+    { label: 'Identidad' },
+    { label: 'Contacto' },
+    { label: 'Horarios' },
+    { label: 'Testimonios' },
+  ];
+  configForm: NegocioConfig = {
+    nombre: '', tagline: '', heroTitulo1: '', heroTitulo2: '',
+    heroDesc: '', footerDesc: '', direccion: '', telefono: '',
+    email: '', whatsapp: '', instagramHandle: '',
+    timeZone: 'America/Montevideo',
+    horario1: '', horario2: '', horario3: '',
+    t1Nombre: '', t1Iniciales: '', t1Servicio: '', t1Texto: '',
+    t2Nombre: '', t2Iniciales: '', t2Servicio: '', t2Texto: '',
+    t3Nombre: '', t3Iniciales: '', t3Servicio: '', t3Texto: '',
+  };
+  cargandoConfig = false;
+  guardandoConfig = false;
+
+  abrirModalConfig() {
+    this.configWizardStep = 1;
+    this.mostrarModalConfig = true;
+    if (!this.configForm.nombre) this.cargarConfig();
+  }
+
+  cargarConfig() {
+    this.cargandoConfig = true;
+    this.negocio.getConfig().subscribe({
+      next: c => {
+        const noVacios = Object.fromEntries(
+          Object.entries(c).filter(([, v]) => v !== null && v !== undefined && v !== '')
+        );
+        this.configForm = { ...this.configForm, ...noVacios };
+        this.cargandoConfig = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.cargandoConfig = false; }
+    });
+  }
+
+  guardarConfig() {
+    this.alert.confirm({
+      title: '¿Guardar configuración?',
+      html: `Los cambios del landing de <strong>${this.esc(this.configForm.nombre || 'el negocio')}</strong> se publicarán inmediatamente.`,
+      confirmText: 'Sí, guardar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.guardandoConfig = true;
+      this.negocio.updateConfig(this.configForm).subscribe({
+        next: c => {
+          this.configForm = { ...c };
+          this.guardandoConfig = false;
+          this.mostrarModalConfig = false;
+          this.cdr.detectChanges();
+          this.alert.success('Configuración guardada');
+        },
+        error: () => {
+          this.guardandoConfig = false;
+          this.alert.error('Error al guardar la configuración');
+        }
+      });
+    });
+  }
+
   constructor(
     private negocio: NegocioService,
     private cdr: ChangeDetectorRef,
     private auth: AuthService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
+    private alert: AlertService
   ) {}
 
   ngAfterViewInit() {
@@ -141,6 +211,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.usuario = this.auth.getUser();
+    this.cargarConfig();
     this.cargarDashboard();
     this.cargarTurnos();
     this.cargarServicios();
@@ -156,7 +227,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
         this.animateStatCards();
       },
-      error: () => {}
+      error: err => {
+        console.error('[Dashboard] Error al cargar resumen:', err);
+        this.dashboardHoy = { fecha: '', total: 0, reservados: 0, completados: 0, cancelados: 0, ingresoEstimadoUYU: 0, porBarbero: [] };
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -238,23 +313,41 @@ export class AdminComponent implements OnInit, AfterViewInit {
   cancelarReasignar() { this.reasignandoId = null; this.reasignarBarberoId = ''; }
   confirmarReasignar(turno: Turno) {
     if (!this.reasignarBarberoId) return;
-    this.negocio.reasignarTurno(turno.id!, +this.reasignarBarberoId).subscribe({
-      next: t => {
-        turno.barberoId = t.barberoId;
-        this.reasignandoId = null;
-        this.reasignarBarberoId = '';
-        this.cdr.detectChanges();
-      },
-      error: err => {
-        alert(err.error?.error || 'No se pudo reasignar. El barbero puede no estar disponible en ese horario.');
-        this.cancelarReasignar();
-      }
+    const nuevoBarbero = this.barberos.find(b => b.id === +this.reasignarBarberoId);
+    this.alert.confirm({
+      title: '¿Reasignar turno?',
+      html: `El turno del <strong>${this.esc(turno.fecha)} ${this.esc(turno.hora)}</strong> se asignará a <strong>${this.esc(nuevoBarbero?.nombre ?? 'otro barbero')}</strong>.`,
+      confirmText: 'Sí, reasignar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.reasignarTurno(turno.id!, +this.reasignarBarberoId).subscribe({
+        next: t => {
+          turno.barberoId = t.barberoId;
+          this.reasignandoId = null;
+          this.reasignarBarberoId = '';
+          this.alert.success('Turno reasignado');
+          this.cdr.detectChanges();
+        },
+        error: err => {
+          this.alert.error(err.error?.error || 'No se pudo reasignar. El barbero puede no estar disponible en ese horario.');
+          this.cancelarReasignar();
+        }
+      });
     });
   }
 
   cambiarEstado(turno: Turno, estado: string) {
-    this.negocio.actualizarEstado(turno.id!, estado).subscribe({
-      next: t => { turno.estado = t.estado; this.cdr.detectChanges(); }
+    const etiqueta = estado === 'COMPLETADO' ? 'completado' : estado === 'CANCELADO' ? 'cancelado' : estado.toLowerCase();
+    this.alert.confirm({
+      title: '¿Cambiar estado?',
+      html: `El turno de <strong>${this.esc(turno.paciente)}</strong> quedará marcado como <strong>${this.esc(etiqueta)}</strong>.`,
+      confirmText: 'Sí, cambiar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.actualizarEstado(turno.id!, estado).subscribe({
+        next: t => { turno.estado = t.estado; this.cdr.detectChanges(); },
+        error: () => this.alert.error('Error al cambiar el estado')
+      });
     });
   }
   nombreBarbero(id?: number) {
@@ -291,10 +384,20 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   eliminarTurno(id: number) {
-    if (!confirm('¿Eliminar esta reserva? Esta acción no se puede deshacer.')) return;
-    this.negocio.eliminarTurno(id).subscribe({
-      next: () => { this.turnos = this.turnos.filter(t => t.id !== id); this.cdr.detectChanges(); },
-      error: () => alert('Error al eliminar la reserva.')
+    this.alert.confirm({
+      title: '¿Eliminar reserva?',
+      html: 'Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarTurno(id).subscribe({
+        next: () => {
+          this.turnos = this.turnos.filter(t => t.id !== id);
+          this.alert.success('Reserva eliminada');
+          this.cdr.detectChanges();
+        },
+        error: () => this.alert.error('Error al eliminar la reserva')
+      });
     });
   }
 
@@ -304,10 +407,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   servicioCarruselIdx = new Map<number, number>();
   servicioImagenes(s: Servicio): string[] {
-    const cat = this.negocio.normalizarCategoria(s.categoria || '');
-    const catImg = this.CAT_IMGS[cat] ?? '';
-    const uploaded = [s.imagenUrl, s.imagenUrl2, s.imagenUrl3].filter(Boolean) as string[];
-    return catImg ? [catImg, ...uploaded] : uploaded;
+    return [s.imagenUrl, s.imagenUrl2, s.imagenUrl3].filter(Boolean) as string[];
   }
   carruselIdx(id: number) { return this.servicioCarruselIdx.get(id) ?? 0; }
   carruselNext(id: number, max: number, e: Event) {
@@ -355,37 +455,57 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
   guardarServicio() {
     if (!this.servicioForm.nombre || !this.servicioForm.precio) return;
-    const pendientes = this.servicioFotos
-      .map((s, i) => ({ slot: s, i }))
-      .filter(x => x.slot.file !== null);
-
-    if (pendientes.length === 0) {
-      this.aplicarUrlsFotos();
-      return;
-    }
-    this.subiendoFotos = true;
-    const uploads$ = pendientes.map(x =>
-      this.negocio.uploadImagen(x.slot.file!).pipe(
-        tap(res => { this.servicioFotos[x.i].url = res.url; })
-      )
-    );
-    forkJoin(uploads$).subscribe({
-      next: () => { this.subiendoFotos = false; this.aplicarUrlsFotos(); },
-      error: () => { this.subiendoFotos = false; alert('Error al subir las imágenes. Intentá de nuevo.'); }
+    this.alert.confirm({
+      title: this.editandoServicio ? '¿Guardar cambios?' : '¿Crear servicio?',
+      html: `Se ${this.editandoServicio ? 'actualizarán los datos de' : 'creará'} <strong>${this.esc(this.servicioForm.nombre)}</strong>.`,
+      confirmText: 'Sí, guardar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      const pendientes = this.servicioFotos
+        .map((s, i) => ({ slot: s, i }))
+        .filter(x => x.slot.file !== null);
+      if (pendientes.length === 0) { this.aplicarUrlsFotos(); return; }
+      this.subiendoFotos = true;
+      const uploads$ = pendientes.map(x =>
+        this.negocio.uploadImagen(x.slot.file!).pipe(
+          tap(res => { this.servicioFotos[x.i].url = res.url; })
+        )
+      );
+      forkJoin(uploads$).subscribe({
+        next: () => { this.subiendoFotos = false; this.aplicarUrlsFotos(); },
+        error: () => { this.subiendoFotos = false; this.alert.error('Error al subir las imágenes', 'Intentá de nuevo.'); }
+      });
     });
   }
   private aplicarUrlsFotos() {
     this.servicioForm.imagenUrl = this.servicioFotos[0].url || undefined;
     this.servicioForm.imagenUrl2 = this.servicioFotos[1].url || undefined;
     this.servicioForm.imagenUrl3 = this.servicioFotos[2].url || undefined;
-    const obs = this.editandoServicio
+    const esEdicion = this.editandoServicio;
+    const obs = esEdicion
       ? this.negocio.actualizarServicio(this.servicioEditandoId!, this.servicioForm)
       : this.negocio.crearServicio(this.servicioForm);
-    obs.subscribe({ next: () => { this.mostrarModalServicio = false; this.cargarServicios(); } });
+    obs.subscribe({
+      next: () => {
+        this.mostrarModalServicio = false;
+        this.cargarServicios();
+        this.alert.success(esEdicion ? 'Servicio actualizado' : 'Servicio creado');
+      },
+      error: () => this.alert.error('Error al guardar el servicio')
+    });
   }
   eliminarServicio(id: number) {
-    if (!confirm('¿Eliminar este servicio?')) return;
-    this.negocio.eliminarServicio(id).subscribe({ next: () => this.cargarServicios() });
+    this.alert.confirm({
+      title: '¿Eliminar servicio?',
+      html: 'El servicio se eliminará del catálogo.',
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarServicio(id).subscribe({
+        next: () => { this.alert.success('Servicio eliminado'); this.cargarServicios(); },
+        error: () => this.alert.error('Error al eliminar el servicio')
+      });
+    });
   }
 
   // ── Barberos ─────────────────────────────────────────────
@@ -417,27 +537,79 @@ export class AdminComponent implements OnInit, AfterViewInit {
   eliminarBarberoFoto() { this.barberoFoto = { file: null, preview: '', url: '' }; }
   guardarBarbero() {
     if (!this.barberoForm.nombre) return;
-    if (this.barberoFoto.file) {
-      this.subiendoBarberoFoto = true;
-      this.negocio.uploadImagen(this.barberoFoto.file).subscribe({
-        next: res => { this.subiendoBarberoFoto = false; this.barberoFoto.url = res.url; this.persistirBarbero(); },
-        error: () => { this.subiendoBarberoFoto = false; alert('Error al subir la foto.'); }
-      });
-    } else {
-      this.barberoFoto.url = this.barberoFoto.url || this.barberoForm.foto || '';
-      this.persistirBarbero();
-    }
+    this.alert.confirm({
+      title: this.editandoBarbero ? '¿Guardar cambios?' : '¿Crear barbero?',
+      html: `Se ${this.editandoBarbero ? 'actualizarán los datos de' : 'creará'} <strong>${this.esc(this.barberoForm.nombre)}</strong>.`,
+      confirmText: 'Sí, guardar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      if (this.barberoFoto.file) {
+        this.subiendoBarberoFoto = true;
+        this.negocio.uploadImagen(this.barberoFoto.file).subscribe({
+          next: res => { this.subiendoBarberoFoto = false; this.barberoFoto.url = res.url; this.persistirBarbero(); },
+          error: () => { this.subiendoBarberoFoto = false; this.alert.error('Error al subir la foto'); }
+        });
+      } else {
+        this.barberoFoto.url = this.barberoFoto.url || this.barberoForm.foto || '';
+        this.persistirBarbero();
+      }
+    });
   }
   private persistirBarbero() {
     this.barberoForm.foto = this.barberoFoto.url || undefined;
-    const obs = this.editandoBarbero
+    const esEdicion = this.editandoBarbero;
+    const obs = esEdicion
       ? this.negocio.actualizarBarbero(this.barberoEditandoId!, this.barberoForm)
       : this.negocio.crearBarbero(this.barberoForm);
-    obs.subscribe({ next: () => { this.mostrarModalBarbero = false; this.cargarBarberos(); } });
+    obs.subscribe({
+      next: () => {
+        this.mostrarModalBarbero = false;
+        this.cargarBarberos();
+        this.alert.success(esEdicion ? 'Barbero actualizado' : 'Barbero creado');
+      },
+      error: () => this.alert.error('Error al guardar el barbero')
+    });
   }
   eliminarBarbero(id: number) {
-    if (!confirm('¿Eliminar este barbero?')) return;
-    this.negocio.eliminarBarbero(id).subscribe({ next: () => this.cargarBarberos() });
+    this.negocio.impactoBarbero(id).subscribe({
+      next: impacto => {
+        const turnosHtml = impacto.turnos > 0
+          ? `<div style="color:#e74c3c;font-weight:600;margin-top:8px">⚠️ ${impacto.turnos} reserva${impacto.turnos !== 1 ? 's' : ''} asociada${impacto.turnos !== 1 ? 's' : ''}</div>`
+          : '';
+        const usuarioHtml = impacto.tieneUsuario
+          ? `<div>🗑️ Acceso al panel (usuario)</div>`
+          : '';
+        this.alert.confirm({
+          title: `Eliminar a ${impacto.nombre}`,
+          html: `
+            <p style="margin-bottom:12px">Esta acción <strong>no se puede deshacer</strong>. Se eliminará:</p>
+            <div style="text-align:left;font-size:13px;line-height:2">
+              <div>🗑️ Horarios configurados</div>
+              <div>🗑️ Bloqueos de agenda</div>
+              ${usuarioHtml}
+              ${turnosHtml}
+            </div>`,
+          confirmText: 'Sí, eliminar todo',
+          cancelText: 'Cancelar',
+        }).then(confirmed => {
+          if (!confirmed) return;
+          this.alert.loading('Eliminando...');
+          this.negocio.eliminarBarbero(id).subscribe({
+            next: () => {
+              this.alert.close();
+              this.alert.success('Barbero eliminado');
+              this.cargarBarberos();
+              this.cdr.detectChanges();
+            },
+            error: () => {
+              this.alert.close();
+              this.alert.error('Error al eliminar el barbero');
+            }
+          });
+        });
+      },
+      error: () => this.alert.error('No se pudo obtener información del barbero')
+    });
   }
   verHorarios(b: Barbero) {
     this.barberoHorariosId = b.id!;
@@ -458,8 +630,20 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
   eliminarHorarioDia(dia: number) {
     if (!this.barberoHorariosId) return;
-    this.negocio.eliminarHorario(this.barberoHorariosId, dia).subscribe({
-      next: () => { this.horariosActivos = this.horariosActivos.filter(h => h.diaSemana !== dia); this.cdr.detectChanges(); }
+    const barberoId = this.barberoHorariosId;
+    this.alert.confirm({
+      title: `¿Quitar ${this.nombreDia(dia)}?`,
+      html: 'El barbero no tendrá disponibilidad ese día.',
+      confirmText: 'Sí, quitar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarHorario(barberoId, dia).subscribe({
+        next: () => {
+          this.horariosActivos = this.horariosActivos.filter(h => h.diaSemana !== dia);
+          this.cdr.detectChanges();
+        },
+        error: () => this.alert.error('Error al quitar el horario')
+      });
     });
   }
 
@@ -514,8 +698,17 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
   }
   eliminarUsuario(id: number) {
-    if (!confirm('¿Revocar el acceso a este barbero?')) return;
-    this.negocio.eliminarUsuario(id).subscribe({ next: () => this.cargarUsuarios() });
+    this.alert.confirm({
+      title: '¿Revocar acceso?',
+      html: 'El barbero perderá acceso al panel de administración.',
+      confirmText: 'Sí, revocar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarUsuario(id).subscribe({
+        next: () => { this.alert.success('Acceso revocado'); this.cargarUsuarios(); },
+        error: () => this.alert.error('Error al revocar el acceso')
+      });
+    });
   }
   // Cambio de contraseña del admin
   guardarCambioPassAdmin() {
@@ -525,9 +718,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.errorCambioPassAdmin = '';
     this.negocio.cambiarMiPassword(actual, nueva).subscribe({
       next: () => {
-        this.exitoCambioPassAdmin = true;
         this.cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
-        setTimeout(() => { this.exitoCambioPassAdmin = false; }, 4000);
+        this.mostrarCambioPassAdmin = false;
+        this.alert.success('Contraseña actualizada correctamente');
       },
       error: err => { this.errorCambioPassAdmin = err.error?.error || 'Contraseña actual incorrecta.'; }
     });
@@ -540,13 +733,35 @@ export class AdminComponent implements OnInit, AfterViewInit {
   abrirModalBloqueo() { this.bloqueoForm = this.bloqueoVacio(); this.mostrarModalBloqueo = true; }
   guardarBloqueo() {
     if (!this.bloqueoForm.barberoId || !this.bloqueoForm.fecha) return;
-    this.negocio.crearBloqueo(this.bloqueoForm).subscribe({
-      next: () => { this.mostrarModalBloqueo = false; this.cargarBloqueos(); }
+    const barbero = this.barberos.find(b => b.id === +this.bloqueoForm.barberoId);
+    this.alert.confirm({
+      title: '¿Crear bloqueo?',
+      html: `Se bloqueará a <strong>${this.esc(barbero?.nombre ?? 'barbero')}</strong> el <strong>${this.esc(this.bloqueoForm.fecha)}</strong> de ${this.esc(this.bloqueoForm.horaInicio)} a ${this.esc(this.bloqueoForm.horaFin)}.`,
+      confirmText: 'Sí, bloquear',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.crearBloqueo(this.bloqueoForm).subscribe({
+        next: () => {
+          this.mostrarModalBloqueo = false;
+          this.cargarBloqueos();
+          this.alert.success('Bloqueo creado');
+        },
+        error: () => this.alert.error('Error al crear el bloqueo')
+      });
     });
   }
   eliminarBloqueo(id: number) {
-    if (!confirm('¿Eliminar este bloqueo?')) return;
-    this.negocio.eliminarBloqueo(id).subscribe({ next: () => this.cargarBloqueos() });
+    this.alert.confirm({
+      title: '¿Eliminar bloqueo?',
+      html: 'Se liberará ese horario en la agenda.',
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarBloqueo(id).subscribe({
+        next: () => { this.alert.success('Bloqueo eliminado'); this.cargarBloqueos(); },
+        error: () => this.alert.error('Error al eliminar el bloqueo')
+      });
+    });
   }
 
   // ── Galería ──────────────────────────────────────────────
@@ -578,27 +793,51 @@ export class AdminComponent implements OnInit, AfterViewInit {
   eliminarGaleriaFoto() { this.galeriaFoto = { file: null, preview: '', url: '' }; }
   guardarGaleria() {
     if (!this.galeriaForm.titulo) return;
-    if (this.galeriaFoto.file) {
-      this.subiendoGaleriaFoto = true;
-      this.negocio.uploadImagen(this.galeriaFoto.file).subscribe({
-        next: res => { this.subiendoGaleriaFoto = false; this.galeriaFoto.url = res.url; this.persistirGaleria(); },
-        error: () => { this.subiendoGaleriaFoto = false; alert('Error al subir la imagen.'); }
-      });
-    } else {
-      this.galeriaFoto.url = this.galeriaFoto.url || this.galeriaForm.imagenUrl || '';
-      this.persistirGaleria();
-    }
+    this.alert.confirm({
+      title: this.editandoGaleria ? '¿Guardar cambios?' : '¿Agregar imagen?',
+      html: `<strong>${this.esc(this.galeriaForm.titulo)}</strong> se ${this.editandoGaleria ? 'actualizará en' : 'agregará a'} la galería.`,
+      confirmText: 'Sí, guardar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      if (this.galeriaFoto.file) {
+        this.subiendoGaleriaFoto = true;
+        this.negocio.uploadImagen(this.galeriaFoto.file).subscribe({
+          next: res => { this.subiendoGaleriaFoto = false; this.galeriaFoto.url = res.url; this.persistirGaleria(); },
+          error: () => { this.subiendoGaleriaFoto = false; this.alert.error('Error al subir la imagen'); }
+        });
+      } else {
+        this.galeriaFoto.url = this.galeriaFoto.url || this.galeriaForm.imagenUrl || '';
+        this.persistirGaleria();
+      }
+    });
   }
   private persistirGaleria() {
     this.galeriaForm.imagenUrl = this.galeriaFoto.url || '';
-    const obs = this.editandoGaleria
+    const esEdicion = this.editandoGaleria;
+    const obs = esEdicion
       ? this.negocio.actualizarGaleria(this.galeriaEditandoId!, this.galeriaForm)
       : this.negocio.crearGaleria(this.galeriaForm);
-    obs.subscribe({ next: () => { this.mostrarModalGaleria = false; this.cargarGaleria(); } });
+    obs.subscribe({
+      next: () => {
+        this.mostrarModalGaleria = false;
+        this.cargarGaleria();
+        this.alert.success(esEdicion ? 'Imagen actualizada' : 'Imagen agregada a la galería');
+      },
+      error: () => this.alert.error('Error al guardar la imagen')
+    });
   }
   eliminarGaleria(id: number) {
-    if (!confirm('¿Ocultar esta imagen?')) return;
-    this.negocio.eliminarGaleria(id).subscribe({ next: () => this.cargarGaleria() });
+    this.alert.confirm({
+      title: '¿Eliminar imagen?',
+      html: 'La imagen se eliminará de la galería.',
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarGaleria(id).subscribe({
+        next: () => { this.alert.success('Imagen eliminada'); this.cargarGaleria(); },
+        error: () => this.alert.error('Error al eliminar la imagen')
+      });
+    });
   }
 
   // ── Configuración agente ─────────────────────────────────────────
@@ -622,8 +861,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.agenteContextoOriginal = this.agenteContexto;
         this.guardandoContexto = false;
         this.cdr.detectChanges();
+        this.alert.success('Prompt del agente guardado');
       },
-      error: () => { this.guardandoContexto = false; alert('Error al guardar el prompt.'); }
+      error: () => { this.guardandoContexto = false; this.alert.error('Error al guardar el prompt'); }
     });
   }
   get agenteContextoCambiado(): boolean {
@@ -669,7 +909,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const t = this.turnoConfirmado;
     if (!t || !t.telefono) return '';
     const tel = t.telefono.replace(/\D/g, '');
-    const msg = `Hola ${t.paciente}! Tu turno en El Corte está confirmado para el ${t.fecha} a las ${t.hora} con ${t.barberoNombre}. ¡Te esperamos!`;
+    const nombreNegocio = this.configForm.nombre || 'El Corte';
+    const msg = `Hola ${t.paciente}! Tu turno en ${nombreNegocio} está confirmado para el ${t.fecha} a las ${t.hora} con ${t.barberoNombre}. ¡Te esperamos!`;
     return `https://wa.me/598${tel}?text=${encodeURIComponent(msg)}`;
   }
 
@@ -730,6 +971,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   // ── Helpers ──────────────────────────────────────────────
+  private esc(v: string): string {
+    return v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+  }
+
   private servicioVacio(): Servicio {
     return { nombre: '', descripcion: '', precio: 0, duracionMinutos: 30, emoji: '✂️', categoria: '' };
   }

@@ -89,6 +89,28 @@ export interface UsuarioConPassword extends UsuarioAdmin {
   password: string;
 }
 
+export interface NegocioConfig {
+  tenantId?: string;
+  nombre: string;
+  tagline: string;
+  heroTitulo1: string;
+  heroTitulo2: string;
+  heroDesc: string;
+  footerDesc: string;
+  direccion: string;
+  telefono: string;
+  email?: string;
+  whatsapp?: string;
+  instagramHandle?: string;
+  timeZone?: string;
+  horario1?: string;
+  horario2?: string;
+  horario3?: string;
+  t1Nombre?: string; t1Iniciales?: string; t1Servicio?: string; t1Texto?: string;
+  t2Nombre?: string; t2Iniciales?: string; t2Servicio?: string; t2Texto?: string;
+  t3Nombre?: string; t3Iniciales?: string; t3Servicio?: string; t3Texto?: string;
+}
+
 export interface ClienteResumen {
   nombre: string;
   telefono: string;
@@ -175,6 +197,9 @@ export class NegocioService {
   }
   actualizarBarbero(id: number, b: Barbero): Observable<Barbero> {
     return this.http.put<Barbero>(`${this.base}/barberos/${this.tenantId}/${id}`, b);
+  }
+  impactoBarbero(id: number): Observable<{ nombre: string; turnos: number; tieneUsuario: boolean }> {
+    return this.http.get<{ nombre: string; turnos: number; tieneUsuario: boolean }>(`${this.base}/barberos/${this.tenantId}/${id}/impacto`);
   }
   eliminarBarbero(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/barberos/${this.tenantId}/${id}`);
@@ -274,6 +299,14 @@ export class NegocioService {
   }
   cambiarMiPassword(actual: string, nueva: string): Observable<void> {
     return this.http.patch<void>(`${this.base.replace('/api/v1', '/api/auth')}/cambiar-password`, { actual, nueva });
+  }
+
+  // Config dinámica del landing
+  getConfig(): Observable<NegocioConfig> {
+    return this.http.get<NegocioConfig>(`${this.base}/config/${this.tenantId}`);
+  }
+  updateConfig(c: NegocioConfig): Observable<NegocioConfig> {
+    return this.http.put<NegocioConfig>(`${this.base}/config/${this.tenantId}`, c);
   }
 
   // Configuración del negocio / agente

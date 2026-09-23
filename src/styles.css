@@ -344,3 +344,42 @@ h1,h2,h3,h4,h5,h6 {
 .btn-close-custom:hover { color: var(--text-primary); background: var(--bg-card-2); }
 
 .form-label { color: var(--text-secondary); font-size: 12px; font-weight: 500; letter-spacing: 0.05em; margin-bottom: 6px; }
+
+/* ─── SWEETALERT2 ADMIN THEME ───────────────────────────────────── */
+.swal-admin-popup {
+  background: #14141F !important;
+  border: 1px solid #2a2a3a !important;
+  border-radius: 14px !important;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.swal-admin-title {
+  color: #f0e6c8 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+}
+.swal-admin-html {
+  color: #9898b0 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+.swal2-icon.swal2-warning { border-color: #c9a03a !important; color: #c9a03a !important; }
+.swal2-icon.swal2-success { border-color: #27ae60 !important; color: #27ae60 !important; }
+.swal2-icon.swal2-success [class^='swal2-success-line'] { background: #27ae60 !important; }
+.swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(39,174,96,0.3) !important; }
+.swal2-icon.swal2-error { border-color: #c0392b !important; color: #c0392b !important; }
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] { background: #c0392b !important; }
+.swal-admin-confirm, .swal-admin-confirm-gold {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+}
+.swal-admin-confirm-gold { background: #c9a03a !important; }
+.swal-admin-cancel {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 10px 22px !important;
+}
+.swal2-loader { border-color: #c9a03a transparent #c9a03a transparent !important; }
