@@ -455,51 +455,37 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   enviarReserva() {
     if (!this.reservaForm.paciente || !this.reservaForm.fecha || !this.reservaForm.hora || !this.reservaForm.servicio) return;
-    const barbero = this.barberos.find(b => b.id === +this.reservaForm.barberoId);
-    const barberoLinea = barbero ? `<div style="margin-top:4px">💈 ${this.esc(barbero.nombre)}</div>` : '';
-    this.alert.confirm({
-      title: '¿Confirmar tu reserva?',
-      html: `<div style="text-align:left;font-size:13px;line-height:2">
-        <div>👤 <strong>${this.esc(this.reservaForm.paciente)}</strong></div>
-        <div>✂️ ${this.esc(this.reservaForm.servicio)}</div>
-        <div>📅 ${this.reservaForm.fecha} · ${this.reservaForm.hora}</div>
-        ${barberoLinea}
-      </div>`,
-      confirmText: 'Sí, confirmar turno',
-    }).then(confirmed => {
-      if (!confirmed) return;
-      this.enviando = true;
-      this.cdr.detectChanges();
-      const turno: Turno = {
-        paciente: this.reservaForm.paciente,
-        telefono: this.reservaForm.telefono,
-        servicio: this.reservaForm.servicio,
-        fecha: this.reservaForm.fecha,
-        hora: this.reservaForm.hora,
-        barberoId: this.reservaForm.barberoId ? +this.reservaForm.barberoId : undefined
-      };
-      this.negocio.crearTurno(turno).subscribe({
-        next: t => {
-          const b = this.barberos.find(x => x.id === t.barberoId);
-          const conBarbero = b ? ` con ${b.nombre}` : '';
-          this.reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
-          this.slotsDisponibles = [];
-          this.enviando = false;
-          this.cerrarReservaModal();
-          this.alert.success(`¡Turno confirmado! Te esperamos el ${t.fecha} a las ${t.hora}${conBarbero}.`);
-          this.cdr.detectChanges();
-        },
-        error: (err: HttpErrorResponse) => {
-          this.enviando = false;
-          if (err.status === 409) {
-            this.alert.error('Ese horario ya fue tomado.', 'Por favor elegí otro horario disponible.');
-            this.onFechaOServicioCambia();
-          } else {
-            this.alert.error('Error al reservar', 'Intentá de nuevo o contactanos directamente.');
-          }
-          this.cdr.detectChanges();
+    this.enviando = true;
+    this.cdr.detectChanges();
+    const turno: Turno = {
+      paciente: this.reservaForm.paciente,
+      telefono: this.reservaForm.telefono,
+      servicio: this.reservaForm.servicio,
+      fecha: this.reservaForm.fecha,
+      hora: this.reservaForm.hora,
+      barberoId: this.reservaForm.barberoId ? +this.reservaForm.barberoId : undefined
+    };
+    this.negocio.crearTurno(turno).subscribe({
+      next: t => {
+        const b = this.barberos.find(x => x.id === t.barberoId);
+        const conBarbero = b ? ` con ${b.nombre}` : '';
+        this.reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
+        this.slotsDisponibles = [];
+        this.enviando = false;
+        this.cerrarReservaModal();
+        this.alert.success(`¡Turno confirmado! Te esperamos el ${t.fecha} a las ${t.hora}${conBarbero}.`);
+        this.cdr.detectChanges();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.enviando = false;
+        if (err.status === 409) {
+          this.alert.error('Ese horario ya fue tomado', 'Por favor elegí otro horario disponible.');
+          this.onFechaOServicioCambia();
+        } else {
+          this.alert.error('Error al reservar', 'Intentá de nuevo o contactanos directamente.');
         }
-      });
+        this.cdr.detectChanges();
+      }
     });
   }
 
