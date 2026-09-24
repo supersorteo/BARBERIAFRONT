@@ -1,271 +1,408 @@
-<!-- TOPBAR -->
-<div class="admin-topbar">
-  <div class="container admin-topbar-inner">
-    <span class="admin-brand">✂️ Mi Panel</span>
-    <div class="admin-user-badge">
-      <span class="admin-user-dot"></span>
-      <span>{{ usuario?.username }}</span>
-      <button class="btn-icon ms-2" (click)="cerrarSesion()">Salir →</button>
-      <a routerLink="/" class="btn-icon">← Sitio</a>
+<!-- ── TOPBAR ─────────────────────────────────────────────────── -->
+<header class="mpanel-topbar">
+  <div class="mpanel-topbar-inner">
+    <div class="mpanel-brand">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+      <span>Panel Barbero</span>
+    </div>
+
+    <div class="mpanel-user-info-wrap">
+      <div class="mpanel-user-avatar-sm">
+        @if (perfilBarbero?.foto) {
+          <img [src]="img(perfilBarbero!.foto)" alt="">
+        } @else {
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        }
+      </div>
+      <div class="mpanel-user-text">
+        <span class="mpanel-user-name">{{ perfilBarbero?.nombre || usuario?.username }}</span>
+        <span class="mpanel-user-role">{{ perfilBarbero?.especialidad || 'Barbero' }}</span>
+      </div>
+      <span class="mpanel-online-dot"></span>
+    </div>
+
+    <div class="mpanel-topbar-nav">
+      <a routerLink="/" class="mpanel-nav-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Sitio
+      </a>
+      <button class="mpanel-nav-btn mpanel-nav-btn--exit" (click)="cerrarSesion()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Salir
+      </button>
     </div>
   </div>
-</div>
+</header>
 
-<!-- TABS -->
-<div class="admin-tabs">
-  <button class="admin-tab" [class.active]="tabActiva === 'agenda'" (click)="tabActiva = 'agenda'">
-    📅 Mi Agenda
+<!-- ── TABS ──────────────────────────────────────────────────────── -->
+<nav class="mpanel-tabs">
+  <button class="mpanel-tab" [class.mpanel-tab--active]="tabActiva === 'agenda'" (click)="tabActiva = 'agenda'">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Mi Agenda
+    @if (turnos.length > 0) { <span class="mpanel-tab-count">{{ turnos.length }}</span> }
   </button>
-  <button class="admin-tab" [class.active]="tabActiva === 'horario'" (click)="tabActiva = 'horario'">
-    🚫 Mi Horario
+  <button class="mpanel-tab" [class.mpanel-tab--active]="tabActiva === 'horario'" (click)="tabActiva = 'horario'">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Bloqueos
+    @if (bloqueos.length > 0) { <span class="mpanel-tab-count">{{ bloqueos.length }}</span> }
   </button>
-  <button class="admin-tab" [class.active]="tabActiva === 'perfil'" (click)="tabActiva = 'perfil'">
-    👤 Mi Perfil
+  <button class="mpanel-tab" [class.mpanel-tab--active]="tabActiva === 'perfil'" (click)="tabActiva = 'perfil'">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Mi Perfil
   </button>
-</div>
+</nav>
 
-<div class="admin-content">
-  <div class="container">
+<!-- ── MAIN CONTENT ───────────────────────────────────────────── -->
+<main class="mpanel-main">
+  <div class="mpanel-container">
 
-    <!-- ── TAB: AGENDA ──────────────────────────────────────────── -->
+    <!-- ────────── TAB: MI AGENDA ─────────────────────────────── -->
     @if (tabActiva === 'agenda') {
+      <div class="mpanel-tab-content">
 
-      <div class="section-head mb-4">
-        <h3>Mis turnos</h3>
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-          <input type="date" class="form-control form-dark w-auto"
-                 [(ngModel)]="fechaFiltro" (change)="cargar()">
-          @if (fechaFiltro) {
-            <button class="btn-icon" (click)="limpiarFecha()">Ver todos →</button>
-          }
-          <button class="btn-icon primary" (click)="cargar()">🔄 Actualizar</button>
-        </div>
-      </div>
-
-      @if (cargando) {
-        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando turnos...</div>
-      } @else if (turnos.length === 0) {
-        <div class="empty-state">
-          <span class="empty-state-icon">📅</span>
-          No hay turnos {{ fechaFiltro ? 'para esta fecha' : 'registrados' }}.
-        </div>
-      } @else {
-        <div class="admin-table-wrap">
-          <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>Hora</th>
-                  <th>Fin</th>
-                  <th>Cliente</th>
-                  <th>Teléfono</th>
-                  <th>Servicio</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (t of turnos; track t.id) {
-                  <tr>
-                    <td><strong>{{ t.hora }}</strong></td>
-                    <td>{{ t.horaFin || '—' }}</td>
-                    <td>{{ t.paciente }}</td>
-                    <td>
-                      @if (t.telefono) {
-                        <a [href]="'https://wa.me/598' + t.telefono.replace(/\D/g,'')"
-                           target="_blank" class="whatsapp-link">
-                          📱 {{ t.telefono }}
-                        </a>
-                      } @else { — }
-                    </td>
-                    <td>{{ t.servicio }}</td>
-                    <td><span [class]="estadoBadge(t.estado || '')">{{ t.estado }}</span></td>
-                    <td>
-                      <div class="d-flex gap-2">
-                        @if (t.estado !== 'COMPLETADO') {
-                          <button class="btn-icon primary" (click)="cambiarEstado(t, 'COMPLETADO')">✓ Listo</button>
-                        }
-                        @if (t.estado !== 'CANCELADO') {
-                          <button class="btn-icon danger" (click)="cambiarEstado(t, 'CANCELADO')">✕</button>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+        <div class="mpanel-section-head">
+          <div>
+            <h2 class="mpanel-section-title">Mis turnos</h2>
+            @if (!cargando) {
+              <span class="mpanel-count">{{ turnos.length }} turno(s)</span>
+            }
+          </div>
+          <div class="mpanel-filter-row">
+            <div class="mpanel-date-wrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <input type="date" class="mpanel-date-input" [(ngModel)]="fechaFiltro" (change)="cargar()">
+            </div>
+            @if (fechaFiltro) {
+              <button class="mpanel-btn-ghost" (click)="limpiarFecha()">Ver todos</button>
+            }
+            <button class="mpanel-btn-icon" (click)="cargar()" title="Actualizar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.47"/></svg>
+            </button>
           </div>
         </div>
-      }
-    }
 
-    <!-- ── TAB: MI HORARIO (bloqueos) ──────────────────────────── -->
-    @if (tabActiva === 'horario') {
+        @if (cargando) {
+          <div class="mpanel-loading">
+            <div class="mpanel-spinner"></div>
+            <span>Cargando turnos...</span>
+          </div>
+        } @else if (turnos.length === 0) {
+          <div class="mpanel-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <p>Sin turnos {{ fechaFiltro ? 'para esta fecha' : 'registrados' }}</p>
+          </div>
+        } @else {
+          <div class="mpanel-turnos-list">
+            @for (t of turnos; track t.id) {
+              <div class="mpanel-turno-card"
+                   [class.mpanel-turno-card--completado]="t.estado === 'COMPLETADO'"
+                   [class.mpanel-turno-card--cancelado]="t.estado === 'CANCELADO'">
 
-      <div class="section-head mb-4">
-        <h3>Mis bloqueos de horario</h3>
-        <button class="btn-gold-sm" (click)="abrirFormBloqueo()">+ Agregar bloqueo</button>
-      </div>
+                <!-- Hora -->
+                <div class="mpanel-tc-time">
+                  <div class="mpanel-tc-hora">{{ t.hora }}</div>
+                  @if (t.horaFin) {
+                    <div class="mpanel-tc-horafin">{{ t.horaFin }}</div>
+                  }
+                </div>
 
-      <p class="text-muted small mb-4">
-        Usá los bloqueos para marcar días libres, llegadas tarde o cualquier horario en que no estés disponible.
-        El sistema no mostrará turnos en esos horarios.
-      </p>
+                <!-- Línea separadora -->
+                <div class="mpanel-tc-divider"></div>
 
-      <!-- Form nuevo bloqueo -->
-      @if (mostrarFormBloqueo) {
-        <div class="bloqueo-form-card mb-4">
-          <h5 class="mb-3" style="color:var(--gold)">Nuevo bloqueo</h5>
+                <!-- Info principal -->
+                <div class="mpanel-tc-body">
+                  <div class="mpanel-tc-cliente">{{ t.paciente }}</div>
+                  @if (t.servicio) {
+                    <div class="mpanel-tc-servicio">{{ t.servicio }}</div>
+                  }
+                  @if (t.telefono) {
+                    <a [href]="'https://wa.me/598' + t.telefono.replace(/\D/g,'')"
+                       target="_blank" class="mpanel-tc-wa">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                      {{ t.telefono }}
+                    </a>
+                  }
+                </div>
 
-          @if (errorBloqueo) {
-            <div class="alert alert-danger py-2 mb-3">{{ errorBloqueo }}</div>
-          }
+                <!-- Estado y acciones -->
+                <div class="mpanel-tc-right">
+                  <span [class]="estadoBadge(t.estado || '')">
+                    {{ t.estado === 'RESERVADO' ? 'Reservado' : t.estado === 'COMPLETADO' ? 'Completado' : 'Cancelado' }}
+                  </span>
+                  @if (t.estado === 'RESERVADO') {
+                    <div class="mpanel-tc-actions">
+                      <button class="mpanel-ta-btn mpanel-ta-btn--ok" (click)="cambiarEstado(t, 'COMPLETADO')" title="Marcar completado">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Listo
+                      </button>
+                      <button class="mpanel-ta-btn mpanel-ta-btn--cancel" (click)="cambiarEstado(t, 'CANCELADO')" title="Cancelar turno">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Cancelar
+                      </button>
+                    </div>
+                  }
+                </div>
 
-          <div class="row g-3">
-            <div class="col-12 col-md-4">
-              <label class="form-label">Fecha *</label>
-              <input type="date" class="form-control form-dark" [(ngModel)]="bloqueoForm.fecha">
-            </div>
-            <div class="col-12 col-md-8 d-flex align-items-end">
-              <div class="form-check ms-2 mb-2">
-                <input type="checkbox" class="form-check-input" id="diaLibre"
-                       [(ngModel)]="bloqueoForm['diaLibre']" (change)="onDiaLibreChange()">
-                <label class="form-check-label" for="diaLibre" style="color:var(--text-muted)">
-                  Día libre completo
-                </label>
-              </div>
-            </div>
-            @if (!bloqueoForm['diaLibre']) {
-              <div class="col-6 col-md-3">
-                <label class="form-label">Hora inicio</label>
-                <input type="time" class="form-control form-dark" [(ngModel)]="bloqueoForm.horaInicio">
-              </div>
-              <div class="col-6 col-md-3">
-                <label class="form-label">Hora fin</label>
-                <input type="time" class="form-control form-dark" [(ngModel)]="bloqueoForm.horaFin">
               </div>
             }
-            <div class="col-12 col-md-6">
-              <label class="form-label">Motivo <span style="color:var(--text-muted)">(opcional)</span></label>
-              <input type="text" class="form-control form-dark" [(ngModel)]="bloqueoForm.motivo"
-                     placeholder="Ej: llegada tarde, cita médica...">
-            </div>
           </div>
+        }
 
-          <div class="d-flex gap-2 mt-3">
-            <button class="btn-gold-sm" (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
-              {{ guardandoBloqueo ? 'Guardando...' : 'Guardar' }}
-            </button>
-            <button class="btn-icon" (click)="mostrarFormBloqueo = false">Cancelar</button>
-          </div>
-        </div>
-      }
-
-      <!-- Lista de bloqueos -->
-      @if (cargandoBloqueos) {
-        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando...</div>
-      } @else if (bloqueos.length === 0) {
-        <div class="empty-state">
-          <span class="empty-state-icon">✅</span>
-          No tenés bloqueos activos. Tu horario está disponible por completo.
-        </div>
-      } @else {
-        <div class="bloqueos-list">
-          @for (b of bloqueos; track b.id) {
-            <div class="bloqueo-item">
-              <div class="bloqueo-fecha">
-                <span class="bloqueo-dia">{{ b.fecha }}</span>
-                @if (esDiaLibre(b)) {
-                  <span class="badge-dia-libre">Día libre</span>
-                } @else {
-                  <span class="bloqueo-horas">{{ b.horaInicio }} — {{ b.horaFin }}</span>
-                }
-              </div>
-              <div class="bloqueo-motivo">{{ b.motivo || 'Sin motivo especificado' }}</div>
-              <button class="btn-icon danger" (click)="eliminarBloqueo(b.id!)">✕ Eliminar</button>
-            </div>
-          }
-        </div>
-      }
+      </div>
     }
 
-    <!-- ── TAB: MI PERFIL ──────────────────────────────────────── -->
-    @if (tabActiva === 'perfil') {
+    <!-- ────────── TAB: BLOQUEOS ──────────────────────────────── -->
+    @if (tabActiva === 'horario') {
+      <div class="mpanel-tab-content">
 
-      <div class="section-head mb-4">
-        <h3>Mi perfil público</h3>
-      </div>
-
-      <p class="text-muted small mb-4">
-        Los clientes ven tu nombre, especialidad y foto al reservar turno. Actualizalos cuando quieras.
-      </p>
-
-      @if (mensajePerfil) {
-        <div class="alert mb-4 py-2" [class.alert-success]="exitoPerfil" [class.alert-danger]="!exitoPerfil">
-          {{ mensajePerfil }}
+        <div class="mpanel-section-head">
+          <div>
+            <h2 class="mpanel-section-title">Mis bloqueos de horario</h2>
+            <p class="mpanel-section-desc">Bloqueá días libres o rangos horarios en que no estés disponible.</p>
+          </div>
+            <button class="mpanel-btn-gold" (click)="abrirFormBloqueo()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuevo bloqueo
+            </button>
         </div>
-      }
 
-      <div class="bloqueo-form-card" style="max-width:520px">
-        <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label">Especialidad</label>
-            <input type="text" class="form-control form-dark"
-                   [(ngModel)]="perfilForm.especialidad"
-                   placeholder="Ej: Cortes clásicos, degradados, barbas...">
-          </div>
-          <div class="col-12">
-            <label class="form-label">URL de foto de perfil</label>
-            <input type="url" class="form-control form-dark"
-                   [(ngModel)]="perfilForm.foto"
-                   placeholder="https://...">
-          </div>
-          @if (perfilForm.foto) {
-            <div class="col-12">
-              <img [src]="perfilForm.foto" alt="Preview"
-                   style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)"
-                   onerror="this.style.display='none'">
+        <!-- Modal nuevo bloqueo -->
+        @if (mostrarFormBloqueo) {
+          <div class="mpanel-modal-backdrop" (click)="mostrarFormBloqueo = false"></div>
+          <div class="mpanel-modal-wrap">
+            <div class="mpanel-modal-dialog" (click)="$event.stopPropagation()">
+              <div class="mpanel-modal-header">
+                <div class="mpanel-modal-header-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Nuevo bloqueo de horario
+                </div>
+                <button class="mpanel-modal-close" (click)="mostrarFormBloqueo = false">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div class="mpanel-modal-body">
+                @if (errorBloqueo) {
+                  <div class="mpanel-error-banner">{{ errorBloqueo }}</div>
+                }
+                <div class="mpanel-form-grid">
+                  <div class="mpanel-form-group">
+                    <label class="mpanel-label">Fecha *</label>
+                    <input type="date" class="mpanel-input" [(ngModel)]="bloqueoForm.fecha">
+                  </div>
+                  <div class="mpanel-form-group mpanel-form-group--check">
+                    <label class="mpanel-check-label">
+                      <input type="checkbox" class="mpanel-check"
+                             [(ngModel)]="bloqueoForm['diaLibre']" (change)="onDiaLibreChange()">
+                      <span>Día libre completo</span>
+                    </label>
+                  </div>
+                  @if (!bloqueoForm['diaLibre']) {
+                    <div class="mpanel-form-group">
+                      <label class="mpanel-label">Inicio</label>
+                      <input type="time" class="mpanel-input" [(ngModel)]="bloqueoForm.horaInicio">
+                    </div>
+                    <div class="mpanel-form-group">
+                      <label class="mpanel-label">Fin</label>
+                      <input type="time" class="mpanel-input" [(ngModel)]="bloqueoForm.horaFin">
+                    </div>
+                  }
+                  <div class="mpanel-form-group mpanel-form-group--wide">
+                    <label class="mpanel-label">Motivo <span style="color:var(--text-muted)">(opcional)</span></label>
+                    <input type="text" class="mpanel-input" [(ngModel)]="bloqueoForm.motivo"
+                           placeholder="Ej: llegada tarde, cita médica...">
+                  </div>
+                </div>
+              </div>
+              <div class="mpanel-modal-footer">
+                <button class="mpanel-btn-ghost" (click)="mostrarFormBloqueo = false">Cancelar</button>
+                <button class="mpanel-btn-gold" (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
+                  {{ guardandoBloqueo ? 'Guardando...' : 'Guardar bloqueo' }}
+                </button>
+              </div>
             </div>
-          }
-          <div class="col-12 mt-2">
-            <button class="btn-gold-sm" (click)="guardarPerfil()" [disabled]="guardandoPerfil">
-              {{ guardandoPerfil ? 'Guardando...' : 'Guardar cambios' }}
-            </button>
           </div>
-        </div>
-      </div>
+        }
 
-      <!-- Cambio de contraseña -->
-      <div class="section-head mt-5 mb-3">
-        <h3>Cambiar contraseña</h3>
+        <!-- Lista de bloqueos -->
+        @if (cargandoBloqueos) {
+          <div class="mpanel-loading">
+            <div class="mpanel-spinner"></div>
+            <span>Cargando bloqueos...</span>
+          </div>
+        } @else if (bloqueos.length === 0) {
+          <div class="mpanel-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p>Sin bloqueos activos. Tu agenda está 100% disponible.</p>
+          </div>
+        } @else {
+          <div class="mpanel-bloqueos-grid">
+            @for (b of bloqueos; track b.id) {
+              <div class="mpanel-bloqueo-card">
+                <div class="mpanel-bloqueo-icon">
+                  @if (esDiaLibre(b)) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  }
+                </div>
+                <div class="mpanel-bloqueo-body">
+                  <div class="mpanel-bloqueo-fecha">{{ b.fecha }}</div>
+                  @if (esDiaLibre(b)) {
+                    <span class="mpanel-badge-dlibre">Día libre</span>
+                  } @else {
+                    <div class="mpanel-bloqueo-horas">{{ b.horaInicio }} — {{ b.horaFin }}</div>
+                  }
+                  @if (b.motivo) {
+                    <div class="mpanel-bloqueo-motivo">{{ b.motivo }}</div>
+                  }
+                </div>
+                <button class="mpanel-btn-icon mpanel-btn-icon--danger" (click)="eliminarBloqueo(b.id!)" title="Eliminar bloqueo">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+              </div>
+            }
+          </div>
+        }
+
       </div>
-      @if (mensajePass) {
-        <div class="alert mb-3 py-2" [class.alert-success]="exitoPass" [class.alert-danger]="!exitoPass">
-          {{ mensajePass }}
-        </div>
-      }
-      <div class="bloqueo-form-card" style="max-width:520px">
-        <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label">Contraseña actual</label>
-            <input type="password" class="form-control form-dark" [(ngModel)]="cambioPassForm.actual" placeholder="Tu contraseña actual">
-          </div>
-          <div class="col-12">
-            <label class="form-label">Nueva contraseña</label>
-            <input type="password" class="form-control form-dark" [(ngModel)]="cambioPassForm.nueva" placeholder="Nueva contraseña">
-          </div>
-          <div class="col-12">
-            <label class="form-label">Confirmar nueva contraseña</label>
-            <input type="password" class="form-control form-dark" [(ngModel)]="cambioPassForm.confirmar" placeholder="Repetí la nueva contraseña">
-          </div>
-          <div class="col-12 mt-2">
-            <button class="btn-gold-sm" (click)="guardarPassword()" [disabled]="guardandoPass">
-              {{ guardandoPass ? 'Guardando...' : 'Cambiar contraseña' }}
-            </button>
+    }
+
+    <!-- ────────── TAB: MI PERFIL ─────────────────────────────── -->
+    @if (tabActiva === 'perfil') {
+      <div class="mpanel-tab-content">
+
+        <div class="mpanel-section-head">
+          <div>
+            <h2 class="mpanel-section-title">Mi perfil público</h2>
+            <p class="mpanel-section-desc">Los clientes ven tu nombre, foto y especialidad al reservar.</p>
           </div>
         </div>
+
+        <div class="mpanel-perfil-layout">
+
+          <!-- Foto de perfil -->
+          <div class="mpanel-perfil-foto-wrap">
+            <div class="mpanel-perfil-foto-card">
+              <div class="mpanel-perfil-foto-preview">
+                @if (perfilFoto.preview) {
+                  <img [src]="perfilFoto.preview" alt="Foto de perfil" class="mpanel-perfil-img">
+                  <button class="mpanel-foto-remove" (click)="eliminarFotoPerfil()" type="button">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                } @else {
+                  <div class="mpanel-perfil-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                }
+                <label class="mpanel-foto-overlay" title="Cambiar foto">
+                  <input type="file" accept="image/*" hidden (change)="onFotoSeleccionada($event)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </label>
+              </div>
+              @if (subiendoFoto) {
+                <p class="mpanel-foto-status">Subiendo foto...</p>
+              } @else {
+                <p class="mpanel-foto-hint">Hacé clic en la foto para cambiarla</p>
+              }
+            </div>
+          </div>
+
+          <!-- Datos del perfil -->
+          <div class="mpanel-perfil-form-wrap">
+            <div class="mpanel-form-card">
+              <div class="mpanel-form-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Datos del perfil
+              </div>
+              <div class="mpanel-form-group" style="margin-top:16px">
+                <label class="mpanel-label">Especialidad</label>
+                <input type="text" class="mpanel-input"
+                       [(ngModel)]="perfilForm.especialidad"
+                       placeholder="Ej: Cortes clásicos, degradados, barbas...">
+              </div>
+              <div style="margin-top:20px">
+                <button class="mpanel-btn-gold" (click)="guardarPerfil()" [disabled]="guardandoPerfil || subiendoFoto">
+                  @if (subiendoFoto) { Subiendo foto... }
+                  @else if (guardandoPerfil) { Guardando... }
+                  @else { Guardar cambios }
+                </button>
+              </div>
+            </div>
+
+            <!-- Cambio de contraseña -->
+            <div class="mpanel-form-card" style="margin-top:20px">
+              <div class="mpanel-form-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Seguridad
+              </div>
+              <p style="color:var(--text-muted);font-size:13px;margin:12px 0 16px">Actualizá tu contraseña para mantener tu cuenta protegida.</p>
+              <button class="mpanel-btn-gold" (click)="abrirModalPass()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Cambiar contraseña
+              </button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     }
 
   </div>
-</div>
+</main>
+
+<!-- ── MODAL CAMBIO DE CONTRASEÑA ────────────────────────────── -->
+@if (mostrarModalPass) {
+  <div class="mpanel-modal-backdrop" (click)="mostrarModalPass = false"></div>
+  <div class="mpanel-modal-wrap">
+    <div class="mpanel-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="mpanel-modal-header">
+        <div class="mpanel-modal-header-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Cambiar contraseña
+        </div>
+        <button class="mpanel-modal-close" (click)="mostrarModalPass = false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="mpanel-modal-body">
+        <div class="mpanel-form-group">
+          <label class="mpanel-label">Contraseña actual</label>
+          <div class="pass-wrap">
+            <input [type]="showPass.actual ? 'text' : 'password'" class="mpanel-input" [(ngModel)]="cambioPassForm.actual" placeholder="Tu contraseña actual">
+            <button type="button" class="pass-eye" (click)="showPass.actual = !showPass.actual" tabindex="-1">
+              @if (showPass.actual) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+            </button>
+          </div>
+        </div>
+        <div class="mpanel-form-group" style="margin-top:14px">
+          <label class="mpanel-label">Nueva contraseña</label>
+          <div class="pass-wrap">
+            <input [type]="showPass.nueva ? 'text' : 'password'" class="mpanel-input" [(ngModel)]="cambioPassForm.nueva" placeholder="Nueva contraseña">
+            <button type="button" class="pass-eye" (click)="showPass.nueva = !showPass.nueva" tabindex="-1">
+              @if (showPass.nueva) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+            </button>
+          </div>
+        </div>
+        <div class="mpanel-form-group" style="margin-top:14px">
+          <label class="mpanel-label">Confirmar nueva contraseña</label>
+          <div class="pass-wrap">
+            <input [type]="showPass.conf ? 'text' : 'password'" class="mpanel-input" [(ngModel)]="cambioPassForm.confirmar" placeholder="Repetí la nueva contraseña">
+            <button type="button" class="pass-eye" (click)="showPass.conf = !showPass.conf" tabindex="-1">
+              @if (showPass.conf) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mpanel-modal-footer">
+        <button class="mpanel-btn-ghost" (click)="mostrarModalPass = false">Cancelar</button>
+        <button class="mpanel-btn-gold" (click)="guardarPassword()" [disabled]="guardandoPass">
+          {{ guardandoPass ? 'Guardando...' : 'Cambiar contraseña' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

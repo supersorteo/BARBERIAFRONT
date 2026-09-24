@@ -54,6 +54,30 @@
   --dur-slow: 450ms;
 }
 
+/* ─── PASSWORD FIELD WRAPPER (global) ─────────────────────────── */
+.pass-wrap {
+  position: relative;
+}
+.pass-wrap input { padding-right: 38px !important; }
+.pass-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+  line-height: 0;
+  z-index: 2;
+}
+.pass-eye:hover { color: var(--text-secondary); }
+
 /* ─── RESET & BASE ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

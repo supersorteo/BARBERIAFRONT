@@ -311,104 +311,199 @@
 
       <div class="action-bar mb-4">
         <div>
-          <h3 class="section-title">Barberos del equipo</h3>
+          <h3 class="section-title">Equipo de barberos</h3>
           <span class="count-badge">{{ barberos.length }} barbero(s)</span>
         </div>
         <button class="btn-primary-admin" (click)="abrirModalNuevoBarbero()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Agregar barbero
+          Nuevo barbero
         </button>
       </div>
 
-      <!-- Credenciales del admin -->
-      <div class="credenciales-admin-card">
-        <div class="credenciales-admin-left">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Tu cuenta:</span>
-          <strong>admin</strong>
-        </div>
-        <button class="btn-cred-action" (click)="mostrarCambioPassAdmin = !mostrarCambioPassAdmin">
-          🔑 Cambiar mi contraseña
-        </button>
-      </div>
-      @if (mostrarCambioPassAdmin) {
-        <div class="credenciales-admin-form">
-          @if (errorCambioPassAdmin) {
-            <div class="alert-error-inline">{{ errorCambioPassAdmin }}</div>
-          }
-          <div class="cred-form-row">
-            <input type="password" class="form-control form-dark" placeholder="Contraseña actual" [(ngModel)]="cambioPassAdminForm.actual">
-            <input type="password" class="form-control form-dark" placeholder="Nueva contraseña" [(ngModel)]="cambioPassAdminForm.nueva">
-            <input type="password" class="form-control form-dark" placeholder="Confirmar nueva" [(ngModel)]="cambioPassAdminForm.confirmar">
-            <button class="btn-primary-admin" (click)="guardarCambioPassAdmin()">Guardar</button>
-            <button class="btn-cancel-admin" (click)="mostrarCambioPassAdmin = false">Cancelar</button>
+      <!-- Admin password card -->
+      <div class="bpr-admin-card mb-4">
+        <div class="bpr-admin-card-inner">
+          <div class="bpr-admin-left">
+            <div class="bpr-admin-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="bpr-admin-name">Cuenta administrador</div>
+              <div class="bpr-admin-user">admin</div>
+            </div>
           </div>
+          <button class="bpr-pass-btn" (click)="mostrarCambioPassAdmin = !mostrarCambioPassAdmin">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Cambiar contraseña
+          </button>
         </div>
-      }
+        @if (mostrarCambioPassAdmin) {
+          <div class="bpr-pass-form">
+            @if (errorCambioPassAdmin) {
+              <div class="alert-error-inline">{{ errorCambioPassAdmin }}</div>
+            }
+            <div class="bpr-pass-form-row">
+              <div class="pass-wrap">
+                <input [type]="showAdminPass.actual ? 'text' : 'password'" class="form-control form-dark" placeholder="Contraseña actual" [(ngModel)]="cambioPassAdminForm.actual">
+                <button type="button" class="pass-eye" (click)="showAdminPass.actual = !showAdminPass.actual" tabindex="-1">
+                  @if (showAdminPass.actual) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+                </button>
+              </div>
+              <div class="pass-wrap">
+                <input [type]="showAdminPass.nueva ? 'text' : 'password'" class="form-control form-dark" placeholder="Nueva contraseña" [(ngModel)]="cambioPassAdminForm.nueva">
+                <button type="button" class="pass-eye" (click)="showAdminPass.nueva = !showAdminPass.nueva" tabindex="-1">
+                  @if (showAdminPass.nueva) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+                </button>
+              </div>
+              <div class="pass-wrap">
+                <input [type]="showAdminPass.conf ? 'text' : 'password'" class="form-control form-dark" placeholder="Confirmar nueva" [(ngModel)]="cambioPassAdminForm.confirmar">
+                <button type="button" class="pass-eye" (click)="showAdminPass.conf = !showAdminPass.conf" tabindex="-1">
+                  @if (showAdminPass.conf) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+                </button>
+              </div>
+              <button class="btn-primary-admin" (click)="guardarCambioPassAdmin()">Guardar</button>
+              <button class="btn-cancel-admin" (click)="mostrarCambioPassAdmin = false">Cancelar</button>
+            </div>
+          </div>
+        }
+      </div>
 
-      <!-- Barbers grid -->
+      <!-- Barberos grid -->
       @if (barberos.length === 0) {
         <div class="empty-state"><span class="empty-state-icon">💈</span>No hay barberos registrados.</div>
       } @else {
-        <div class="barbers-grid">
+        <div class="bpr-grid">
           @for (b of barberos; track b.id) {
             @let usuarioB = usuarioDelBarbero(b.id!);
-            <div class="barber-admin-card">
-              <div class="barber-card-top">
-                <div class="barber-admin-avatar">
+            @let turnosB = turnosDelBarberoHoy(b.id!);
+            @let isExp = barberoExpandidoId === b.id;
+            <div class="bpr-card" [class.bpr-card--expanded]="isExp">
+
+              <!-- Header: avatar + info -->
+              <div class="bpr-header">
+                <div class="bpr-avatar" (click)="abrirModalEditarBarbero(b)" title="Editar foto">
                   @if (b.foto) {
-                    <img [src]="img(b.foto)" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="">
+                    <img [src]="img(b.foto)" class="bpr-avatar-img" alt="">
                   } @else {
-                    💈
+                    <span class="bpr-avatar-emoji">💈</span>
                   }
+                  <div class="bpr-avatar-overlay">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </div>
                 </div>
-                <div class="barber-admin-info">
-                  <div class="barber-admin-name">{{ b.nombre }}</div>
-                  <div class="barber-admin-role">{{ b.especialidad || 'Barbero' }}</div>
-                  <div class="barber-badges-row">
-                    <span class="status-badge" [class]="b.activo ? 'status-active' : 'status-inactive'">
+                <div class="bpr-info">
+                  <div class="bpr-name">{{ b.nombre }}</div>
+                  <div class="bpr-role">{{ b.especialidad || 'Barbero' }}</div>
+                  <div class="bpr-badges">
+                    <span class="bpr-badge" [class.bpr-badge--on]="b.activo" [class.bpr-badge--off]="!b.activo">
+                      @if (b.activo) {
+                        <span class="bpr-badge-dot bpr-badge-dot--on"></span>
+                      }
                       {{ b.activo ? 'Activo' : 'Inactivo' }}
                     </span>
                     @if (usuarioB) {
-                      <span class="usuario-badge usuario-ok">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      <span class="bpr-badge bpr-badge--user">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         {{ usuarioB.username }}
                       </span>
                     } @else {
-                      <span class="usuario-badge usuario-sin">Sin acceso</span>
+                      <span class="bpr-badge bpr-badge--nouser">Sin acceso</span>
                     }
                   </div>
                 </div>
               </div>
-              <div class="bca-actions">
-                <button class="bca-btn" (click)="verHorarios(b)">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+
+              <!-- Action buttons -->
+              <div class="bpr-actions">
+                <button class="bpr-btn" (click)="verHorarios(b)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                   Horarios
                 </button>
-                <button class="bca-btn" (click)="abrirModalEditarBarbero(b)">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <button class="bpr-btn" (click)="abrirModalEditarBarbero(b)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   Editar
                 </button>
                 @if (usuarioB) {
-                  <button class="bca-btn" (click)="abrirResetPass(usuarioB)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Reset pass
+                  <button class="bpr-btn" (click)="abrirResetPass(usuarioB)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.47"/></svg>
+                    Reset
                   </button>
-                  <button class="bca-btn bca-btn-warning" (click)="eliminarUsuario(usuarioB.id)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  <button class="bpr-btn bpr-btn--warn" (click)="eliminarUsuario(usuarioB.id)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                     Revocar
                   </button>
                 } @else {
-                  <button class="bca-btn bca-btn-success" (click)="abrirCrearUsuario(b)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  <button class="bpr-btn bpr-btn--success" (click)="abrirCrearUsuario(b)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                     Dar acceso
                   </button>
                 }
-                <button class="bca-btn bca-btn-danger" (click)="eliminarBarbero(b.id!)">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                <button class="bpr-btn bpr-btn--danger" (click)="eliminarBarbero(b.id!)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                   Eliminar
                 </button>
               </div>
+
+              <!-- Turnos de hoy toggle -->
+              <button class="bpr-turnos-toggle" (click)="toggleTurnosBarbero(b.id!)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Turnos de hoy</span>
+                @if (cargandoTurnosHoy && isExp) {
+                  <span class="bpr-pulse"></span>
+                } @else {
+                  <span class="bpr-turnos-count">{{ turnosB.length }}</span>
+                }
+                <svg class="bpr-chevron" [class.bpr-chevron--open]="isExp" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+
+              <!-- Expanded turno list -->
+              @if (isExp) {
+                <div class="bpr-turnos-list">
+                  @if (cargandoTurnosHoy) {
+                    <div class="bpr-turnos-msg">
+                      <span class="bpr-pulse"></span>
+                      Cargando turnos...
+                    </div>
+                  } @else if (turnosB.length === 0) {
+                    <div class="bpr-turnos-msg">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      Sin turnos para hoy
+                    </div>
+                  } @else {
+                    @for (t of turnosB; track t.id) {
+                      <div class="bpr-turno-row">
+                        <div class="bpr-turno-hora">{{ t.hora }}</div>
+                        <div class="bpr-turno-info">
+                          <div class="bpr-turno-cliente">{{ t.paciente }}</div>
+                          @if (t.servicio) {
+                            <div class="bpr-turno-servicio">{{ t.servicio }}</div>
+                          }
+                        </div>
+                        <span class="status-badge" [class]="estadoBadge(t.estado ?? '')" style="font-size:10px;padding:2px 7px">
+                          {{ t.estado === 'RESERVADO' ? 'Reservado' : t.estado === 'COMPLETADO' ? 'Completado' : 'Cancelado' }}
+                        </span>
+                        <div class="bpr-turno-actions">
+                          @if (t.estado === 'RESERVADO') {
+                            <button class="bpr-ta-btn bpr-ta-btn--ok" (click)="completarTurnoRapido(t)" title="Marcar completado">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </button>
+                            <button class="bpr-ta-btn bpr-ta-btn--cancel" (click)="cancelarTurnoRapido(t)" title="Cancelar turno">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                          }
+                          <button class="bpr-ta-btn bpr-ta-btn--del" (click)="eliminarTurnoRapido(t)" title="Eliminar turno">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              }
+
             </div>
           }
         </div>
@@ -479,7 +574,13 @@
                 </div>
                 <div class="col-12">
                   <label class="form-label">Contraseña</label>
-                  <input type="text" class="form-control form-dark" [(ngModel)]="nuevoUsuarioForm.password" placeholder="Ingresá una contraseña">
+                  <div class="pass-wrap">
+                    <input [type]="showCrearPass ? 'text' : 'password'" class="form-control form-dark" [(ngModel)]="nuevoUsuarioForm.password" placeholder="Ingresá una contraseña">
+                    <button type="button" class="pass-eye" (click)="showCrearPass = !showCrearPass" tabindex="-1">
+                      @if (showCrearPass) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                      } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -507,7 +608,13 @@
               <div class="row g-3">
                 <div class="col-12">
                   <label class="form-label">Nueva contraseña</label>
-                  <input type="text" class="form-control form-dark" [(ngModel)]="nuevaPassForm.password" placeholder="Ingresá la nueva contraseña">
+                  <div class="pass-wrap">
+                    <input [type]="showResetField ? 'text' : 'password'" class="form-control form-dark" [(ngModel)]="nuevaPassForm.password" placeholder="Ingresá la nueva contraseña">
+                    <button type="button" class="pass-eye" (click)="showResetField = !showResetField" tabindex="-1">
+                      @if (showResetField) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                      } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1225,7 +1332,7 @@
 @if (mostrarModalReserva) {
   <div class="modal-backdrop-custom" (click)="cerrarModalReserva()"></div>
   <div class="modal-custom">
-    <div class="modal-content-custom" style="max-width:560px">
+    <div class="modal-content-custom" style="max-width:560px" (click)="$event.stopPropagation()">
       <div class="modal-header-custom">
         <h5>{{ turnoConfirmado ? 'Reserva confirmada' : 'Nueva reserva manual' }}</h5>
         <button class="btn-close-custom" (click)="cerrarModalReserva()">✕</button>

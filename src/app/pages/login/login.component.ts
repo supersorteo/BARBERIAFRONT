@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
   nombreNegocio = 'El Corte';
+  showPass = false;
 
   constructor(private auth: AuthService, private router: Router, private negocio: NegocioService, private cdr: ChangeDetectorRef) {}
 
@@ -37,7 +38,7 @@ export class LoginComponent implements OnInit {
         const destino = u.rol === 'BARBERO' ? '/mi-agenda' : '/admin';
         this.router.navigate([destino]);
       },
-      error: () => { this.error = 'Usuario o contraseña incorrectos.'; this.loading = false; }
+      error: () => { this.error = 'Usuario o contraseña incorrectos.'; this.loading = false; this.cdr.detectChanges(); }
     });
   }
 

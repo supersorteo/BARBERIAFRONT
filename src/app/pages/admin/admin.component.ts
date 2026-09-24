@@ -98,6 +98,14 @@ export class AdminComponent implements OnInit, AfterViewInit {
   nuevaPassForm = { password: '' };
   credencialMostrada: { username: string; password: string } | null = null;
   errorUsuario = '';
+  // Visibilidad de contraseñas
+  showAdminPass  = { actual: false, nueva: false, conf: false };
+  showCrearPass  = false;
+  showResetField = false;
+  // Turnos por barbero (panel barberos)
+  barberoExpandidoId: number | null = null;
+  turnosHoy: Turno[] = [];
+  cargandoTurnosHoy = false;
   // Cambio de contraseña del admin
   mostrarCambioPassAdmin = false;
   cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
@@ -665,18 +673,25 @@ export class AdminComponent implements OnInit, AfterViewInit {
       this.errorUsuario = 'Usuario y contraseña son obligatorios.'; return;
     }
     this.errorUsuario = '';
-    this.negocio.crearUsuarioBarbero({
-      username: this.nuevoUsuarioForm.username,
-      password: this.nuevoUsuarioForm.password,
-      barberoId: this.barberoParaUsuario!.id!
-    }).subscribe({
-      next: res => {
-        this.mostrarModalCrearUsuario = false;
-        this.credencialMostrada = { username: res.username, password: res.password };
-        this.mostrarModalCredencial = true;
-        this.cargarUsuarios();
-      },
-      error: err => { this.errorUsuario = err.error?.error || 'Error al crear usuario.'; }
+    this.alert.confirm({
+      title: '¿Crear acceso?',
+      html: `Se creará el usuario <strong>${this.esc(this.nuevoUsuarioForm.username)}</strong> para <strong>${this.esc(this.barberoParaUsuario?.nombre ?? '')}</strong>.`,
+      confirmText: 'Sí, crear',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.crearUsuarioBarbero({
+        username: this.nuevoUsuarioForm.username,
+        password: this.nuevoUsuarioForm.password,
+        barberoId: this.barberoParaUsuario!.id!
+      }).subscribe({
+        next: res => {
+          this.mostrarModalCrearUsuario = false;
+          this.credencialMostrada = { username: res.username, password: res.password };
+          this.mostrarModalCredencial = true;
+          this.cargarUsuarios();
+        },
+        error: err => { this.errorUsuario = err.error?.error || 'Error al crear usuario.'; }
+      });
     });
   }
   abrirResetPass(u: UsuarioAdmin) {
@@ -688,13 +703,20 @@ export class AdminComponent implements OnInit, AfterViewInit {
   resetearPassword() {
     if (!this.nuevaPassForm.password) { this.errorUsuario = 'Ingresá la nueva contraseña.'; return; }
     this.errorUsuario = '';
-    this.negocio.resetearPassword(this.usuarioParaReset!.id, this.nuevaPassForm.password).subscribe({
-      next: res => {
-        this.mostrarModalResetPass = false;
-        this.credencialMostrada = { username: res.username, password: res.password };
-        this.mostrarModalCredencial = true;
-      },
-      error: () => { this.errorUsuario = 'Error al resetear contraseña.'; }
+    this.alert.confirm({
+      title: '¿Resetear contraseña?',
+      html: `Se cambiará la contraseña de <strong>${this.esc(this.usuarioParaReset?.username ?? '')}</strong>. El barbero deberá usar la nueva contraseña.`,
+      confirmText: 'Sí, cambiar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.resetearPassword(this.usuarioParaReset!.id, this.nuevaPassForm.password).subscribe({
+        next: res => {
+          this.mostrarModalResetPass = false;
+          this.credencialMostrada = { username: res.username, password: res.password };
+          this.mostrarModalCredencial = true;
+        },
+        error: () => { this.errorUsuario = 'Error al resetear contraseña.'; }
+      });
     });
   }
   eliminarUsuario(id: number) {
@@ -710,19 +732,72 @@ export class AdminComponent implements OnInit, AfterViewInit {
       });
     });
   }
+  // ── Turnos rápidos desde panel barberos ────────────────
+  toggleTurnosBarbero(barberoId: number) {
+    if (this.barberoExpandidoId === barberoId) {
+      this.barberoExpandidoId = null;
+      return;
+    }
+    this.barberoExpandidoId = barberoId;
+    if (!this.cargandoTurnosHoy && this.turnosHoy.length === 0) {
+      this.cargarTurnosHoy();
+    }
+  }
+
+  cargarTurnosHoy() {
+    const hoy = new Date().toISOString().split('T')[0];
+    this.cargandoTurnosHoy = true;
+    this.negocio.getTurnos(hoy).subscribe({
+      next: t => { this.turnosHoy = t; this.cargandoTurnosHoy = false; this.cdr.detectChanges(); },
+      error: () => { this.cargandoTurnosHoy = false; }
+    });
+  }
+
+  turnosDelBarberoHoy(barberoId: number): Turno[] {
+    return this.turnosHoy.filter(t => t.barberoId === barberoId);
+  }
+
+  completarTurnoRapido(turno: Turno) { this.cambiarEstado(turno, 'COMPLETADO'); }
+  cancelarTurnoRapido(turno: Turno) { this.cambiarEstado(turno, 'CANCELADO'); }
+
+  eliminarTurnoRapido(turno: Turno) {
+    this.alert.confirm({
+      title: '¿Eliminar turno?',
+      html: `El turno de <strong>${this.esc(turno.paciente)}</strong> · ${this.esc(turno.hora)} se eliminará permanentemente.`,
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarTurno(turno.id!).subscribe({
+        next: () => {
+          this.turnosHoy = this.turnosHoy.filter(t => t.id !== turno.id);
+          this.alert.success('Turno eliminado');
+          this.cdr.detectChanges();
+        },
+        error: () => this.alert.error('Error al eliminar el turno')
+      });
+    });
+  }
+
   // Cambio de contraseña del admin
   guardarCambioPassAdmin() {
     const { actual, nueva, confirmar } = this.cambioPassAdminForm;
     if (!actual || !nueva) { this.errorCambioPassAdmin = 'Completá todos los campos.'; return; }
     if (nueva !== confirmar) { this.errorCambioPassAdmin = 'Las contraseñas nuevas no coinciden.'; return; }
     this.errorCambioPassAdmin = '';
-    this.negocio.cambiarMiPassword(actual, nueva).subscribe({
-      next: () => {
-        this.cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
-        this.mostrarCambioPassAdmin = false;
-        this.alert.success('Contraseña actualizada correctamente');
-      },
-      error: err => { this.errorCambioPassAdmin = err.error?.error || 'Contraseña actual incorrecta.'; }
+    this.alert.confirm({
+      title: '¿Cambiar contraseña?',
+      html: 'Vas a actualizar tu contraseña de administrador. Asegurate de recordar la nueva.',
+      confirmText: 'Sí, cambiar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.cambiarMiPassword(actual, nueva).subscribe({
+        next: () => {
+          this.cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
+          this.mostrarCambioPassAdmin = false;
+          this.alert.success('Contraseña actualizada correctamente');
+        },
+        error: err => { this.errorCambioPassAdmin = err.error?.error || 'Contraseña actual incorrecta.'; }
+      });
     });
   }
 
