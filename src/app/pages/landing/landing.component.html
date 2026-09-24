@@ -403,14 +403,6 @@
       </div>
 
       <div class="reserva-modal-body">
-        @if (mensajeReserva) {
-          <div class="reserva-modal-alert mb-4"
-               [class.is-success]="exito"
-               [class.is-warning]="!exito && mensajeReserva.startsWith('⚠️')"
-               [class.is-error]="!exito && !mensajeReserva.startsWith('⚠️')">
-            {{ mensajeReserva }}
-          </div>
-        }
 
         <div class="row g-3">
           <div class="col-12 col-sm-6">

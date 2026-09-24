@@ -7,6 +7,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible, NegocioConfig } from '../../negocio.service';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
+import { AlertService } from '../../shared/alert.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -106,7 +107,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private negocio: NegocioService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private alert: AlertService
   ) {}
 
   @HostListener('window:scroll')
@@ -453,37 +455,55 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   enviarReserva() {
     if (!this.reservaForm.paciente || !this.reservaForm.fecha || !this.reservaForm.hora || !this.reservaForm.servicio) return;
-    this.enviando = true;
-    this.mensajeReserva = '';
-    const turno: Turno = {
-      paciente: this.reservaForm.paciente,
-      telefono: this.reservaForm.telefono,
-      servicio: this.reservaForm.servicio,
-      fecha: this.reservaForm.fecha,
-      hora: this.reservaForm.hora,
-      barberoId: this.reservaForm.barberoId ? +this.reservaForm.barberoId : undefined
-    };
-    this.negocio.crearTurno(turno).subscribe({
-      next: t => {
-        this.exito = true;
-        const barbero = this.barberos.find(b => b.id === t.barberoId);
-        const conBarbero = barbero ? ` con ${barbero.nombre}` : '';
-        this.mensajeReserva = `✅ ¡Turno confirmado! Te esperamos el ${t.fecha} a las ${t.hora}${conBarbero}.`;
-        this.reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
-        this.slotsDisponibles = [];
-        this.enviando = false;
-        this.cdr.detectChanges();
-        setTimeout(() => { if (this.reservaModalOpen) this.cerrarReservaModal(); }, 3200);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.exito = false;
-        this.mensajeReserva = err.status === 409
-          ? '⚠️ Ese horario ya fue tomado. Por favor elegí otro.'
-          : '❌ Error al reservar. Intentá de nuevo o contactanos directamente.';
-        if (err.status === 409) this.onFechaOServicioCambia();
-        this.enviando = false;
-        this.cdr.detectChanges();
-      }
+    const barbero = this.barberos.find(b => b.id === +this.reservaForm.barberoId);
+    const barberoLinea = barbero ? `<div style="margin-top:4px">💈 ${this.esc(barbero.nombre)}</div>` : '';
+    this.alert.confirm({
+      title: '¿Confirmar tu reserva?',
+      html: `<div style="text-align:left;font-size:13px;line-height:2">
+        <div>👤 <strong>${this.esc(this.reservaForm.paciente)}</strong></div>
+        <div>✂️ ${this.esc(this.reservaForm.servicio)}</div>
+        <div>📅 ${this.reservaForm.fecha} · ${this.reservaForm.hora}</div>
+        ${barberoLinea}
+      </div>`,
+      confirmText: 'Sí, confirmar turno',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.enviando = true;
+      this.cdr.detectChanges();
+      const turno: Turno = {
+        paciente: this.reservaForm.paciente,
+        telefono: this.reservaForm.telefono,
+        servicio: this.reservaForm.servicio,
+        fecha: this.reservaForm.fecha,
+        hora: this.reservaForm.hora,
+        barberoId: this.reservaForm.barberoId ? +this.reservaForm.barberoId : undefined
+      };
+      this.negocio.crearTurno(turno).subscribe({
+        next: t => {
+          const b = this.barberos.find(x => x.id === t.barberoId);
+          const conBarbero = b ? ` con ${b.nombre}` : '';
+          this.reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
+          this.slotsDisponibles = [];
+          this.enviando = false;
+          this.cerrarReservaModal();
+          this.alert.success(`¡Turno confirmado! Te esperamos el ${t.fecha} a las ${t.hora}${conBarbero}.`);
+          this.cdr.detectChanges();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.enviando = false;
+          if (err.status === 409) {
+            this.alert.error('Ese horario ya fue tomado.', 'Por favor elegí otro horario disponible.');
+            this.onFechaOServicioCambia();
+          } else {
+            this.alert.error('Error al reservar', 'Intentá de nuevo o contactanos directamente.');
+          }
+          this.cdr.detectChanges();
+        }
+      });
     });
+  }
+
+  private esc(v: string) {
+    return v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 }

@@ -469,6 +469,8 @@
 }
 .mpanel-input {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: var(--bg-card-2);
   border: 1px solid var(--border-md);
   border-radius: 8px;
@@ -644,7 +646,8 @@
   .mpanel-perfil-layout { flex-direction: column; }
   .mpanel-perfil-foto-card { width: 100%; }
   .mpanel-perfil-form-wrap { width: 100%; min-width: auto; }
-  .mpanel-form-grid { grid-template-columns: 1fr 1fr; }
+  .mpanel-form-grid { grid-template-columns: 1fr; }
+  .mpanel-modal-dialog { border-radius: 12px; }
 }
 
 /* WhatsApp link */
