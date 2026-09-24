@@ -676,15 +676,8 @@
 .testimonial-service { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
 /* ─── RESERVA MODAL ───────────────────────────────────────────── */
-.reserva-modal-backdrop {
-  position: fixed; inset: 0; z-index: 9500;
-  background: rgba(0,0,0,0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 16px;
-}
 .reserva-modal-panel {
+  animation: modalIn 0.28s var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
   background: var(--bg-card);
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-xl);

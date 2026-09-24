@@ -317,29 +317,12 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reservaModalOpen = true;
     document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
-    this.zone.runOutsideAngular(() => {
-      setTimeout(() => {
-        gsap.fromTo('.reserva-modal-backdrop', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' });
-        gsap.fromTo('.reserva-modal-panel',
-          { scale: 0.88, y: 50, opacity: 0 },
-          { scale: 1, y: 0, opacity: 1, duration: 0.45, ease: 'back.out(1.8)' }
-        );
-      }, 0);
-    });
   }
 
   cerrarReservaModal() {
-    this.zone.runOutsideAngular(() => {
-      gsap.to('.reserva-modal-panel', {
-        scale: 0.92, y: 24, opacity: 0, duration: 0.25, ease: 'power2.in',
-        onComplete: () => this.zone.run(() => {
-          this.reservaModalOpen = false;
-          document.body.style.overflow = '';
-          this.cdr.detectChanges();
-        })
-      });
-      gsap.to('.reserva-modal-backdrop', { opacity: 0, duration: 0.3, ease: 'power2.in' });
-    });
+    this.reservaModalOpen = false;
+    document.body.style.overflow = '';
+    this.cdr.detectChanges();
   }
 
   // ── Carousel ──────────────────────────────────────────────────────

@@ -391,7 +391,8 @@
 
 <!-- ═══════════════ RESERVA MODAL ══════════════════════════════════ -->
 @if (reservaModalOpen) {
-  <div class="reserva-modal-backdrop" (click)="cerrarReservaModal()">
+  <div class="modal-backdrop-custom" (click)="cerrarReservaModal()"></div>
+  <div class="modal-custom">
     <div class="reserva-modal-panel" (click)="$event.stopPropagation()">
 
       <div class="reserva-modal-header">
