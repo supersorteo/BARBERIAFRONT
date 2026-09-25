@@ -319,6 +319,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  onChatReserva() {
+    this.abrirReservaModal();
+  }
+
   cerrarReservaModal() {
     this.reservaModalOpen = false;
     document.body.style.overflow = '';
