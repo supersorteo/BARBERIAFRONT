@@ -1,0 +1,60 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5D06A"/>
+      <stop offset="50%" stop-color="#C9A03A"/>
+      <stop offset="100%" stop-color="#8B6914"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F5D06A"/>
+      <stop offset="50%" stop-color="#C9A03A"/>
+      <stop offset="100%" stop-color="#8B6914"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#18182A"/>
+      <stop offset="100%" stop-color="#050508"/>
+    </linearGradient>
+    <radialGradient id="ambientGlow" cx="50%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#C9A03A" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#050508" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  <!-- Ambient gold glow from top center -->
+  <rect width="512" height="512" rx="96" fill="url(#ambientGlow)"/>
+  <!-- Subtle gold border -->
+  <rect x="5" y="5" width="502" height="502" rx="93" fill="none" stroke="#C9A03A" stroke-width="5" stroke-opacity="0.28"/>
+
+  <!-- ===== SCISSORS ===== -->
+
+  <!-- RIGHT BLADE (drawn first, appears behind left blade) -->
+  <polygon points="359,78 365,82 263,259 249,251" fill="url(#g2)"/>
+
+  <!-- LEFT BLADE (drawn over right blade, appears in front) -->
+  <polygon points="153,78 147,82 249,259 263,251" fill="url(#g)"/>
+
+  <!-- LEFT ARM CONNECTOR: pivot area down to left handle -->
+  <polygon points="263,251 249,259 162,416 178,424" fill="url(#g)"/>
+
+  <!-- RIGHT ARM CONNECTOR: pivot area down to right handle -->
+  <polygon points="249,251 263,259 350,416 334,424" fill="url(#g2)"/>
+
+  <!-- LEFT HANDLE RING (outer circle minus inner hole) -->
+  <circle cx="170" cy="420" r="54" fill="url(#g)"/>
+  <circle cx="170" cy="420" r="35" fill="url(#bgGrad)"/>
+
+  <!-- RIGHT HANDLE RING -->
+  <circle cx="342" cy="420" r="54" fill="url(#g2)"/>
+  <circle cx="342" cy="420" r="35" fill="url(#bgGrad)"/>
+
+  <!-- PIVOT: covers the overlapping area, then shows a gold screw detail -->
+  <circle cx="256" cy="255" r="22" fill="url(#bgGrad)"/>
+  <circle cx="256" cy="255" r="14" fill="url(#g)"/>
+  <circle cx="256" cy="255" r="5"  fill="url(#bgGrad)"/>
+
+  <!-- Blade tip highlight sparkles (tiny gold gleam at each tip) -->
+  <circle cx="150" cy="79"  r="3.5" fill="#F5D06A" opacity="0.9"/>
+  <circle cx="362" cy="79"  r="3.5" fill="#F5D06A" opacity="0.9"/>
+</svg>
