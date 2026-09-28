@@ -1,0 +1,139 @@
+<div class="registro-page">
+
+  <!-- Panel izquierdo — solo desktop -->
+  <div class="registro-left" aria-hidden="true">
+    <div class="left-content">
+      <div class="brand">
+        <span class="brand-icon">✂️</span>
+        <span class="brand-name">BarberOS</span>
+      </div>
+      <h2 class="left-title">Tu barbería online<br>en 60 segundos</h2>
+      <ul class="feature-list">
+        <li><span class="fi">📅</span><span>Reservas online 24/7</span></li>
+        <li><span class="fi">🤖</span><span>Agente IA incluido</span></li>
+        <li><span class="fi">📊</span><span>Panel admin completo</span></li>
+        <li><span class="fi">✂️</span><span>Agenda para tus barberos</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Panel derecho — formulario o éxito -->
+  <div class="registro-right">
+
+    <!-- ── FORMULARIO ── -->
+    @if (vista === 'form') {
+      <div class="registro-card">
+        <h1 class="card-title">Crear mi barbería</h1>
+        <p class="card-sub">Completá los datos y empezá hoy</p>
+
+        <div class="form-group">
+          <label for="reg-codigo">Código de invitación</label>
+          <input
+            id="reg-codigo"
+            type="text"
+            class="form-input"
+            [(ngModel)]="form.codigoInvitacion"
+            placeholder="Ej: BARBEROS2026"
+            autocomplete="off"
+          />
+          <span class="field-hint">Solicitalo al administrador de BarberOS</span>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-nombre">Nombre del negocio</label>
+          <input
+            id="reg-nombre"
+            type="text"
+            class="form-input"
+            [(ngModel)]="form.nombreNegocio"
+            (ngModelChange)="onNombreChange()"
+            placeholder="Ej: Barbería El Señor"
+            maxlength="60"
+          />
+          @if (slugPreview) {
+            <div class="slug-preview">
+              <span class="slug-label">Tu URL:</span>
+              <span class="slug-value">{{ slugPreview }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="reg-admin">Tu nombre</label>
+          <input id="reg-admin" type="text" class="form-input" [(ngModel)]="form.adminNombre"
+            placeholder="Ej: Juan García" maxlength="60" />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-user">Usuario para el panel</label>
+          <input id="reg-user" type="text" class="form-input" [(ngModel)]="form.username"
+            placeholder="Ej: juan.garcia" maxlength="30" autocomplete="username" />
+          <span class="field-hint">Letras, números, puntos, guiones</span>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-pass">Contraseña</label>
+          <div class="input-wrapper">
+            <input id="reg-pass" [type]="showPass ? 'text' : 'password'" class="form-input"
+              [(ngModel)]="form.password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+            <button class="toggle-pass" type="button" (click)="showPass = !showPass">{{ showPass ? '🙈' : '👁️' }}</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-confirm">Confirmá tu contraseña</label>
+          <div class="input-wrapper">
+            <input id="reg-confirm" [type]="showConfirm ? 'text' : 'password'" class="form-input"
+              [(ngModel)]="form.confirmar" placeholder="Repetí la contraseña" autocomplete="new-password" />
+            <button class="toggle-pass" type="button" (click)="showConfirm = !showConfirm">{{ showConfirm ? '🙈' : '👁️' }}</button>
+          </div>
+        </div>
+
+        @if (error) {
+          <div class="form-error" role="alert">{{ error }}</div>
+        }
+
+        <button class="btn-submit" type="button" (click)="submit()" [disabled]="loading">
+          @if (!loading) { <span>Crear mi barbería →</span> }
+          @if (loading) { <span class="spinner" aria-label="Creando..."></span> }
+        </button>
+
+        <p class="footer-link">¿Ya tenés cuenta? Ingresá en <span class="link-gold">tudominio.com/<em>tu-slug</em>/login</span></p>
+      </div>
+    }
+
+    <!-- ── ÉXITO ── -->
+    @if (vista === 'exito' && resultado) {
+      <div class="registro-card exito-card">
+        <div class="exito-check" aria-hidden="true">✓</div>
+        <h2 class="exito-title">¡Tu barbería está lista!</h2>
+        <p class="exito-sub">Guardá estos datos — no los enviamos por email.</p>
+
+        <div class="info-table">
+          <div class="info-row">
+            <span class="info-label">Negocio</span>
+            <span class="info-value">{{ form.nombreNegocio }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Usuario</span>
+            <span class="info-value mono">{{ resultado.username }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">URL pública</span>
+            <div class="url-row">
+              <span class="info-value mono url-text">{{ urlPublica }}</span>
+              <button class="btn-copy" type="button" (click)="copiarUrl()" title="Copiar URL">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="exito-warning">
+          ⚠️ Anotá tu usuario y contraseña antes de continuar.
+        </div>
+
+        <a [routerLink]="urlLogin" class="btn-submit btn-link">Ir a iniciar sesión</a>
+      </div>
+    }
+
+  </div>
+</div>

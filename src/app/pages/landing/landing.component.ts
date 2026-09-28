@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, HostListener, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible, NegocioConfig } from '../../negocio.service';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
 import { AlertService } from '../../shared/alert.service';
+import { TenantContextService } from '../../tenant-context.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -108,7 +109,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     private negocio: NegocioService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private alert: AlertService
+    private alert: AlertService,
+    private route: ActivatedRoute,
+    private tenantCtx: TenantContextService
   ) {}
 
   @HostListener('window:scroll')
@@ -117,7 +120,13 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:keydown.escape')
   onEscape() { if (this.reservaModalOpen) this.cerrarReservaModal(); }
 
+  slugActual = '';
+  tenantInactivo = false;
+
   ngOnInit() {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    if (slug) { this.slugActual = slug; this.tenantCtx.setSlug(slug); }
+
     this.negocio.getConfig().subscribe({
       next: c => {
         // Merge: servidor sobreescribe solo campos con valor real; nulls/vacíos conservan el default
@@ -127,7 +136,12 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.config = { ...this.config, ...noVacios };
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: (err) => {
+        if (err?.error?.code === 'TENANT_INACTIVE') {
+          this.tenantInactivo = true;
+          this.cdr.detectChanges();
+        }
+      }
     });
     this.negocio.getServicios().subscribe({
       next: s => {

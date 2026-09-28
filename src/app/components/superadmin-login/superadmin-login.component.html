@@ -1,0 +1,43 @@
+<div class="sa-overlay" (click)="onBackdropClick($event)">
+  <div class="sa-modal" role="dialog" aria-modal="true">
+
+    <div class="sa-header">
+      <span class="sa-icon">⚙️</span>
+      <div>
+        <div class="sa-title">Acceso restringido</div>
+        <div class="sa-subtitle">Panel de administración del sistema</div>
+      </div>
+      <button class="sa-close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="sa-body">
+      <div class="sa-field">
+        <label for="sa-user">Usuario</label>
+        <input id="sa-user" type="text" class="sa-input" [(ngModel)]="form.username"
+          (keydown)="onKey($event)" autocomplete="username" placeholder="Administrador" />
+      </div>
+
+      <div class="sa-field">
+        <label for="sa-pass">Contraseña</label>
+        <div class="sa-pass-wrap">
+          <input id="sa-pass" [type]="showPass ? 'text' : 'password'" class="sa-input"
+            [(ngModel)]="form.password" (keydown)="onKey($event)"
+            autocomplete="current-password" placeholder="••••••••" />
+          <button class="sa-toggle-pass" type="button" (click)="showPass = !showPass">
+            {{ showPass ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      @if (error) {
+        <div class="sa-error" role="alert">{{ error }}</div>
+      }
+
+      <button class="sa-btn" type="button" (click)="submit()" [disabled]="loading">
+        @if (!loading) { <span>Ingresar</span> }
+        @if (loading) { <span class="sa-spinner"></span> }
+      </button>
+    </div>
+
+  </div>
+</div>

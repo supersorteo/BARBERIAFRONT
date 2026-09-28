@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
+import { AuthService } from './auth.service';
+import { TenantContextService } from './tenant-context.service';
 
 export interface Servicio {
   id?: number;
@@ -131,9 +133,12 @@ export interface DashboardHoy {
 @Injectable({ providedIn: 'root' })
 export class NegocioService {
   private base = environment.apiBase;
-  readonly tenantId = 'barberia-demo';
 
-  constructor(private http: HttpClient) {}
+  get tenantId(): string {
+    return this.tenantCtx.resolve(this.auth.getUser()?.tenantId);
+  }
+
+  constructor(private http: HttpClient, private auth: AuthService, private tenantCtx: TenantContextService) {}
 
   // Servicios
   getServicios(): Observable<Servicio[]> {

@@ -1,3 +1,13 @@
+@if (tenantInactivo) {
+  <div class="tenant-inactivo-overlay">
+    <div class="ti-content">
+      <div class="ti-icono">✂️</div>
+      <h2 class="ti-titulo">Barbería no disponible</h2>
+      <p class="ti-desc">Esta barbería está temporalmente inactiva.<br>Si sos el dueño, contactá al administrador de la plataforma.</p>
+    </div>
+  </div>
+}
+
 <!-- ═══════════════ NAVBAR ════════════════════════════════════════ -->
 <nav class="navbar-premium" [class.scrolled]="navScrolled">
   <div class="container d-flex align-items-center justify-content-between">
@@ -11,7 +21,7 @@
       <li><a (click)="scrollTo('galeria')">Galería</a></li>
       <li><a (click)="abrirReservaModal()">Reservar</a></li>
       <li><a (click)="scrollTo('contacto')">Contacto</a></li>
-      <li><a routerLink="/login" class="admin-link" (click)="navOpen=false">Panel Admin</a></li>
+      <li><a [routerLink]="'/' + slugActual + '/login'" class="admin-link" (click)="navOpen=false">Panel Admin</a></li>
     </ul>
   </div>
 </nav>
@@ -537,4 +547,4 @@
 </footer>
 
 <!-- CHAT FLOTANTE -->
-<app-chat-widget (abrirReserva)="onChatReserva()" />
+<app-chat-widget [nombreNegocio]="config.nombre" (abrirReserva)="onChatReserva()" />

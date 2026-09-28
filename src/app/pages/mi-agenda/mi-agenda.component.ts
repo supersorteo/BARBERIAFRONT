@@ -267,7 +267,24 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
     });
   }
 
-  cerrarSesion() { this.auth.logout(); this.router.navigate(['/login']); }
+  cerrarSesion() {
+    this.alert.confirm({
+      title: '¿Cerrar sesión?',
+      html: 'Tu sesión se cerrará. Necesitarás ingresar tus credenciales nuevamente.',
+      confirmText: 'Sí, salir',
+      cancelText: 'Quedarme',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      const slug = this.usuario?.tenantId;
+      this.auth.logout();
+      this.router.navigate([slug ? `/${slug}/login` : '/login']);
+    });
+  }
+
+  irAlSitio() {
+    const slug = this.usuario?.tenantId;
+    if (slug) this.router.navigate([`/${slug}`]);
+  }
 
   private esc(v: string) {
     return v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

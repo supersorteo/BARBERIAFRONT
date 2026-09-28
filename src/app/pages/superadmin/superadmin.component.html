@@ -1,0 +1,187 @@
+<div class="sa-page">
+
+  <!-- Header -->
+  <header class="sa-header">
+    <div class="sa-brand">
+      <span class="sa-brand-icon">⚙️</span>
+      <div>
+        <div class="sa-brand-title">Panel de Administración</div>
+        <div class="sa-brand-sub">Control total de la plataforma</div>
+      </div>
+    </div>
+    <div class="sa-header-actions">
+      <button class="sa-landing-btn" type="button" (click)="irAlLanding()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Ver landing
+      </button>
+      <button class="sa-logout-btn" type="button" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  @if (resumen) {
+    <section class="sa-stats">
+      <div class="sa-stat-card">
+        <div class="sa-stat-value">{{ resumen.totalTenants }}</div>
+        <div class="sa-stat-label">Barberías registradas</div>
+      </div>
+      <div class="sa-stat-card sa-stat-card--active">
+        <div class="sa-stat-value">{{ resumen.tenantActivos }}</div>
+        <div class="sa-stat-label">Barberías activas</div>
+      </div>
+      <div class="sa-stat-card">
+        <div class="sa-stat-value">{{ resumen.totalAdmins }}</div>
+        <div class="sa-stat-label">Administradores</div>
+      </div>
+      <div class="sa-stat-card sa-stat-card--codigos">
+        <div class="sa-stat-value">{{ resumen.codigosDisponibles }}</div>
+        <div class="sa-stat-label">Códigos disponibles</div>
+      </div>
+    </section>
+  }
+
+  <div class="sa-grid">
+
+    <!-- Generador de códigos -->
+    <section class="sa-card">
+      <div class="sa-card-header">
+        <span class="sa-card-icon">🔑</span>
+        <div>
+          <div class="sa-card-title">Códigos de invitación</div>
+          <div class="sa-card-sub">Cada código es de un solo uso y se asigna a una barbería</div>
+        </div>
+      </div>
+
+      <div class="sa-gen-form">
+        <div class="sa-gen-field">
+          <label class="sa-gen-label">Cantidad a generar</label>
+          <input
+            type="number"
+            class="sa-input"
+            [(ngModel)]="cantidad"
+            min="1"
+            max="50"
+            (keydown.enter)="generarCodigos()"
+          />
+        </div>
+        <button class="sa-btn" type="button" (click)="generarCodigos()" [disabled]="generando">
+          @if (!generando) { <span>Generar</span> }
+          @if (generando) { <span class="sa-spinner"></span> }
+        </button>
+      </div>
+
+      @if (mensajeCodigo) {
+        <div class="sa-msg sa-msg--ok">{{ mensajeCodigo }}</div>
+      }
+      @if (errorCodigo) {
+        <div class="sa-msg sa-msg--err">{{ errorCodigo }}</div>
+      }
+
+      <!-- Lista de códigos -->
+      @if (codigos.length > 0) {
+        <div class="sa-codes-list">
+          @for (c of codigos; track c.codigo) {
+            <div class="sa-code-row" [class.sa-code-row--used]="c.usado">
+              <span class="sa-code-value">{{ c.codigo }}</span>
+              @if (!c.usado) {
+                <button class="sa-copy-btn" type="button" (click)="copiar(c.codigo)" title="Copiar">⧉</button>
+                <span class="sa-code-badge sa-code-badge--ok">Disponible</span>
+              } @else {
+                <span class="sa-code-badge sa-code-badge--used">Usado</span>
+                <span class="sa-code-by">por {{ c.usadoPorUsername }}</span>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="sa-empty-codes">No hay códigos generados aún.</div>
+      }
+    </section>
+
+    <!-- Barberías -->
+    <section class="sa-card sa-card--tenants">
+      <div class="sa-card-header">
+        <span class="sa-card-icon">💈</span>
+        <div>
+          <div class="sa-card-title">Barberías</div>
+          <div class="sa-card-sub">Activa o desactiva el acceso de cada negocio</div>
+        </div>
+        <button class="sa-reload-btn" type="button" (click)="cargar()" title="Recargar">↻</button>
+      </div>
+
+      @if (cargando) {
+        <div class="sa-empty">Cargando...</div>
+      } @else if (tenants.length === 0) {
+        <div class="sa-empty">No hay barberías registradas aún.</div>
+      } @else {
+        <div class="sa-table-wrap">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Negocio</th>
+                <th>URL de acceso</th>
+                <th>Admin</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of tenants; track t.slug) {
+                <tr [class.sa-row--inactive]="!t.activo">
+                  <td class="sa-td-name">
+                    {{ t.nombre }}
+                    @if (t.slug === DEMO_SLUG) {
+                      <span class="sa-demo-chip">Demo</span>
+                    }
+                  </td>
+                  <td class="sa-td-url">
+                    <button type="button" class="sa-url-link" (click)="copiarUrl(t.slug)" title="Copiar URL del sitio">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      /{{ t.slug }}
+                    </button>
+                  </td>
+                  <td class="sa-td-admin">{{ t.adminUsername }}</td>
+                  <td>
+                    <span class="sa-badge" [class.sa-badge--active]="t.activo" [class.sa-badge--inactive]="!t.activo">
+                      {{ t.activo ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td class="sa-td-actions">
+                    @if (t.slug !== DEMO_SLUG) {
+                      <button
+                        class="sa-toggle-btn"
+                        [class.sa-toggle-btn--deactivate]="t.activo"
+                        [class.sa-toggle-btn--activate]="!t.activo"
+                        type="button"
+                        (click)="toggleTenant(t.slug)"
+                        [disabled]="togglingSlug === t.slug || eliminandoSlug === t.slug"
+                      >
+                        @if (togglingSlug === t.slug) { <span class="sa-spinner sa-spinner--sm"></span> }
+                        @else { {{ t.activo ? 'Desactivar' : 'Activar' }} }
+                      </button>
+                      <button
+                        class="sa-delete-btn"
+                        type="button"
+                        (click)="eliminarTenant(t)"
+                        [disabled]="eliminandoSlug === t.slug || togglingSlug === t.slug"
+                        title="Eliminar barbería"
+                      >
+                        @if (eliminandoSlug === t.slug) { <span class="sa-spinner sa-spinner--sm"></span> }
+                        @else {
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                        }
+                      </button>
+                    } @else {
+                      <span class="sa-demo-lock" title="La barbería demo no se puede modificar">🔒</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+  </div>
+</div>

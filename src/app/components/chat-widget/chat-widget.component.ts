@@ -1,7 +1,9 @@
-import { Component, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../chat.service';
+import { AuthService } from '../../auth.service';
+import { TenantContextService } from '../../tenant-context.service';
 
 interface Mensaje { rol: 'user' | 'bot'; texto: string; hora: string; }
 
@@ -15,21 +17,32 @@ const MARKER = '[ABRIR_MODAL_RESERVA]';
   styleUrl: './chat-widget.component.css'
 })
 export class ChatWidgetComponent {
+  @Input() nombreNegocio = '';
+
   abierto = false;
   mensajes: Mensaje[] = [];
   inputTexto = '';
   escribiendo = false;
-  tenantId = 'barberia-demo';
   sessionId = 'session-' + Date.now();
+
+  get tenantId(): string {
+    return this.tenantCtx.resolve(this.authService.getUser()?.tenantId);
+  }
 
   @Output() abrirReserva = new EventEmitter<void>();
 
-  constructor(private chatService: ChatService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private chatService: ChatService,
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService,
+    private tenantCtx: TenantContextService
+  ) {}
 
   toggle() {
     this.abierto = !this.abierto;
     if (this.abierto && this.mensajes.length === 0) {
-      this.agregar('bot', '¡Hola! Soy el asistente de Barbería El Corte ✂️ ¿En qué te puedo ayudar?');
+      const nombre = this.nombreNegocio || 'la barbería';
+      this.agregar('bot', `¡Hola! Soy el asistente de ${nombre} ✂️ ¿En qué te puedo ayudar?`);
     }
   }
 
