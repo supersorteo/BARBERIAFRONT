@@ -4,27 +4,27 @@ import { map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export const authGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
+  const router = inject(Router);
   if (auth.isLoggedIn()) return true;
-  inject(Router).navigate(['/login']);
+  router.navigate(['/login']);
   return false;
 };
 
 export const adminGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
+  const router = inject(Router);
   if (!auth.isLoggedIn() || !auth.isAdmin()) {
     const slug = auth.getUser()?.tenantId;
-    inject(Router).navigate([slug ? `/${slug}/login` : '/login']);
+    router.navigate([slug ? `/${slug}/login` : '/login']);
     return false;
   }
   return auth.verificarSesion().pipe(
     map(ok => {
       if (ok) return true;
-      // Si ya no está logueado, el interceptor manejó el TENANT_INACTIVE.
-      // Si sigue logueado pero falló, redirigir al login.
       if (auth.isLoggedIn()) {
         const slug = auth.getUser()?.tenantId;
-        inject(Router).navigate([slug ? `/${slug}/login` : '/login']);
+        router.navigate([slug ? `/${slug}/login` : '/login']);
       }
       return false;
     })
@@ -32,16 +32,17 @@ export const adminGuard: CanActivateFn = () => {
 };
 
 export const barberoGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
+  const router = inject(Router);
   if (!auth.isLoggedIn()) {
     const slug = auth.getUser()?.tenantId;
-    inject(Router).navigate([slug ? `/${slug}/login` : '/login']);
+    router.navigate([slug ? `/${slug}/login` : '/login']);
     return false;
   }
   if (!auth.isBarbero()) {
-    if (auth.isAdmin()) { inject(Router).navigate(['/admin']); return false; }
+    if (auth.isAdmin()) { router.navigate(['/admin']); return false; }
     const slug = auth.getUser()?.tenantId;
-    inject(Router).navigate([slug ? `/${slug}/login` : '/login']);
+    router.navigate([slug ? `/${slug}/login` : '/login']);
     return false;
   }
   return auth.verificarSesion().pipe(
@@ -49,7 +50,7 @@ export const barberoGuard: CanActivateFn = () => {
       if (ok) return true;
       if (auth.isLoggedIn()) {
         const slug = auth.getUser()?.tenantId;
-        inject(Router).navigate([slug ? `/${slug}/login` : '/login']);
+        router.navigate([slug ? `/${slug}/login` : '/login']);
       }
       return false;
     })
@@ -57,9 +58,10 @@ export const barberoGuard: CanActivateFn = () => {
 };
 
 export const superAdminGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
+  const router = inject(Router);
   if (auth.isLoggedIn() && auth.isSuperAdmin()) return true;
-  inject(Router).navigate(['/barberia-demo']);
+  router.navigate(['/barberia-demo']);
   return false;
 };
 
