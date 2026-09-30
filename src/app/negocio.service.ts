@@ -195,6 +195,31 @@ export class NegocioService {
     return this.base.replace('/api/v1', '') + url;
   }
 
+  applyBrandColor(hex: string) {
+    if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const mix = (c: number, t: number, p: number) => Math.round(c + (t - c) * p);
+    const toHex = (rv: number, gv: number, bv: number) =>
+      '#' + [rv, gv, bv].map(x => x.toString(16).padStart(2, '0')).join('');
+    const lR = mix(r, 255, 0.35), lG = mix(g, 255, 0.35), lB = mix(b, 255, 0.35);
+    const dR = mix(r, 0, 0.40),   dG = mix(g, 0, 0.40),   dB = mix(b, 0, 0.40);
+    const light = toHex(lR, lG, lB);
+    const dark  = toHex(dR, dG, dB);
+    const root  = document.documentElement;
+    root.style.setProperty('--gold',             hex);
+    root.style.setProperty('--gold-light',       light);
+    root.style.setProperty('--gold-dark',        dark);
+    root.style.setProperty('--gold-glow',        `rgba(${r},${g},${b},0.18)`);
+    root.style.setProperty('--gold-glow-strong', `rgba(${r},${g},${b},0.35)`);
+    root.style.setProperty('--border-gold',      `rgba(${r},${g},${b},0.25)`);
+    root.style.setProperty('--border-gold-h',    `rgba(${r},${g},${b},0.55)`);
+    root.style.setProperty('--grad-gold',        `linear-gradient(135deg,${light} 0%,${hex} 50%,${dark} 100%)`);
+    root.style.setProperty('--grad-gold-h',      `linear-gradient(90deg,${light} 0%,${hex} 50%,${dark} 100%)`);
+    root.style.setProperty('--color-primary',    hex);
+  }
+
   normalizarCategoria(cat: string): string {
     const n = (cat || '').trim().toLowerCase();
     if (n.includes('barba') || n.includes('beard'))                             return 'Barba';

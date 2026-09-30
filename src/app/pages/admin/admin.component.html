@@ -982,7 +982,7 @@
 
 <!-- ─── MODAL CONFIGURACIÓN WIZARD ─── -->
 @if (mostrarModalConfig) {
-  <div class="modal-backdrop-custom" (click)="mostrarModalConfig=false"></div>
+  <div class="modal-backdrop-custom" (click)="cerrarModalConfig()"></div>
   <div class="cfg-modal-wrap">
     <div class="cfg-modal">
 
@@ -992,7 +992,7 @@
           <span class="cfg-eyebrow">Panel de Administración</span>
           <h4 class="cfg-modal-title">Configuración del sitio</h4>
         </div>
-        <button class="btn-close-custom" (click)="mostrarModalConfig=false">✕</button>
+        <button class="btn-close-custom" (click)="cerrarModalConfig()">✕</button>
       </div>
 
       <!-- Steps indicator -->
@@ -1203,9 +1203,12 @@
                 <div class="col-12">
                   <label class="form-label">Color principal del sitio</label>
                   <div class="cfg-color-row">
-                    <input type="color" class="cfg-color-picker" [(ngModel)]="configForm.colorPrimario">
+                    <input type="color" class="cfg-color-picker"
+                           [value]="configForm.colorPrimario"
+                           (input)="onColorInput($event)">
                     <input type="text" class="form-control form-dark cfg-color-text"
                            [(ngModel)]="configForm.colorPrimario"
+                           (ngModelChange)="negocio.applyBrandColor($event)"
                            placeholder="#c9a84c" maxlength="7">
                     <div class="cfg-color-preview" [style.background]="configForm.colorPrimario"></div>
                   </div>
@@ -1289,7 +1292,7 @@
 
       <!-- Footer -->
       <div class="cfg-modal-footer">
-        <button class="btn-cancel-admin" (click)="mostrarModalConfig=false">Cancelar</button>
+        <button class="btn-cancel-admin" (click)="cerrarModalConfig()">Cancelar</button>
         <div class="cfg-nav-btns">
           @if (configWizardStep > 1) {
             <button class="btn-cancel-admin" (click)="configWizardStep = configWizardStep - 1">

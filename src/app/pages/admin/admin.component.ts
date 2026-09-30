@@ -172,10 +172,24 @@ export class AdminComponent implements OnInit, AfterViewInit {
   cargandoConfig = false;
   guardandoConfig = false;
 
+  private _colorOriginal = '';
+
   abrirModalConfig() {
     this.configWizardStep = 1;
+    this._colorOriginal = this.configForm.colorPrimario || '#c9a84c';
     this.mostrarModalConfig = true;
     if (!this.configForm.nombre) this.cargarConfig();
+  }
+
+  cerrarModalConfig() {
+    this.negocio.applyBrandColor(this._colorOriginal);
+    this.mostrarModalConfig = false;
+  }
+
+  onColorInput(e: Event) {
+    const hex = (e.target as HTMLInputElement).value;
+    this.configForm.colorPrimario = hex;
+    this.negocio.applyBrandColor(hex);
   }
 
   cargarConfig() {

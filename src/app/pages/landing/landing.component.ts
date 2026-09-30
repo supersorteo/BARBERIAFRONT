@@ -143,7 +143,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         // Resolver URLs relativas de backend a absolutas
         if (this.config.logoUrl) this.config = { ...this.config, logoUrl: this.negocio.resolveImageUrl(this.config.logoUrl) };
         if (this.config.colorPrimario) {
-          document.documentElement.style.setProperty('--color-primary', this.config.colorPrimario);
+          this.negocio.applyBrandColor(this.config.colorPrimario);
         }
         if (this.config.heroBgUrl) {
           this.heroBgUrl = this.negocio.resolveImageUrl(this.config.heroBgUrl);
