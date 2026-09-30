@@ -173,8 +173,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       '/categorias/combo.jpg', '/categorias/corte.jpg',
       '/categorias/barba.jpg', '/categorias/coloracion.jpg',
     ];
-    const slug = this.slugActual || 'default';
-    const idx = [...slug].reduce((s, c) => s + c.charCodeAt(0), 0) % HERO_BG_DEFAULTS.length;
+    const slugHash = this.slugActual || 'default';
+    const idx = [...slugHash].reduce((s, c) => s + c.charCodeAt(0), 0) % HERO_BG_DEFAULTS.length;
     this.heroBgUrl = HERO_BG_DEFAULTS[idx];
     setTimeout(() => { this.heroBgLoaded = true; }, 80);
     this.negocio.getGaleria().subscribe({
