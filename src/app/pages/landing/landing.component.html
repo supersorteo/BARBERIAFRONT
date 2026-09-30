@@ -12,7 +12,12 @@
 <nav class="navbar-premium" [class.scrolled]="navScrolled">
   <div class="container d-flex align-items-center justify-content-between">
     <a class="nav-brand" href="#">
-      <span class="nav-brand-scissors">✂</span> {{ config.nombre }}
+      @if (config.logoUrl) {
+        <img [src]="config.logoUrl" alt="{{ config.nombre }}" class="nav-brand-logo">
+      } @else {
+        <span class="nav-brand-scissors">✂</span>
+      }
+      {{ config.nombre }}
     </a>
     <button class="nav-toggle" (click)="navOpen = !navOpen">☰</button>
     <ul class="nav-links" [class.open]="navOpen">
@@ -218,7 +223,7 @@
                 @if (cat.servicios.length > 2) { <span style="color:var(--gold)">+{{ cat.servicios.length - 2 }} más</span> }
               </p>
               @if (cat.servicios.length > 0) {
-                <div class="cat-price-range">Desde ${{ minPrecio(cat.servicios) | number:'1.0-0' }} UYU</div>
+                <div class="cat-price-range">Desde {{ formatPrecio(minPrecio(cat.servicios)) }}</div>
               }
               <div class="cat-cta">Ver estilos →</div>
             </div>
@@ -267,7 +272,7 @@
             <div class="modal-servicio-body">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
                 <h5 class="modal-servicio-name">{{ s.nombre }}</h5>
-                <span class="service-price" style="font-size:18px;white-space:nowrap">${{ s.precio | number:'1.0-0' }}</span>
+                <span class="service-price" style="font-size:18px;white-space:nowrap">{{ formatPrecio(s.precio) }}</span>
               </div>
               <p class="modal-servicio-desc">{{ s.descripcion }}</p>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px">
@@ -429,7 +434,7 @@
             <select class="form-select form-dark" [(ngModel)]="reservaForm.servicio" (change)="onFechaOServicioCambia()">
               <option value="">— Seleccioná —</option>
               @for (s of servicios; track s.id) {
-                <option [value]="s.nombre">{{ s.emoji }} {{ s.nombre }} — ${{ s.precio | number:'1.0-0' }}</option>
+                <option [value]="s.nombre">{{ s.emoji }} {{ s.nombre }} — {{ formatPrecio(s.precio) }}</option>
               }
             </select>
           </div>

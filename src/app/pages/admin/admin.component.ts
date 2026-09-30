@@ -139,7 +139,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
     { label: 'Contacto' },
     { label: 'Horarios' },
     { label: 'Testimonios' },
+    { label: 'Apariencia' },
   ];
+  logoFile: File | null = null;
+  logoPreview = '';
+  subiendoLogo = false;
+
   configForm: NegocioConfig = {
     nombre: '', tagline: '', heroTitulo1: '', heroTitulo2: '',
     heroDesc: '', footerDesc: '', direccion: '', telefono: '',
@@ -149,6 +154,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     t1Nombre: '', t1Iniciales: '', t1Servicio: '', t1Texto: '',
     t2Nombre: '', t2Iniciales: '', t2Servicio: '', t2Texto: '',
     t3Nombre: '', t3Iniciales: '', t3Servicio: '', t3Texto: '',
+    colorPrimario: '#c9a84c', logoUrl: '', moneda: 'UYU', paisCodigo: 'UY',
   };
   cargandoConfig = false;
   guardandoConfig = false;
@@ -171,6 +177,21 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       },
       error: () => { this.cargandoConfig = false; }
+    });
+  }
+
+  onLogoSeleccionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.logoFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.logoPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
+    this.subiendoLogo = true;
+    this.negocio.uploadImagen(file).subscribe({
+      next: res => { this.configForm.logoUrl = res.url; this.subiendoLogo = false; this.cdr.detectChanges(); },
+      error: () => { this.subiendoLogo = false; this.alert.error('Error al subir el logo'); }
     });
   }
 
@@ -1003,7 +1024,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const tel = t.telefono.replace(/\D/g, '');
     const nombreNegocio = this.configForm.nombre || 'El Corte';
     const msg = `Hola ${t.paciente}! Tu turno en ${nombreNegocio} está confirmado para el ${t.fecha} a las ${t.hora} con ${t.barberoNombre}. ¡Te esperamos!`;
-    return `https://wa.me/598${tel}?text=${encodeURIComponent(msg)}`;
+    return `https://wa.me/${this.waPrefijo}${tel}?text=${encodeURIComponent(msg)}`;
+  }
+
+  private get waPrefijo(): string {
+    const map: Record<string, string> = { UY:'598', AR:'54', US:'1', CL:'56', CO:'57', MX:'52', PE:'51' };
+    return map[this.configForm.paisCodigo || 'UY'] ?? '598';
   }
 
   waRecordatorio(t: Turno): string {
@@ -1012,7 +1038,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const negocio = this.configForm.nombre || 'la barbería';
     const barbero = this.nombreBarbero(t.barberoId) || 'tu barbero';
     const msg = `Hola ${t.paciente}! Te recordamos tu turno en ${negocio} para el ${t.fecha} a las ${t.hora} con ${barbero}. ¡Te esperamos!`;
-    return `https://wa.me/598${tel}?text=${encodeURIComponent(msg)}`;
+    return `https://wa.me/${this.waPrefijo}${tel}?text=${encodeURIComponent(msg)}`;
   }
 
   onCambioSlotManual() {

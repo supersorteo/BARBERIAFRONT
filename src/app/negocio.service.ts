@@ -111,6 +111,11 @@ export interface NegocioConfig {
   t1Nombre?: string; t1Iniciales?: string; t1Servicio?: string; t1Texto?: string;
   t2Nombre?: string; t2Iniciales?: string; t2Servicio?: string; t2Texto?: string;
   t3Nombre?: string; t3Iniciales?: string; t3Servicio?: string; t3Texto?: string;
+  // Personalización visual
+  colorPrimario?: string;
+  logoUrl?: string;
+  moneda?: string;
+  paisCodigo?: string;
 }
 
 export interface ClienteResumen {

@@ -72,6 +72,16 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     t3Texto: 'Reservé online en 2 minutos, puntualidad total y el corte exactamente como lo pedí. 100% recomendado.',
   };
 
+  get monedaSimbolo(): string {
+    return this.config.moneda === 'PEN' ? 'S/.' : '$';
+  }
+
+  formatPrecio(precio: number): string {
+    const num = Math.round(precio).toLocaleString('es-UY');
+    const moneda = this.config.moneda || 'UYU';
+    return `${this.monedaSimbolo}${num} ${moneda}`;
+  }
+
   get whatsappUrl(): string {
     if (!this.config.whatsapp) return '#';
     return `https://wa.me/${this.config.whatsapp.replace(/\D/g, '')}`;
@@ -134,6 +144,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
           Object.entries(c).filter(([, v]) => v !== null && v !== undefined && v !== '')
         );
         this.config = { ...this.config, ...noVacios };
+        if (this.config.colorPrimario) {
+          document.documentElement.style.setProperty('--color-primary', this.config.colorPrimario);
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {

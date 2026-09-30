@@ -115,6 +115,33 @@
 }
 .cfg-has-prefix { padding-left: 32px !important; }
 
+/* Apariencia */
+.cfg-color-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.cfg-color-picker {
+  width: 44px; height: 36px; border: none; border-radius: 8px;
+  cursor: pointer; background: none; padding: 0;
+}
+.cfg-color-text { max-width: 120px; font-family: monospace; }
+.cfg-color-preview {
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--border); flex-shrink: 0;
+}
+.cfg-logo-row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.cfg-logo-preview {
+  height: 48px; max-width: 120px; object-fit: contain;
+  border: 1px solid var(--border); border-radius: 8px; padding: 4px; background: #1a1a1a;
+}
+.cfg-logo-placeholder {
+  height: 48px; width: 100px; border: 1px dashed var(--border);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--text-muted);
+}
+.cfg-logo-btn { cursor: pointer; }
+
 /* Testimonios */
 .cfg-testimonios-grid {
   display: flex; flex-direction: column; gap: 16px;

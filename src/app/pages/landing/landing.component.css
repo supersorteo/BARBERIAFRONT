@@ -1,3 +1,5 @@
+:root { --color-primary: var(--color-primary); }
+
 /* ─── TENANT INACTIVO ─────────────────────────────────────────── */
 .tenant-inactivo-overlay {
   align-items: center;
@@ -54,6 +56,11 @@
   -webkit-text-fill-color: initial;
   background: none; color: var(--gold);
   font-size: 18px;
+}
+.nav-brand-logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
 }
 .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
 .nav-links a {
