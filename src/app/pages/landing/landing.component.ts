@@ -5,7 +5,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible, NegocioConfig } from '../../negocio.service';
+import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible, NegocioConfig, Categoria } from '../../negocio.service';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
 import { AlertService } from '../../shared/alert.service';
 import { TenantContextService } from '../../tenant-context.service';
@@ -23,12 +23,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   servicios: Servicio[] = [];
   barberos: Barbero[] = [];
   galeria: Galeria[] = [];
-  categorias: { nombre: string; imagen: string; servicios: Servicio[] }[] = [
-    { nombre: 'Corte',      imagen: '/categorias/corte.jpg',      servicios: [] },
-    { nombre: 'Barba',      imagen: '/categorias/barba.jpg',      servicios: [] },
-    { nombre: 'Combo',      imagen: '/categorias/combo.jpg',      servicios: [] },
-    { nombre: 'Coloración', imagen: '/categorias/coloracion.jpg', servicios: [] },
-  ];
+  _categoriasApi: Categoria[] = [];
+  categorias: { nombre: string; imagen: string; servicios: Servicio[] }[] = [];
   categoriaModal: { nombre: string; imagen: string; servicios: Servicio[] } | null = null;
 
   reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
@@ -156,12 +152,27 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.negocio.getServicios().subscribe({
-      next: s => {
-        this.servicios = s;
-        this.categorias = this.agruparCategorias(s);
-        this.cdr.detectChanges();
-        this.refreshScrollTrigger();
+    this.negocio.getCategorias(this.slugActual || undefined).subscribe({
+      next: cats => {
+        this._categoriasApi = cats;
+        this.negocio.getServicios().subscribe({
+          next: s => {
+            this.servicios = s;
+            this.categorias = this.agruparCategorias(s);
+            this.cdr.detectChanges();
+            this.refreshScrollTrigger();
+          }
+        });
+      },
+      error: () => {
+        this.negocio.getServicios().subscribe({
+          next: s => {
+            this.servicios = s;
+            this.categorias = this.agruparCategorias(s);
+            this.cdr.detectChanges();
+            this.refreshScrollTrigger();
+          }
+        });
       }
     });
     this.negocio.getBarberos().subscribe({
@@ -384,27 +395,27 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Services ──────────────────────────────────────────────────────
-  private readonly CATEGORIA_IMGS: Record<string, string> = {
-    'Corte':      '/categorias/corte.jpg',
-    'Barba':      '/categorias/barba.jpg',
-    'Combo':      '/categorias/combo.jpg',
-    'Coloración': '/categorias/coloracion.jpg',
-  };
-
-  private readonly CATEGORIA_ORDEN = ['Corte', 'Barba', 'Combo', 'Coloración'];
-
   private agruparCategorias(servicios: Servicio[]) {
     const map = new Map<string, Servicio[]>();
     for (const s of servicios) {
-      const cat = this.negocio.normalizarCategoria(s.categoria || '');
+      const cat = s.categoria?.trim() || 'Otros';
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(s);
     }
-    return this.CATEGORIA_ORDEN.map(cat => ({
-      nombre: cat,
-      imagen: this.CATEGORIA_IMGS[cat] ?? '',
-      servicios: map.get(cat) ?? []
-    }));
+    if (this._categoriasApi.length > 0) {
+      const result: { nombre: string; imagen: string; servicios: Servicio[] }[] = [];
+      for (const c of this._categoriasApi) {
+        result.push({ nombre: c.nombre, imagen: '', servicios: map.get(c.nombre) ?? [] });
+      }
+      for (const [cat, items] of map.entries()) {
+        if (!this._categoriasApi.some(c => c.nombre === cat)) {
+          result.push({ nombre: cat, imagen: '', servicios: items });
+        }
+      }
+      return result.filter(g => g.servicios.length > 0);
+    }
+    return Array.from(map.entries())
+      .map(([nombre, svcs]) => ({ nombre, imagen: '', servicios: svcs }));
   }
 
   minPrecio(servicios: Servicio[]): number {

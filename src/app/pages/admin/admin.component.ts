@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin, tap } from 'rxjs';
 import {
-  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible, UsuarioAdmin, NegocioConfig
+  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible, UsuarioAdmin, NegocioConfig, Categoria
 } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
 import { AlertService } from '../../shared/alert.service';
@@ -261,6 +261,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cargarDashboard();
     this.cargarTurnos();
     this.cargarServicios();
+    this.cargarCategorias();
     this.cargarBarberos();
     this.cargarBloqueos();
     this.cargarGaleria();
@@ -403,30 +404,80 @@ export class AdminComponent implements OnInit, AfterViewInit {
     return e === 'RESERVADO' ? 'status-badge status-reservado' : e === 'COMPLETADO' ? 'status-badge status-completado' : 'status-badge status-cancelado';
   }
 
-  private readonly CAT_ORDEN = ['Corte', 'Barba', 'Combo', 'Coloración'];
-  private readonly CAT_EMOJIS: Record<string, string> = { 'Corte': '✂️', 'Barba': '🪒', 'Combo': '💈', 'Coloración': '🎨' };
-  private readonly CAT_IMGS: Record<string, string> = {
-    'Corte':      '/categorias/corte.jpg',
-    'Barba':      '/categorias/barba.jpg',
-    'Combo':      '/categorias/combo.jpg',
-    'Coloración': '/categorias/coloracion.jpg',
-  };
+  // Categorías dinámicas
+  categorias: Categoria[] = [];
+  mostrarModalCategoria = false;
+  editandoCategoria = false;
+  categoriaForm: Categoria = this.categoriaVacia();
+  categoriaEditandoId: number | null = null;
+
+  private categoriaVacia(): Categoria { return { nombre: '', emoji: '✂️', orden: 1 }; }
+
+  cargarCategorias() {
+    this.negocio.getCategorias().subscribe({
+      next: c => { this.categorias = c; this.cdr.detectChanges(); }
+    });
+  }
+
+  abrirModalNuevaCategoria() {
+    this.editandoCategoria = false;
+    this.categoriaEditandoId = null;
+    this.categoriaForm = this.categoriaVacia();
+    this.categoriaForm.orden = this.categorias.length + 1;
+    this.mostrarModalCategoria = true;
+  }
+
+  abrirEditarCategoria(c: Categoria) {
+    this.editandoCategoria = true;
+    this.categoriaEditandoId = c.id!;
+    this.categoriaForm = { ...c };
+    this.mostrarModalCategoria = true;
+  }
+
+  guardarCategoria() {
+    const obs = this.editandoCategoria && this.categoriaEditandoId != null
+      ? this.negocio.actualizarCategoria(this.categoriaEditandoId, this.categoriaForm)
+      : this.negocio.crearCategoria(this.categoriaForm);
+    obs.subscribe({
+      next: () => {
+        this.mostrarModalCategoria = false;
+        this.cargarCategorias();
+        this.alert.success(this.editandoCategoria ? 'Categoría actualizada' : 'Categoría creada');
+      },
+      error: () => this.alert.error('Error al guardar la categoría')
+    });
+  }
+
+  eliminarCategoria(id: number) {
+    this.alert.confirm({
+      title: '¿Eliminar categoría?',
+      html: 'Los servicios de esta categoría quedarán sin categoría asignada.',
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarCategoria(id).subscribe({
+        next: () => { this.alert.success('Categoría eliminada'); this.cargarCategorias(); },
+        error: () => this.alert.error('Error al eliminar la categoría')
+      });
+    });
+  }
 
   get serviciosPorCategoria(): { categoria: string; emoji: string; items: Servicio[] }[] {
+    const emojiMap = new Map(this.categorias.map(c => [c.nombre, c.emoji]));
+    const ordenMap = new Map(this.categorias.map((c, i) => [c.nombre, c.orden ?? i]));
     const map = new Map<string, Servicio[]>();
     for (const s of this.servicios) {
-      const cat = this.negocio.normalizarCategoria(s.categoria || '');
+      const cat = s.categoria || 'Sin categoría';
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(s);
     }
-    const result: { categoria: string; emoji: string; items: Servicio[] }[] = [];
-    for (const cat of this.CAT_ORDEN) {
-      if (map.has(cat)) result.push({ categoria: cat, emoji: this.CAT_EMOJIS[cat] ?? '✂️', items: map.get(cat)! });
-    }
-    for (const [cat, items] of map.entries()) {
-      if (!this.CAT_ORDEN.includes(cat)) result.push({ categoria: cat, emoji: '✂️', items });
-    }
-    return result;
+    return Array.from(map.entries())
+      .sort(([a], [b]) => (ordenMap.get(a) ?? 999) - (ordenMap.get(b) ?? 999))
+      .map(([cat, items]) => ({ categoria: cat, emoji: emojiMap.get(cat) ?? '✂️', items }));
+  }
+
+  get categoriasNombres(): string[] {
+    return this.categorias.map(c => c.nombre);
   }
 
   eliminarTurno(id: number) {

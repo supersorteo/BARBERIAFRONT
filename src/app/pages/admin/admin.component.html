@@ -762,10 +762,16 @@
           <h3 class="section-title">Servicios ofrecidos</h3>
           <span class="count-badge">{{ servicios.length }} servicio(s) · {{ serviciosPorCategoria.length }} categoría(s)</span>
         </div>
-        <button class="btn-primary-admin" (click)="abrirModalNuevoServicio()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Agregar servicio
-        </button>
+        <div class="btn-row">
+          <button class="btn-secondary-admin" (click)="abrirModalNuevaCategoria()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Gestionar categorías
+          </button>
+          <button class="btn-primary-admin" (click)="abrirModalNuevoServicio()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar servicio
+          </button>
+        </div>
       </div>
 
       @if (servicios.length === 0) {
@@ -1353,10 +1359,7 @@
             <label class="form-label">Categoría</label>
             <select class="form-control form-dark" [(ngModel)]="servicioForm.categoria">
               <option value="">— Seleccionar —</option>
-              <option>Corte</option>
-              <option>Barba</option>
-              <option>Combo</option>
-              <option>Coloración</option>
+              <option *ngFor="let cat of categoriasNombres" [value]="cat">{{cat}}</option>
             </select>
           </div>
           <div class="col-6">
@@ -1503,6 +1506,59 @@
             </button>
           </div>
         }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── MODAL CATEGORÍAS ─── -->
+@if (mostrarModalCategoria) {
+  <div class="modal-backdrop-custom" (click)="mostrarModalCategoria=false"></div>
+  <div class="modal-custom">
+    <div class="modal-content-custom">
+      <div class="modal-header-custom">
+        <h5>{{ editandoCategoria ? 'Editar' : 'Nueva' }} categoría</h5>
+        <button class="modal-close-btn" (click)="mostrarModalCategoria=false">✕</button>
+      </div>
+      <div class="modal-body-custom">
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input class="form-control form-dark" [(ngModel)]="categoriaForm.nombre" placeholder="Ej: Corte, Barba...">
+        </div>
+        <div class="form-row col-2">
+          <div class="col-4">
+            <label class="form-label">Emoji</label>
+            <input class="form-control form-dark" [(ngModel)]="categoriaForm.emoji" placeholder="✂️">
+          </div>
+          <div class="col-8">
+            <label class="form-label">Orden</label>
+            <input class="form-control form-dark" type="number" min="1" [(ngModel)]="categoriaForm.orden">
+          </div>
+        </div>
+        <!-- Lista actual de categorías -->
+        @if (categorias.length > 0) {
+          <div class="cat-list-admin mt-3">
+            <label class="form-label">Categorías actuales</label>
+            @for (c of categorias; track c.id) {
+              <div class="cat-list-row">
+                <span class="cat-list-emoji">{{c.emoji}}</span>
+                <span class="cat-list-nombre">{{c.nombre}}</span>
+                <span class="cat-list-orden">#{{c.orden}}</span>
+                <div class="cat-list-actions">
+                  <button class="btn-icon-small" title="Editar" (click)="abrirEditarCategoria(c)">✎</button>
+                  <button class="btn-icon-small btn-icon-danger" title="Eliminar" (click)="eliminarCategoria(c.id!)">✕</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="modal-footer-actions">
+        <button class="btn-cancel-admin" (click)="mostrarModalCategoria=false">Cerrar</button>
+        <button class="btn-primary-admin" (click)="guardarCategoria()"
+                [disabled]="!categoriaForm.nombre.trim()">
+          {{ editandoCategoria ? 'Actualizar' : 'Agregar' }}
+        </button>
       </div>
     </div>
   </div>

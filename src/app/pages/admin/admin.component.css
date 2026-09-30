@@ -1286,3 +1286,33 @@
   .bpr-pass-form-row { flex-direction: column; }
   .bpr-pass-form-row .form-control { min-width: 0; }
 }
+
+/* ─── Categorías ─── */
+.btn-row { display: flex; gap: 10px; align-items: center; }
+.btn-secondary-admin {
+  display: flex; align-items: center; gap: 6px;
+  background: transparent; border: 1px solid rgba(201,168,76,.45);
+  color: #c9a84c; padding: 8px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s;
+}
+.btn-secondary-admin:hover { background: rgba(201,168,76,.1); border-color: #c9a84c; }
+
+.cat-list-admin { display: flex; flex-direction: column; gap: 6px; }
+.cat-list-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,.04); border-radius: 6px;
+  padding: 8px 12px;
+}
+.cat-list-emoji { font-size: 18px; width: 24px; text-align: center; }
+.cat-list-nombre { flex: 1; font-size: 14px; color: #e8e0d0; }
+.cat-list-orden { font-size: 11px; color: rgba(232,224,208,.4); min-width: 28px; text-align: right; }
+.cat-list-actions { display: flex; gap: 6px; }
+.btn-icon-small {
+  background: transparent; border: 1px solid rgba(255,255,255,.15);
+  color: rgba(232,224,208,.6); width: 26px; height: 26px;
+  border-radius: 5px; cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.btn-icon-small:hover { background: rgba(255,255,255,.08); color: #e8e0d0; }
+.btn-icon-danger:hover { background: rgba(220,53,69,.15); border-color: rgba(220,53,69,.4); color: #ef4444; }

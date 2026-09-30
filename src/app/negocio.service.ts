@@ -118,6 +118,15 @@ export interface NegocioConfig {
   paisCodigo?: string;
 }
 
+export interface Categoria {
+  id?: number;
+  tenantId?: string;
+  nombre: string;
+  emoji: string;
+  orden: number;
+  activo?: boolean;
+}
+
 export interface ClienteResumen {
   nombre: string;
   telefono: string;
@@ -234,6 +243,21 @@ export class NegocioService {
   }
   eliminarBloqueo(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/bloqueos/${this.tenantId}/${id}`);
+  }
+
+  // Categorías
+  getCategorias(tenantId?: string): Observable<Categoria[]> {
+    const tid = tenantId || this.tenantId;
+    return this.http.get<Categoria[]>(`${this.base}/categorias/${tid}`);
+  }
+  crearCategoria(c: Categoria): Observable<Categoria> {
+    return this.http.post<Categoria>(`${this.base}/categorias/${this.tenantId}`, c);
+  }
+  actualizarCategoria(id: number, c: Categoria): Observable<Categoria> {
+    return this.http.put<Categoria>(`${this.base}/categorias/${this.tenantId}/${id}`, c);
+  }
+  eliminarCategoria(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/categorias/${this.tenantId}/${id}`);
   }
 
   // Galería
