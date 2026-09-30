@@ -1407,3 +1407,29 @@
 }
 .btn-icon-small:hover { background: rgba(255,255,255,.08); color: #e8e0d0; }
 .btn-icon-danger:hover { background: rgba(220,53,69,.15); border-color: rgba(220,53,69,.4); color: #ef4444; }
+
+/* ── Split phone input (badge prefijo + dígitos locales) ── */
+.tel-split {
+  display: flex; align-items: stretch; gap: 0;
+  border: 1px solid var(--border-md); border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color var(--dur-fast);
+}
+.tel-split:focus-within { border-color: var(--border-gold-h); }
+.tel-prefix-badge {
+  display: flex; align-items: center; padding: 0 12px;
+  background: var(--bg-card-2); color: var(--gold);
+  font-size: 13px; font-weight: 600; font-family: monospace;
+  border-right: 1px solid var(--border-md);
+  white-space: nowrap; flex-shrink: 0;
+}
+.tel-local-input {
+  flex: 1; border: none !important; border-radius: 0 !important;
+  background: var(--bg-card) !important;
+}
+.tel-local-input:focus { box-shadow: none !important; outline: none; }
+.tel-error-border { background: rgba(255,95,95,0.06) !important; }
+.tel-error-msg {
+  display: block; margin-top: 4px;
+  font-size: 11px; color: var(--danger); opacity: 0.85;
+}
