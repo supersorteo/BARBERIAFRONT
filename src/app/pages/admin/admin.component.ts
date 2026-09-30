@@ -627,6 +627,27 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
   }
 
+  readonly CATEGORIAS_DEFAULT = [
+    { nombre: 'Corte',      emoji: '✂️', orden: 1 },
+    { nombre: 'Barba',      emoji: '🪒', orden: 2 },
+    { nombre: 'Combo',      emoji: '💈', orden: 3 },
+    { nombre: 'Coloración', emoji: '🎨', orden: 4 },
+  ];
+
+  cargandoDefecto = false;
+
+  cargarCategoriasPorDefecto() {
+    this.cargandoDefecto = true;
+    const requests = this.CATEGORIAS_DEFAULT.map(d =>
+      this.negocio.crearCategoria({ nombre: d.nombre, emoji: d.emoji, orden: d.orden, activo: true })
+    );
+    let completadas = 0;
+    requests.forEach(r => r.subscribe({
+      next: () => { completadas++; if (completadas === requests.length) { this.cargandoDefecto = false; this.cargarCategorias(); } },
+      error: () => { this.cargandoDefecto = false; this.alert.error('Error al crear categorías'); this.cargarCategorias(); }
+    }));
+  }
+
   get serviciosPorCategoria(): { categoria: string; emoji: string; items: Servicio[] }[] {
     const emojiMap = new Map(this.categorias.map(c => [c.nombre, c.emoji]));
     const ordenMap = new Map(this.categorias.map((c, i) => [c.nombre, c.orden ?? i]));

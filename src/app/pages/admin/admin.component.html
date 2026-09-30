@@ -1708,8 +1708,17 @@
           <label class="form-label">Orden</label>
           <input class="form-control form-dark" type="number" min="1" [(ngModel)]="categoriaForm.orden" style="width:80px">
         </div>
-        <!-- Lista actual de categorías -->
-        @if (categorias.length > 0) {
+        <!-- Lista actual de categorías / empty state -->
+        @if (categorias.length === 0) {
+          <div class="cat-empty-state mt-3">
+            <div class="cat-empty-icon">✂️</div>
+            <p class="cat-empty-title">Sin categorías todavía</p>
+            <p class="cat-empty-sub">Sin categorías el landing no puede organizar los servicios. Cargá las 4 por defecto o creá las tuyas.</p>
+            <button class="btn-primary-admin" style="margin-top:8px" (click)="cargarCategoriasPorDefecto()" [disabled]="cargandoDefecto">
+              {{ cargandoDefecto ? 'Cargando...' : '💈 Cargar categorías por defecto' }}
+            </button>
+          </div>
+        } @else {
           <div class="cat-list-admin mt-3">
             <label class="form-label">Categorías actuales</label>
             @for (c of categorias; track c.id) {
