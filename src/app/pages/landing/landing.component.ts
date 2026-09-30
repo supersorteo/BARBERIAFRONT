@@ -27,7 +27,29 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   categorias: { nombre: string; emoji: string; imagen: string; servicios: Servicio[] }[] = [];
   categoriaModal: { nombre: string; emoji: string; imagen: string; servicios: Servicio[] } | null = null;
 
-  reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
+  reservaForm = { paciente: '', servicio: '', fecha: '', hora: '', barberoId: '' };
+  telefonoLocal = '';
+
+  private readonly PAIS_CONFIG: Record<string, { prefijo: string; digitos: number; placeholder: string }> = {
+    'UY': { prefijo: '598', digitos: 8,  placeholder: '91 234 567'   },
+    'AR': { prefijo: '549', digitos: 10, placeholder: '11 1234 5678' },
+    'CL': { prefijo: '56',  digitos: 9,  placeholder: '9 1234 5678'  },
+    'CO': { prefijo: '57',  digitos: 10, placeholder: '300 123 4567' },
+    'PE': { prefijo: '51',  digitos: 9,  placeholder: '987 654 321'  },
+    'MX': { prefijo: '52',  digitos: 10, placeholder: '55 1234 5678' },
+    'US': { prefijo: '1',   digitos: 10, placeholder: '555 234 5678' },
+  };
+
+  get paisCfg() {
+    return this.PAIS_CONFIG[this.config.paisCodigo || 'UY'] ?? this.PAIS_CONFIG['UY'];
+  }
+
+  get telefonoPrefijo(): string { return '+' + this.paisCfg.prefijo; }
+
+  get telefonoValido(): boolean {
+    const d = this.telefonoLocal.replace(/\D/g, '');
+    return d.length === this.paisCfg.digitos;
+  }
   slotsDisponibles: SlotDisponible[] = [];
   cargandoSlots = false;
   enviando = false;
@@ -360,6 +382,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   cerrarReservaModal() {
     this.reservaModalOpen = false;
+    this.telefonoLocal = '';
     document.body.style.overflow = '';
     this.cdr.detectChanges();
   }
@@ -494,11 +517,16 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   enviarReserva() {
     if (!this.reservaForm.paciente || !this.reservaForm.fecha || !this.reservaForm.hora || !this.reservaForm.servicio) return;
+    const digits = this.telefonoLocal.replace(/\D/g, '');
+    if (digits && digits.length !== this.paisCfg.digitos) {
+      this.alert.error('Número inválido', `Ingresá ${this.paisCfg.digitos} dígitos sin el 0 inicial`);
+      return;
+    }
     this.enviando = true;
     this.cdr.detectChanges();
     const turno: Turno = {
       paciente: this.reservaForm.paciente,
-      telefono: this.reservaForm.telefono,
+      telefono: digits ? this.paisCfg.prefijo + digits : '',
       servicio: this.reservaForm.servicio,
       fecha: this.reservaForm.fecha,
       hora: this.reservaForm.hora,
@@ -508,7 +536,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       next: t => {
         const b = this.barberos.find(x => x.id === t.barberoId);
         const conBarbero = b ? ` con ${b.nombre}` : '';
-        this.reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
+        this.reservaForm = { paciente: '', servicio: '', fecha: '', hora: '', barberoId: '' };
+        this.telefonoLocal = '';
         this.slotsDisponibles = [];
         this.enviando = false;
         this.cerrarReservaModal();

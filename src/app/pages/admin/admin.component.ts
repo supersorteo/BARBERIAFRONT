@@ -1229,7 +1229,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   private get waPrefijo(): string {
-    const map: Record<string, string> = { UY:'598', AR:'54', US:'1', CL:'56', CO:'57', MX:'52', PE:'51' };
+    const map: Record<string, string> = { UY:'598', AR:'549', US:'1', CL:'56', CO:'57', MX:'52', PE:'51' };
     return map[this.configForm.paisCodigo || 'UY'] ?? '598';
   }
 
