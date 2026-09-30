@@ -17,6 +17,11 @@
   <div class="login-page">
     <div class="login-card">
 
+      <a [routerLink]="tenantSlug ? '/' + tenantSlug : '/barberia-demo'" class="btn-volver">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        {{ tenantSlug ? 'Volver al sitio' : 'Ir al demo' }}
+      </a>
+
       <div class="login-brand">
         <span class="brand-icon">✂️</span>
         <span class="brand-name">BarberOS</span>
@@ -85,12 +90,6 @@
           @if (loading) { <span class="spinner" aria-label="Cargando"></span> }
         </button>
 
-        @if (tenantSlug) {
-          <a [routerLink]="'/' + tenantSlug" class="btn-ver-sitio">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Ver sitio de {{ nombreNegocio }}
-          </a>
-        }
         <p class="login-footer-text">
           ¿No tenés cuenta?
           <a routerLink="/registro" class="login-link">Registrá tu barbería</a>

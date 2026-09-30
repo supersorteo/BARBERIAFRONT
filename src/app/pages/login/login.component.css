@@ -16,6 +16,18 @@
   width: 100%;
 }
 
+.btn-volver {
+  align-items: center;
+  color: var(--text-muted, #888);
+  display: inline-flex;
+  font-size: 13px;
+  gap: 5px;
+  margin-bottom: 1.25rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.btn-volver:hover { color: #c9a84c; }
+
 .login-brand {
   align-items: center;
   display: flex;

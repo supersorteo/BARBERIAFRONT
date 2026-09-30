@@ -26,6 +26,8 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
     setTimeout(() => gsap.from('.mpanel-tab-content', { y: 18, opacity: 0, duration: 0.3, ease: 'power2.out' }), 0);
   }
 
+  nombreNegocio = '';
+
   // Agenda
   turnos: Turno[] = [];
   fechaFiltro = new Date().toISOString().split('T')[0];
@@ -66,6 +68,7 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
     this.cargar();
     this.cargarBloqueos();
     this.cargarPerfil();
+    this.negocio.getConfig().subscribe({ next: c => this.nombreNegocio = c.nombre || '' });
   }
 
   ngAfterViewInit() {
@@ -284,6 +287,14 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
   irAlSitio() {
     const slug = this.usuario?.tenantId;
     if (slug) this.router.navigate([`/${slug}`]);
+  }
+
+  waRecordatorio(t: Turno): string {
+    if (!t.telefono) return '';
+    const tel = t.telefono.replace(/\D/g, '');
+    const negocio = this.nombreNegocio || 'la barbería';
+    const msg = `Hola ${t.paciente}! Te recordamos tu turno en ${negocio} para el ${t.fecha} a las ${t.hora}. ¡Te esperamos!`;
+    return `https://wa.me/598${tel}?text=${encodeURIComponent(msg)}`;
   }
 
   private esc(v: string) {

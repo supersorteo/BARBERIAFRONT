@@ -600,6 +600,8 @@
 .btn-action-neutral:hover { background: rgba(201,160,58,0.1); color: var(--gold); border-color: var(--border-gold); }
 .btn-action-delete { background: rgba(255,80,80,0.08); color: #ff6060; border: 1px solid rgba(255,80,80,0.25); }
 .btn-action-delete:hover { background: rgba(255,80,80,0.22); border-color: rgba(255,80,80,0.5); }
+.btn-action-wa { background: rgba(37,211,102,0.1); color: #25d366; border: 1px solid rgba(37,211,102,0.25); text-decoration: none; }
+.btn-action-wa:hover { background: rgba(37,211,102,0.22); border-color: rgba(37,211,102,0.5); }
 
 /* ─── STATUS BADGES ────────────────────────────────────────────── */
 .status-badge {

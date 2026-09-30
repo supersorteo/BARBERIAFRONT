@@ -1006,6 +1006,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
     return `https://wa.me/598${tel}?text=${encodeURIComponent(msg)}`;
   }
 
+  waRecordatorio(t: Turno): string {
+    if (!t.telefono) return '';
+    const tel = t.telefono.replace(/\D/g, '');
+    const negocio = this.configForm.nombre || 'la barbería';
+    const barbero = this.nombreBarbero(t.barberoId) || 'tu barbero';
+    const msg = `Hola ${t.paciente}! Te recordamos tu turno en ${negocio} para el ${t.fecha} a las ${t.hora} con ${barbero}. ¡Te esperamos!`;
+    return `https://wa.me/598${tel}?text=${encodeURIComponent(msg)}`;
+  }
+
   onCambioSlotManual() {
     this.slotsReservaManual = [];
     this.reservaManualForm.hora = '';
