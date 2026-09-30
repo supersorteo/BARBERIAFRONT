@@ -1065,6 +1065,38 @@
             <div class="cfg-step-content">
               <p class="cfg-step-desc">Datos de contacto y redes sociales visibles en el footer.</p>
               <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Zona horaria del negocio</label>
+                  <select class="form-control form-dark" [(ngModel)]="configForm.timeZone" (ngModelChange)="onTimeZoneChange($event)">
+                    <optgroup label="América del Sur">
+                      <option value="America/Montevideo">Uruguay — America/Montevideo</option>
+                      <option value="America/Argentina/Buenos_Aires">Argentina — America/Argentina/Buenos_Aires</option>
+                      <option value="America/Sao_Paulo">Brasil — America/Sao_Paulo</option>
+                      <option value="America/Santiago">Chile — America/Santiago</option>
+                      <option value="America/Bogota">Colombia — America/Bogota</option>
+                      <option value="America/Lima">Perú — America/Lima</option>
+                      <option value="America/Caracas">Venezuela — America/Caracas</option>
+                      <option value="America/La_Paz">Bolivia — America/La_Paz</option>
+                      <option value="America/Asuncion">Paraguay — America/Asuncion</option>
+                    </optgroup>
+                    <optgroup label="América Central y México">
+                      <option value="America/Mexico_City">México — America/Mexico_City</option>
+                      <option value="America/Guatemala">Guatemala — America/Guatemala</option>
+                    </optgroup>
+                    <optgroup label="América del Norte">
+                      <option value="America/New_York">EE.UU. Este — America/New_York</option>
+                      <option value="America/Chicago">EE.UU. Centro — America/Chicago</option>
+                      <option value="America/Denver">EE.UU. Montaña — America/Denver</option>
+                      <option value="America/Los_Angeles">EE.UU. Oeste — America/Los_Angeles</option>
+                    </optgroup>
+                    <optgroup label="Europa">
+                      <option value="Europe/Madrid">España — Europe/Madrid</option>
+                      <option value="Europe/London">Reino Unido — Europe/London</option>
+                      <option value="Europe/Paris">Francia — Europe/Paris</option>
+                    </optgroup>
+                  </select>
+                  <div class="cfg-hint">Define el país y el prefijo del campo WhatsApp · también afecta la fecha "hoy" del dashboard</div>
+                </div>
                 <div class="col-12 col-sm-6">
                   <label class="form-label">Dirección</label>
                   <input type="text" class="form-control form-dark" [(ngModel)]="configForm.direccion" placeholder="Av. General Rivera 2500, Mvd">
@@ -1117,38 +1149,6 @@
                 <div class="col-12">
                   <label class="form-label">Horario 3</label>
                   <input type="text" class="form-control form-dark" [(ngModel)]="configForm.horario3" placeholder="Lunes: Cerrado">
-                </div>
-                <div class="col-12">
-                  <label class="form-label">Zona horaria del negocio</label>
-                  <select class="form-control form-dark" [(ngModel)]="configForm.timeZone" (ngModelChange)="onTimeZoneChange($event)">
-                    <optgroup label="América del Sur">
-                      <option value="America/Montevideo">Uruguay — America/Montevideo</option>
-                      <option value="America/Argentina/Buenos_Aires">Argentina — America/Argentina/Buenos_Aires</option>
-                      <option value="America/Sao_Paulo">Brasil — America/Sao_Paulo</option>
-                      <option value="America/Santiago">Chile — America/Santiago</option>
-                      <option value="America/Bogota">Colombia — America/Bogota</option>
-                      <option value="America/Lima">Perú — America/Lima</option>
-                      <option value="America/Caracas">Venezuela — America/Caracas</option>
-                      <option value="America/La_Paz">Bolivia — America/La_Paz</option>
-                      <option value="America/Asuncion">Paraguay — America/Asuncion</option>
-                    </optgroup>
-                    <optgroup label="América Central y México">
-                      <option value="America/Mexico_City">México — America/Mexico_City</option>
-                      <option value="America/Guatemala">Guatemala — America/Guatemala</option>
-                    </optgroup>
-                    <optgroup label="América del Norte">
-                      <option value="America/New_York">EE.UU. Este — America/New_York</option>
-                      <option value="America/Chicago">EE.UU. Centro — America/Chicago</option>
-                      <option value="America/Denver">EE.UU. Montaña — America/Denver</option>
-                      <option value="America/Los_Angeles">EE.UU. Oeste — America/Los_Angeles</option>
-                    </optgroup>
-                    <optgroup label="Europa">
-                      <option value="Europe/Madrid">España — Europe/Madrid</option>
-                      <option value="Europe/London">Reino Unido — Europe/London</option>
-                      <option value="Europe/Paris">Francia — Europe/Paris</option>
-                    </optgroup>
-                  </select>
-                  <div class="cfg-hint">Afecta la fecha "hoy" del dashboard y la validación de turnos</div>
                 </div>
               </div>
             </div>
