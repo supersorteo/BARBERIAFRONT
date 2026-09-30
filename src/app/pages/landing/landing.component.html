@@ -12,11 +12,7 @@
 <nav class="navbar-premium" [class.scrolled]="navScrolled">
   <div class="container d-flex align-items-center justify-content-between">
     <a class="nav-brand" href="#">
-      @if (config.logoUrl) {
-        <img [src]="config.logoUrl" alt="{{ config.nombre }}" class="nav-brand-logo">
-      } @else {
-        <span class="nav-brand-scissors">✂</span>
-      }
+      <img [src]="config.logoUrl || 'logos/logo-white.jpeg'" alt="{{ config.nombre }}" class="nav-brand-logo">
       {{ config.nombre }}
     </a>
     <button class="nav-toggle" (click)="navOpen = !navOpen">☰</button>

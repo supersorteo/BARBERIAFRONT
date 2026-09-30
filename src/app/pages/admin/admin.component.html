@@ -1593,8 +1593,19 @@
               <input class="form-control form-dark" [(ngModel)]="reservaManualForm.paciente" placeholder="Juan Pérez">
             </div>
             <div class="col-12 col-md-6">
-              <label class="form-label">Teléfono</label>
-              <input class="form-control form-dark" [(ngModel)]="reservaManualForm.telefono" placeholder="099 123 456">
+              <label class="form-label">WhatsApp</label>
+              <div class="tel-split">
+                <span class="tel-prefix-badge">{{ rmPrefijo }}</span>
+                <input type="tel" class="form-control form-dark tel-local-input"
+                       [value]="rmTelLocal"
+                       (input)="onRmTelInput($event)"
+                       [placeholder]="rmCfg.placeholder"
+                       [class.tel-error-border]="rmTelLocal && !rmValido"
+                       maxlength="15" inputmode="numeric">
+              </div>
+              @if (rmTelLocal && !rmValido) {
+                <small class="tel-error-msg">{{ rmCfg.digitos }} dígitos sin 0 inicial · ej: {{ rmCfg.placeholder }}</small>
+              }
             </div>
             <div class="col-12 col-md-6">
               <label class="form-label">Servicio *</label>

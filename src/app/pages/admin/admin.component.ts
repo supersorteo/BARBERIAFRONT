@@ -68,10 +68,19 @@ export class AdminComponent implements OnInit, AfterViewInit {
   // Nueva reserva manual (admin)
   mostrarModalReserva = false;
   reservaManualForm = this.reservaManualVacia();
+  rmTelLocal = '';
   slotsReservaManual: SlotDisponible[] = [];
   cargandoSlotsManual = false;
   enviandoReservaManual = false;
   errorReservaManual = '';
+
+  get rmCfg() { return this.negocio.paisTelCfg(this.configForm.paisCodigo || 'UY'); }
+  get rmPrefijo(): string { return '+' + this.rmCfg.prefijo; }
+  get rmValido(): boolean {
+    const d = this.rmTelLocal.replace(/\D/g, '');
+    return !d || d.length === this.rmCfg.digitos;
+  }
+  onRmTelInput(e: Event) { this.rmTelLocal = (e.target as HTMLInputElement).value; }
   turnoConfirmado: { paciente: string; telefono: string; fecha: string; hora: string; barberoNombre: string } | null = null;
   readonly minDate = new Date().toISOString().split('T')[0];
 
@@ -1207,6 +1216,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   abrirModalReserva() {
     this.reservaManualForm = this.reservaManualVacia();
+    this.rmTelLocal = '';
     this.slotsReservaManual = [];
     this.errorReservaManual = '';
     this.turnoConfirmado = null;
@@ -1215,6 +1225,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   cerrarModalReserva() {
     this.mostrarModalReserva = false;
+    this.rmTelLocal = '';
     this.turnoConfirmado = null;
   }
 
@@ -1283,6 +1294,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
       this.errorReservaManual = 'Nombre, servicio, fecha y hora son obligatorios.';
       return;
     }
+    const rmDigits = this.rmTelLocal.replace(/\D/g, '');
+    f.telefono = rmDigits ? this.rmCfg.prefijo + rmDigits : '';
     this.enviandoReservaManual = true;
     this.errorReservaManual = '';
     const turno: Turno = {
