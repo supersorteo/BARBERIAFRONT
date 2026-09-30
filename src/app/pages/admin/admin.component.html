@@ -1474,18 +1474,12 @@
           <label class="form-label">Descripción</label>
           <textarea class="form-control form-dark" [(ngModel)]="servicioForm.descripcion" rows="2"></textarea>
         </div>
-        <div class="row g-3 mb-3">
-          <div class="col-6">
-            <label class="form-label">Categoría</label>
-            <select class="form-control form-dark" [(ngModel)]="servicioForm.categoria">
-              <option value="">— Seleccionar —</option>
-              <option *ngFor="let cat of categoriasNombres" [value]="cat">{{cat}}</option>
-            </select>
-          </div>
-          <div class="col-6">
-            <label class="form-label">Emoji</label>
-            <input class="form-control form-dark" [(ngModel)]="servicioForm.emoji" placeholder="✂️">
-          </div>
+        <div class="mb-3">
+          <label class="form-label">Categoría</label>
+          <select class="form-control form-dark" [(ngModel)]="servicioForm.categoria">
+            <option value="">— Seleccionar —</option>
+            <option *ngFor="let cat of categoriasNombres" [value]="cat">{{cat}}</option>
+          </select>
         </div>
         <div class="mb-3">
           <label class="form-label">Fotos del servicio (hasta 3)</label>

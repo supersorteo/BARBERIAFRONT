@@ -664,6 +664,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.servicioForm.imagenUrl = this.servicioFotos[0].url || undefined;
     this.servicioForm.imagenUrl2 = this.servicioFotos[1].url || undefined;
     this.servicioForm.imagenUrl3 = this.servicioFotos[2].url || undefined;
+    const cat = this.categorias.find(c => c.nombre === this.servicioForm.categoria);
+    if (cat?.emoji) this.servicioForm.emoji = cat.emoji;
     const esEdicion = this.editandoServicio;
     const obs = esEdicion
       ? this.negocio.actualizarServicio(this.servicioEditandoId!, this.servicioForm)
