@@ -426,7 +426,7 @@
             <input type="text" class="form-control form-dark" [(ngModel)]="reservaForm.paciente" placeholder="Tu nombre">
           </div>
           <div class="col-12 col-sm-6">
-            <label class="form-label">WhatsApp <span style="color:var(--text-muted)">(opcional)</span></label>
+            <label class="form-label">WhatsApp *</label>
             <div class="tel-split">
               <span class="tel-prefix-badge">{{ telefonoPrefijo }}</span>
               <input type="tel" class="form-control form-dark tel-local-input"
@@ -436,7 +436,7 @@
                      maxlength="15" inputmode="numeric">
             </div>
             @if (telefonoLocal && !telefonoValido) {
-              <small class="tel-error-msg">{{ paisCfg.digitos }} dígitos sin el 0 inicial · ej: {{ paisCfg.placeholder }}</small>
+              <small class="tel-error-msg">Ingresá {{ paisCfg.digitos }} dígitos sin 0 inicial · ej: {{ paisCfg.placeholder }}</small>
             }
           </div>
           <div class="col-12 col-sm-6">

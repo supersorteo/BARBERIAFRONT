@@ -518,7 +518,11 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   enviarReserva() {
     if (!this.reservaForm.paciente || !this.reservaForm.fecha || !this.reservaForm.hora || !this.reservaForm.servicio) return;
     const digits = this.telefonoLocal.replace(/\D/g, '');
-    if (digits && digits.length !== this.paisCfg.digitos) {
+    if (!digits) {
+      this.alert.error('WhatsApp requerido', 'Ingresá tu número para poder contactarte');
+      return;
+    }
+    if (digits.length !== this.paisCfg.digitos) {
       this.alert.error('Número inválido', `Ingresá ${this.paisCfg.digitos} dígitos sin el 0 inicial`);
       return;
     }

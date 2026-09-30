@@ -1202,7 +1202,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const tel = t.telefono.replace(/\D/g, '');
     const nombreNegocio = this.configForm.nombre || 'El Corte';
     const msg = `Hola ${t.paciente}! Tu turno en ${nombreNegocio} está confirmado para el ${t.fecha} a las ${t.hora} con ${t.barberoNombre}. ¡Te esperamos!`;
-    return `https://wa.me/${this.waPrefijo}${tel}?text=${encodeURIComponent(msg)}`;
+    return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   }
 
   private readonly TZ_MAP: Record<string, { paisCodigo: string; moneda: string }> = {
@@ -1237,9 +1237,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
     if (!t.telefono) return '';
     const tel = t.telefono.replace(/\D/g, '');
     const negocio = this.configForm.nombre || 'la barbería';
-    const barbero = this.nombreBarbero(t.barberoId) || 'tu barbero';
-    const msg = `Hola ${t.paciente}! Te recordamos tu turno en ${negocio} para el ${t.fecha} a las ${t.hora} con ${barbero}. ¡Te esperamos!`;
-    return `https://wa.me/${this.waPrefijo}${tel}?text=${encodeURIComponent(msg)}`;
+    const msg = `Recuerde que tiene una reserva en ${negocio} a las ${t.hora} del ${t.fecha}. ¡Le esperamos!`;
+    return `whatsapp://send?phone=${tel}&text=${encodeURIComponent(msg)}`;
   }
 
   onCambioSlotManual() {
