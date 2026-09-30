@@ -153,27 +153,11 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.negocio.getCategorias(this.slugActual || undefined).subscribe({
-      next: cats => {
-        this._categoriasApi = cats;
-        this.negocio.getServicios().subscribe({
-          next: s => {
-            this.servicios = s;
-            this.categorias = this.agruparCategorias(s);
-            this.cdr.detectChanges();
-            this.refreshScrollTrigger();
-          }
-        });
-      },
-      error: () => {
-        this.negocio.getServicios().subscribe({
-          next: s => {
-            this.servicios = s;
-            this.categorias = this.agruparCategorias(s);
-            this.cdr.detectChanges();
-            this.refreshScrollTrigger();
-          }
-        });
-      }
+      next: cats => { this._categoriasApi = cats; this.reagrupar(); },
+      error: () => { /* sin categorías API, agrupar igual */ this.reagrupar(); }
+    });
+    this.negocio.getServicios().subscribe({
+      next: s => { this.servicios = s; this.reagrupar(); }
     });
     this.negocio.getBarberos().subscribe({
       next: b => { this.barberos = b; this.cdr.detectChanges(); this.refreshScrollTrigger(); }
@@ -395,6 +379,19 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Services ──────────────────────────────────────────────────────
+  private readonly CAT_IMGS: Record<string, string> = {
+    'Corte':      '/categorias/corte.jpg',
+    'Barba':      '/categorias/barba.jpg',
+    'Combo':      '/categorias/combo.jpg',
+    'Coloración': '/categorias/coloracion.jpg',
+  };
+
+  private reagrupar() {
+    this.categorias = this.agruparCategorias(this.servicios);
+    this.cdr.detectChanges();
+    this.refreshScrollTrigger();
+  }
+
   private agruparCategorias(servicios: Servicio[]) {
     const map = new Map<string, Servicio[]>();
     for (const s of servicios) {
@@ -405,17 +402,20 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this._categoriasApi.length > 0) {
       const result: { nombre: string; imagen: string; servicios: Servicio[] }[] = [];
       for (const c of this._categoriasApi) {
-        result.push({ nombre: c.nombre, imagen: '', servicios: map.get(c.nombre) ?? [] });
+        if (map.has(c.nombre)) {
+          result.push({ nombre: c.nombre, imagen: this.CAT_IMGS[c.nombre] ?? '', servicios: map.get(c.nombre)! });
+        }
       }
       for (const [cat, items] of map.entries()) {
         if (!this._categoriasApi.some(c => c.nombre === cat)) {
-          result.push({ nombre: cat, imagen: '', servicios: items });
+          result.push({ nombre: cat, imagen: this.CAT_IMGS[cat] ?? '', servicios: items });
         }
       }
-      return result.filter(g => g.servicios.length > 0);
+      return result;
     }
+    // Fallback: sin categorías de API, usar las del campo categoria del servicio
     return Array.from(map.entries())
-      .map(([nombre, svcs]) => ({ nombre, imagen: '', servicios: svcs }));
+      .map(([nombre, svcs]) => ({ nombre, imagen: this.CAT_IMGS[nombre] ?? '', servicios: svcs }));
   }
 
   minPrecio(servicios: Servicio[]): number {
