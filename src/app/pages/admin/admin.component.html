@@ -1247,6 +1247,13 @@
                   </div>
                 </div>
 
+                <!-- Reset colores -->
+                <div class="col-12">
+                  <button type="button" class="btn-reset-colors" (click)="resetColores()">
+                    ↺ Restablecer colores originales
+                  </button>
+                </div>
+
                 <!-- Logo -->
                 <div class="col-12">
                   <label class="form-label">Logo del negocio</label>
@@ -1287,32 +1294,11 @@
                   <small class="form-text text-muted">JPG o PNG. Se muestra como fondo de la sección principal del landing.</small>
                 </div>
 
-                <!-- Moneda -->
-                <div class="col-6">
+                <!-- Moneda — se actualiza automáticamente al cambiar zona horaria -->
+                <div class="col-12">
                   <label class="form-label">Moneda</label>
-                  <select class="form-select form-dark" [(ngModel)]="configForm.moneda">
-                    <option value="UYU">$ Peso uruguayo (UYU)</option>
-                    <option value="ARS">$ Peso argentino (ARS)</option>
-                    <option value="USD">USD Dólar</option>
-                    <option value="CLP">$ Peso chileno (CLP)</option>
-                    <option value="COP">$ Peso colombiano (COP)</option>
-                    <option value="MXN">$ Peso mexicano (MXN)</option>
-                    <option value="PEN">S/. Sol peruano (PEN)</option>
-                  </select>
-                </div>
-
-                <!-- País (prefijo WhatsApp) -->
-                <div class="col-6">
-                  <label class="form-label">País (prefijo WhatsApp)</label>
-                  <select class="form-select form-dark" [(ngModel)]="configForm.paisCodigo">
-                    <option value="UY">🇺🇾 Uruguay (+598)</option>
-                    <option value="AR">🇦🇷 Argentina (+54)</option>
-                    <option value="US">🇺🇸 EE.UU. (+1)</option>
-                    <option value="CL">🇨🇱 Chile (+56)</option>
-                    <option value="CO">🇨🇴 Colombia (+57)</option>
-                    <option value="MX">🇲🇽 México (+52)</option>
-                    <option value="PE">🇵🇪 Perú (+51)</option>
-                  </select>
+                  <div class="cfg-moneda-badge">{{ configForm.moneda || 'UYU' }}</div>
+                  <div class="cfg-hint">Se asigna automáticamente según la zona horaria. Cambiá el país en el Paso 2 para actualizarla.</div>
                 </div>
 
               </div>

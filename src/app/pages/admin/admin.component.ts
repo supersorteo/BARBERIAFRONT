@@ -221,6 +221,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.mostrarModalConfig = false;
   }
 
+  resetColores() {
+    this.configForm.colorPrimario = this._paletteOriginal.primario;
+    this.configForm.colorFondo    = this._paletteOriginal.fondo;
+    this.configForm.colorTexto    = this._paletteOriginal.texto;
+    this.negocio.applyBrandColor(this._paletteOriginal.primario);
+    this.negocio.applyBackgroundColor(this._paletteOriginal.fondo);
+    this.negocio.applyTextColor(this._paletteOriginal.texto);
+  }
+
   onColorInput(e: Event) {
     const hex = (e.target as HTMLInputElement).value;
     this.configForm.colorPrimario = hex;
