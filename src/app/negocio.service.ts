@@ -198,13 +198,18 @@ export class NegocioService {
   }
 
   readonly PAIS_TEL: Record<string, { prefijo: string; digitos: number; placeholder: string }> = {
-    'UY': { prefijo: '598', digitos: 8,  placeholder: '91 234 567'   },
-    'AR': { prefijo: '549', digitos: 10, placeholder: '11 1234 5678' },
-    'CL': { prefijo: '56',  digitos: 9,  placeholder: '9 1234 5678'  },
-    'CO': { prefijo: '57',  digitos: 10, placeholder: '300 123 4567' },
-    'PE': { prefijo: '51',  digitos: 9,  placeholder: '987 654 321'  },
-    'MX': { prefijo: '52',  digitos: 10, placeholder: '55 1234 5678' },
-    'US': { prefijo: '1',   digitos: 10, placeholder: '555 234 5678' },
+    // América Latina activa
+    'UY': { prefijo: '598', digitos: 8,  placeholder: '91 234 567'        },
+    'AR': { prefijo: '549', digitos: 10, placeholder: '11 1234 5678 · 351 123 4567' },
+    'CL': { prefijo: '56',  digitos: 9,  placeholder: '9 1234 5678'       },
+    'CO': { prefijo: '57',  digitos: 10, placeholder: '300 123 4567'      },
+    'PE': { prefijo: '51',  digitos: 9,  placeholder: '987 654 321'       },
+    'PY': { prefijo: '595', digitos: 9,  placeholder: '981 234 567'       },
+    'BO': { prefijo: '591', digitos: 8,  placeholder: '71 234 567'        },
+    // Fuera de LATAM — deshabilitados en el selector pero disponibles si se necesitan
+    // 'MX': { prefijo: '52',  digitos: 10, placeholder: '55 1234 5678' },
+    // 'US': { prefijo: '1',   digitos: 10, placeholder: '555 234 5678' },
+    // 'ES': { prefijo: '34',  digitos: 9,  placeholder: '612 345 678'  },
   };
 
   paisTelCfg(paisCodigo: string) {

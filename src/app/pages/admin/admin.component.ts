@@ -1239,18 +1239,25 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   private readonly TZ_MAP: Record<string, { paisCodigo: string; moneda: string }> = {
+    // América Latina activa
     'America/Montevideo':                    { paisCodigo: 'UY', moneda: 'UYU' },
     'America/Argentina/Buenos_Aires':        { paisCodigo: 'AR', moneda: 'ARS' },
     'America/Argentina/Cordoba':             { paisCodigo: 'AR', moneda: 'ARS' },
     'America/Santiago':                      { paisCodigo: 'CL', moneda: 'CLP' },
     'America/Bogota':                        { paisCodigo: 'CO', moneda: 'COP' },
     'America/Lima':                          { paisCodigo: 'PE', moneda: 'PEN' },
-    'America/Mexico_City':                   { paisCodigo: 'MX', moneda: 'MXN' },
-    'America/Monterrey':                     { paisCodigo: 'MX', moneda: 'MXN' },
-    'America/New_York':                      { paisCodigo: 'US', moneda: 'USD' },
-    'America/Chicago':                       { paisCodigo: 'US', moneda: 'USD' },
-    'America/Denver':                        { paisCodigo: 'US', moneda: 'USD' },
-    'America/Los_Angeles':                   { paisCodigo: 'US', moneda: 'USD' },
+    'America/Asuncion':                      { paisCodigo: 'PY', moneda: 'PYG' },
+    'America/La_Paz':                        { paisCodigo: 'BO', moneda: 'BOB' },
+    // Fuera de LATAM — comentados hasta habilitar en el selector
+    // 'America/Mexico_City':                { paisCodigo: 'MX', moneda: 'MXN' },
+    // 'America/Monterrey':                  { paisCodigo: 'MX', moneda: 'MXN' },
+    // 'America/New_York':                   { paisCodigo: 'US', moneda: 'USD' },
+    // 'America/Chicago':                    { paisCodigo: 'US', moneda: 'USD' },
+    // 'America/Denver':                     { paisCodigo: 'US', moneda: 'USD' },
+    // 'America/Los_Angeles':                { paisCodigo: 'US', moneda: 'USD' },
+    // 'Europe/Madrid':                      { paisCodigo: 'ES', moneda: 'EUR' },
+    // 'Europe/London':                      { paisCodigo: 'GB', moneda: 'GBP' },
+    // 'Europe/Paris':                       { paisCodigo: 'FR', moneda: 'EUR' },
   };
 
   onTimeZoneChange(tz: string) {

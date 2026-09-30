@@ -1068,34 +1068,35 @@
                 <div class="col-12">
                   <label class="form-label">Zona horaria del negocio</label>
                   <select class="form-control form-dark" [(ngModel)]="configForm.timeZone" (ngModelChange)="onTimeZoneChange($event)">
-                    <optgroup label="América del Sur">
-                      <option value="America/Montevideo">Uruguay — America/Montevideo</option>
-                      <option value="America/Argentina/Buenos_Aires">Argentina — America/Argentina/Buenos_Aires</option>
-                      <option value="America/Sao_Paulo">Brasil — America/Sao_Paulo</option>
-                      <option value="America/Santiago">Chile — America/Santiago</option>
-                      <option value="America/Bogota">Colombia — America/Bogota</option>
-                      <option value="America/Lima">Perú — America/Lima</option>
-                      <option value="America/Caracas">Venezuela — America/Caracas</option>
-                      <option value="America/La_Paz">Bolivia — America/La_Paz</option>
-                      <option value="America/Asuncion">Paraguay — America/Asuncion</option>
+                    <optgroup label="América Latina">
+                      <option value="America/Montevideo">🇺🇾 Uruguay (+598)</option>
+                      <option value="America/Argentina/Buenos_Aires">🇦🇷 Argentina — Buenos Aires (+549)</option>
+                      <option value="America/Argentina/Cordoba">🇦🇷 Argentina — Córdoba / Interior (+549)</option>
+                      <option value="America/Santiago">🇨🇱 Chile (+56)</option>
+                      <option value="America/Bogota">🇨🇴 Colombia (+57)</option>
+                      <option value="America/Lima">🇵🇪 Perú (+51)</option>
+                      <option value="America/Asuncion">🇵🇾 Paraguay (+595)</option>
+                      <option value="America/La_Paz">🇧🇴 Bolivia (+591)</option>
                     </optgroup>
+                    <!-- Fuera de LATAM — descomentar para habilitar
                     <optgroup label="América Central y México">
-                      <option value="America/Mexico_City">México — America/Mexico_City</option>
-                      <option value="America/Guatemala">Guatemala — America/Guatemala</option>
+                      <option value="America/Mexico_City">🇲🇽 México (+52)</option>
+                      <option value="America/Guatemala">🇬🇹 Guatemala (+502)</option>
                     </optgroup>
                     <optgroup label="América del Norte">
-                      <option value="America/New_York">EE.UU. Este — America/New_York</option>
-                      <option value="America/Chicago">EE.UU. Centro — America/Chicago</option>
-                      <option value="America/Denver">EE.UU. Montaña — America/Denver</option>
-                      <option value="America/Los_Angeles">EE.UU. Oeste — America/Los_Angeles</option>
+                      <option value="America/New_York">🇺🇸 EE.UU. Este (+1)</option>
+                      <option value="America/Chicago">🇺🇸 EE.UU. Centro (+1)</option>
+                      <option value="America/Denver">🇺🇸 EE.UU. Montaña (+1)</option>
+                      <option value="America/Los_Angeles">🇺🇸 EE.UU. Oeste (+1)</option>
                     </optgroup>
                     <optgroup label="Europa">
-                      <option value="Europe/Madrid">España — Europe/Madrid</option>
-                      <option value="Europe/London">Reino Unido — Europe/London</option>
-                      <option value="Europe/Paris">Francia — Europe/Paris</option>
+                      <option value="Europe/Madrid">🇪🇸 España (+34)</option>
+                      <option value="Europe/London">🇬🇧 Reino Unido (+44)</option>
+                      <option value="Europe/Paris">🇫🇷 Francia (+33)</option>
                     </optgroup>
+                    -->
                   </select>
-                  <div class="cfg-hint">Define el país y el prefijo del campo WhatsApp · también afecta la fecha "hoy" del dashboard</div>
+                  <div class="cfg-hint">Determina el prefijo de WhatsApp y la moneda · también afecta la fecha "hoy" del dashboard</div>
                 </div>
                 <div class="col-12 col-sm-6">
                   <label class="form-label">Dirección</label>
