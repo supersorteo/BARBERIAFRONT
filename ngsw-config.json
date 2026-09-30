@@ -8,9 +8,10 @@
       "updateMode": "prefetch",
       "resources": {
         "files": [
-          "/favicon-32.png",
-          "/favicon-16.png",
-          "/barber-icon.svg",
+          "/favicon.ico",
+          "/icons/corteo-favicon-*.png",
+          "/logos/logo-black.webp",
+          "/logos/apple-touch-icon.png",
           "/index.html",
           "/manifest.webmanifest",
           "/*.css",

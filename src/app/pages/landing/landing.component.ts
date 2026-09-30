@@ -32,12 +32,6 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get paisCfg() { return this.negocio.paisTelCfg(this.config.paisCodigo || 'UY'); }
 
-  private updateFavicon(url: string) {
-    document.querySelectorAll("link[rel*='icon']").forEach(el => {
-      (el as HTMLLinkElement).href = url;
-    });
-  }
-
   get telefonoPrefijo(): string { return '+' + this.paisCfg.prefijo; }
 
   get telefonoValido(): boolean {
@@ -162,7 +156,6 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.config.colorFondo)   this.negocio.applyBackgroundColor(this.config.colorFondo);
         if (this.config.colorTexto)   this.negocio.applyTextColor(this.config.colorTexto);
         if (this.config.nombre) document.title = `${this.config.nombre} — Reservas Online`;
-        if (this.config.logoUrl) this.updateFavicon(this.negocio.resolveImageUrl(this.config.logoUrl));
         if (this.config.heroBgUrl) {
           this.heroBgUrl = this.negocio.resolveImageUrl(this.config.heroBgUrl);
           setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);

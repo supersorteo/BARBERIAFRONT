@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AuthService } from './auth.service';
 import { TenantContextService } from './tenant-context.service';
@@ -424,10 +424,31 @@ export class NegocioService {
 
   // Config dinámica del landing
   getConfig(): Observable<NegocioConfig> {
-    return this.http.get<NegocioConfig>(`${this.base}/config/${this.tenantId}`);
+    return this.http.get<NegocioConfig>(`${this.base}/config/${this.tenantId}`).pipe(
+      tap(config => this.applyBusinessIcons(config.logoUrl))
+    );
   }
   updateConfig(c: NegocioConfig): Observable<NegocioConfig> {
-    return this.http.put<NegocioConfig>(`${this.base}/config/${this.tenantId}`, c);
+    return this.http.put<NegocioConfig>(`${this.base}/config/${this.tenantId}`, c).pipe(
+      tap(config => this.applyBusinessIcons(config.logoUrl))
+    );
+  }
+
+  private applyBusinessIcons(logoUrl?: string) {
+    const customLogo = logoUrl?.trim() ? this.resolveImageUrl(logoUrl.trim()) : '';
+    for (const rel of ['icon', 'apple-touch-icon']) {
+      const links = document.head.querySelectorAll<HTMLLinkElement>(`link[rel="${rel}"]`);
+      const icon = document.createElement('link');
+      icon.rel = rel;
+      icon.href = customLogo || (rel === 'icon' ? 'favicon.ico?v=corteo-3' : 'logos/apple-touch-icon.png');
+      // Custom uploads may be PNG, JPEG, WebP or SVG: do not retain the ICO MIME type/sizes.
+      if (!customLogo) {
+        icon.type = rel === 'icon' ? 'image/x-icon' : 'image/png';
+        if (rel === 'apple-touch-icon') icon.sizes.value = '180x180';
+      }
+      links.forEach(link => link.remove());
+      document.head.appendChild(icon);
+    }
   }
 
   // Configuración del negocio / agente
