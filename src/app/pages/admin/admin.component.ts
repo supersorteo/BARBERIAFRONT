@@ -192,6 +192,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.negocio.applyBrandColor(hex);
   }
 
+  onColorHexChange(hex: string) {
+    this.negocio.applyBrandColor(hex);
+  }
+
   cargarConfig() {
     this.cargandoConfig = true;
     this.negocio.getConfig().subscribe({

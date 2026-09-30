@@ -1208,7 +1208,7 @@
                            (input)="onColorInput($event)">
                     <input type="text" class="form-control form-dark cfg-color-text"
                            [(ngModel)]="configForm.colorPrimario"
-                           (ngModelChange)="negocio.applyBrandColor($event)"
+                           (ngModelChange)="onColorHexChange($event)"
                            placeholder="#c9a84c" maxlength="7">
                     <div class="cfg-color-preview" [style.background]="configForm.colorPrimario"></div>
                   </div>
