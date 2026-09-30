@@ -22,10 +22,9 @@ export const adminGuard: CanActivateFn = () => {
   return auth.verificarSesion().pipe(
     map(ok => {
       if (ok) return true;
-      if (auth.isLoggedIn()) {
-        const slug = auth.getUser()?.tenantId;
-        router.navigate([slug ? `/${slug}/login` : '/login']);
-      }
+      const slug = auth.getUser()?.tenantId;
+      auth.logout(); // limpia token vencido — sin esto alreadyLoggedInGuard redirige de vuelta en bucle
+      router.navigate([slug ? `/${slug}/login` : '/login']);
       return false;
     })
   );
@@ -48,10 +47,9 @@ export const barberoGuard: CanActivateFn = () => {
   return auth.verificarSesion().pipe(
     map(ok => {
       if (ok) return true;
-      if (auth.isLoggedIn()) {
-        const slug = auth.getUser()?.tenantId;
-        router.navigate([slug ? `/${slug}/login` : '/login']);
-      }
+      const slug = auth.getUser()?.tenantId;
+      auth.logout(); // ídem — evita bucle barberoGuard ↔ alreadyLoggedInGuard
+      router.navigate([slug ? `/${slug}/login` : '/login']);
       return false;
     })
   );

@@ -17,9 +17,19 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError(err => {
-      // Solo manejar TENANT_INACTIVE para usuarios que tienen sesión activa.
-      // Visitantes sin sesión (landing pública) dejan que el componente maneje el error.
-      if (err.status === 403 && err.error?.code === 'TENANT_INACTIVE' && auth.isLoggedIn()) {
+      if (!auth.isLoggedIn()) return throwError(() => err);
+
+      if (err.status === 401) {
+        // Token vencido o inválido — limpiar sesión y redirigir al login
+        const slug = auth.getUser()?.tenantId;
+        const isSuperAdmin = auth.isSuperAdmin();
+        auth.logout();
+        if (isSuperAdmin) {
+          router.navigate(['/barberia-demo']);
+        } else {
+          router.navigate([slug ? `/${slug}/login` : '/login']);
+        }
+      } else if (err.status === 403 && err.error?.code === 'TENANT_INACTIVE') {
         const slug = auth.getUser()?.tenantId;
         auth.logout();
         alert.error(
@@ -29,6 +39,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           router.navigate([slug ? `/${slug}/login` : '/login']);
         });
       }
+
       return throwError(() => err);
     })
   );
