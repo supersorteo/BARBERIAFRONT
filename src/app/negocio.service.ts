@@ -144,6 +144,19 @@ export interface DashboardHoy {
   porBarbero: { barberoId: number; nombre: string; total: number; completados: number }[];
 }
 
+export interface DashboardRango {
+  desde: string;
+  hasta: string;
+  total: number;
+  completados: number;
+  cancelados: number;
+  reservados: number;
+  ingresoEstimado: number;
+  rankingBarberos: { barberoId: number; nombre: string; total: number; completados: number; ingreso: number }[];
+  rankingServicios: { servicio: string; cantidad: number }[];
+  serieDiaria: { fecha: string; total: number; completados: number }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class NegocioService {
   private base = environment.apiBase;
@@ -307,6 +320,9 @@ export class NegocioService {
   // Dashboard admin
   getDashboardHoy(): Observable<DashboardHoy> {
     return this.http.get<DashboardHoy>(`${this.base}/dashboard/${this.tenantId}/hoy`);
+  }
+  getDashboardRango(desde: string, hasta: string): Observable<DashboardRango> {
+    return this.http.get<DashboardRango>(`${this.base}/dashboard/${this.tenantId}/rango?desde=${desde}&hasta=${hasta}`);
   }
 
   // Disponibilidad

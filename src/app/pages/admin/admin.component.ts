@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin, tap } from 'rxjs';
 import {
-  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, ClienteResumen, SlotDisponible, UsuarioAdmin, NegocioConfig, Categoria
+  NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, DashboardRango, ClienteResumen, SlotDisponible, UsuarioAdmin, NegocioConfig, Categoria
 } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
 import { AlertService } from '../../shared/alert.service';
@@ -39,6 +39,16 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
   }
   dashboardHoy: DashboardHoy | null = null;
+  dashboardRango: DashboardRango | null = null;
+  cargandoRango = false;
+  periodoActivo: 'hoy' | '7d' | '30d' | 'mes' = 'hoy';
+
+  readonly PERIODOS: { key: typeof this.periodoActivo; label: string }[] = [
+    { key: 'hoy',  label: 'Hoy'         },
+    { key: '7d',   label: '7 días'      },
+    { key: '30d',  label: '30 días'     },
+    { key: 'mes',  label: 'Este mes'    },
+  ];
 
   // Clientes
   clientes: ClienteResumen[] = [];
@@ -280,6 +290,45 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  seleccionarPeriodo(p: typeof this.periodoActivo) {
+    this.periodoActivo = p;
+    if (p === 'hoy') { this.dashboardRango = null; return; }
+    const hoy = new Date();
+    const fmt = (d: Date) => d.toISOString().split('T')[0];
+    let desde: string;
+    if (p === '7d') {
+      const d = new Date(hoy); d.setDate(d.getDate() - 6);
+      desde = fmt(d);
+    } else if (p === '30d') {
+      const d = new Date(hoy); d.setDate(d.getDate() - 29);
+      desde = fmt(d);
+    } else {
+      desde = fmt(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+    }
+    this.cargandoRango = true;
+    this.negocio.getDashboardRango(desde, fmt(hoy)).subscribe({
+      next: d => { this.dashboardRango = d; this.cargandoRango = false; this.cdr.detectChanges(); this.animateStatCards(); },
+      error: () => { this.cargandoRango = false; }
+    });
+  }
+
+  get maxRankingBarbero(): number {
+    return Math.max(1, ...(this.dashboardRango?.rankingBarberos.map(b => b.total) ?? [0]));
+  }
+  get maxRankingServicio(): number {
+    return Math.max(1, ...(this.dashboardRango?.rankingServicios.map(s => s.cantidad) ?? [0]));
+  }
+
+  get tasaCompletado(): number {
+    const d = this.dashboardRango;
+    if (!d || d.total === 0) return 0;
+    return Math.round((d.completados / d.total) * 100);
+  }
+
+  get maxSerieDiaria(): number {
+    return Math.max(1, ...(this.dashboardRango?.serieDiaria.map(d => d.total) ?? [0]));
   }
 
   private animateStatCards() {

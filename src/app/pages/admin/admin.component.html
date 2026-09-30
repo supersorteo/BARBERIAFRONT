@@ -36,85 +36,193 @@
   <!-- ─── TAB DASHBOARD ─── -->
   @if (tabActiva === 'dashboard') {
     <div class="admin-tab-panel">
-      @if (!dashboardHoy) {
-        <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando resumen...</div>
-      } @else {
-        <div class="action-bar mb-4">
-          <div>
-            <h3 class="section-title">Resumen de hoy</h3>
-            <span class="count-badge">{{ dashboardHoy.fecha }}</span>
-          </div>
-          <button class="btn-icon" (click)="cargarDashboard()" title="Actualizar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Actualizar
-          </button>
-        </div>
 
-        @if (dashboardHoy.total === 0) {
-          <!-- Sin turnos hoy -->
-          <div class="dashboard-empty-day">
-            <div class="dashboard-empty-icon">📭</div>
-            <p class="dashboard-empty-title">Sin turnos para hoy</p>
-            <p class="dashboard-empty-sub">No hay reservas agendadas para el {{ dashboardHoy.fecha }}. Usá la pestaña <strong>Reservas</strong> para ver otros días o crear una reserva manual.</p>
-          </div>
+      <!-- Selector de período -->
+      <div class="dash-periodo-bar mb-4">
+        @for (p of PERIODOS; track p.key) {
+          <button class="dash-periodo-btn" [class.active]="periodoActivo === p.key"
+                  (click)="seleccionarPeriodo(p.key)">{{ p.label }}</button>
+        }
+        <button class="btn-icon ms-auto" (click)="cargarDashboard()" title="Actualizar hoy">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+
+      <!-- ── VISTA HOY ── -->
+      @if (periodoActivo === 'hoy') {
+        @if (!dashboardHoy) {
+          <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando...</div>
         } @else {
-          <!-- Stats cards -->
+          <div class="dash-section-label mb-3">{{ dashboardHoy.fecha }}</div>
+          @if (dashboardHoy.total === 0) {
+            <div class="dashboard-empty-day">
+              <div class="dashboard-empty-icon">📭</div>
+              <p class="dashboard-empty-title">Sin turnos para hoy</p>
+              <p class="dashboard-empty-sub">No hay reservas agendadas. Usá la pestaña <strong>Reservas</strong> para ver otros días o crear una reserva manual.</p>
+            </div>
+          } @else {
+            <div class="dashboard-stats mb-5">
+              <div class="stat-card">
+                <div class="stat-card-icon">📅</div>
+                <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.total">{{ dashboardHoy.total }}</div>
+                <div class="stat-card-label">Turnos</div>
+              </div>
+              <div class="stat-card warning">
+                <div class="stat-card-icon">⏳</div>
+                <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.reservados">{{ dashboardHoy.reservados }}</div>
+                <div class="stat-card-label">Pendientes</div>
+              </div>
+              <div class="stat-card success">
+                <div class="stat-card-icon">✅</div>
+                <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.completados">{{ dashboardHoy.completados }}</div>
+                <div class="stat-card-label">Completados</div>
+              </div>
+              <div class="stat-card gold">
+                <div class="stat-card-icon">💰</div>
+                <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimadoUYU" data-prefix="$">${{ dashboardHoy.ingresoEstimadoUYU | number:'1.0-0' }}</div>
+                <div class="stat-card-label">Ingresos estimados</div>
+              </div>
+            </div>
+          }
+          @if (dashboardHoy.total > 0 && dashboardHoy.porBarbero.length > 0) {
+            <p class="dash-section-label mb-3">Por barbero</p>
+            <div class="admin-table-wrap">
+              <table class="table table-dark align-middle">
+                <thead>
+                  <tr>
+                    <th>Barbero</th>
+                    <th class="text-center">Asignados</th>
+                    <th class="text-center">Completados</th>
+                    <th class="text-center">%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (b of dashboardHoy.porBarbero; track b.barberoId) {
+                    <tr>
+                      <td><strong style="color:var(--text-primary)">{{ b.nombre }}</strong></td>
+                      <td class="text-center">{{ b.total }}</td>
+                      <td class="text-center"><span class="status-badge status-completado">{{ b.completados }}</span></td>
+                      <td class="text-center" style="color:var(--text-secondary)">
+                        {{ b.total > 0 ? ((b.completados / b.total) * 100 | number:'1.0-0') : 0 }}%
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      }
+
+      <!-- ── VISTA PERÍODO ── -->
+      @if (periodoActivo !== 'hoy') {
+        @if (cargandoRango) {
+          <div class="empty-state"><span class="empty-state-icon">⏳</span>Cargando estadísticas...</div>
+        } @else if (!dashboardRango) {
+          <div class="empty-state"><span class="empty-state-icon">📊</span>Sin datos.</div>
+        } @else {
+          <div class="dash-section-label mb-3">{{ dashboardRango.desde }} → {{ dashboardRango.hasta }}</div>
+
+          <!-- KPI cards -->
           <div class="dashboard-stats mb-5">
             <div class="stat-card">
               <div class="stat-card-icon">📅</div>
-              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.total">{{ dashboardHoy.total }}</div>
-              <div class="stat-card-label">Turnos hoy</div>
-            </div>
-            <div class="stat-card warning">
-              <div class="stat-card-icon">⏳</div>
-              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.reservados">{{ dashboardHoy.reservados }}</div>
-              <div class="stat-card-label">Pendientes</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardRango.total">{{ dashboardRango.total }}</div>
+              <div class="stat-card-label">Total turnos</div>
             </div>
             <div class="stat-card success">
               <div class="stat-card-icon">✅</div>
-              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.completados">{{ dashboardHoy.completados }}</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardRango.completados">{{ dashboardRango.completados }}</div>
               <div class="stat-card-label">Completados</div>
+            </div>
+            <div class="stat-card danger">
+              <div class="stat-card-icon">❌</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardRango.cancelados">{{ dashboardRango.cancelados }}</div>
+              <div class="stat-card-label">Cancelados</div>
             </div>
             <div class="stat-card gold">
               <div class="stat-card-icon">💰</div>
-              <div class="stat-card-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimadoUYU" data-prefix="$">${{ dashboardHoy.ingresoEstimadoUYU | number:'1.0-0' }}</div>
+              <div class="stat-card-value" [attr.data-count-admin]="dashboardRango.ingresoEstimado" data-prefix="$">${{ dashboardRango.ingresoEstimado | number:'1.0-0' }}</div>
               <div class="stat-card-label">Ingresos estimados</div>
             </div>
           </div>
-        }
 
-        @if (dashboardHoy.total > 0 && dashboardHoy.porBarbero.length > 0) {
-          <div class="section-head mb-3">
-            <h3>Por barbero</h3>
+          <!-- Tasa de completado + mini metric -->
+          <div class="dash-metrics-row mb-5">
+            <div class="dash-metric-card">
+              <div class="dash-metric-label">Tasa de completado</div>
+              <div class="dash-metric-value">{{ tasaCompletado }}%</div>
+              <div class="dash-progress-track">
+                <div class="dash-progress-fill" [style.width.%]="tasaCompletado"></div>
+              </div>
+            </div>
+            <div class="dash-metric-card">
+              <div class="dash-metric-label">Tasa de cancelación</div>
+              <div class="dash-metric-value">{{ dashboardRango.total > 0 ? ((dashboardRango.cancelados / dashboardRango.total) * 100 | number:'1.0-0') : 0 }}%</div>
+              <div class="dash-progress-track danger">
+                <div class="dash-progress-fill danger" [style.width.%]="dashboardRango.total > 0 ? (dashboardRango.cancelados / dashboardRango.total) * 100 : 0"></div>
+              </div>
+            </div>
+            <div class="dash-metric-card">
+              <div class="dash-metric-label">Promedio por turno</div>
+              <div class="dash-metric-value">${{ dashboardRango.completados > 0 ? (dashboardRango.ingresoEstimado / dashboardRango.completados | number:'1.0-0') : 0 }}</div>
+              <div class="dash-metric-sub">estimado</div>
+            </div>
           </div>
-          <div class="admin-table-wrap">
-            <table class="table table-dark align-middle">
-              <thead>
-                <tr>
-                  <th>Barbero</th>
-                  <th class="text-center">Asignados</th>
-                  <th class="text-center">Completados</th>
-                  <th class="text-center">% completado</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (b of dashboardHoy.porBarbero; track b.barberoId) {
-                  <tr>
-                    <td><strong style="color:var(--text-primary)">{{ b.nombre }}</strong></td>
-                    <td class="text-center">{{ b.total }}</td>
-                    <td class="text-center">
-                      <span class="status-badge status-completado">{{ b.completados }}</span>
-                    </td>
-                    <td class="text-center" style="color:var(--text-secondary)">
-                      {{ b.total > 0 ? ((b.completados / b.total) * 100 | number:'1.0-0') : 0 }}%
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+
+          <!-- Ranking servicios -->
+          @if (dashboardRango.rankingServicios.length > 0) {
+            <p class="dash-section-label mb-3">Top servicios</p>
+            <div class="dash-ranking mb-5">
+              @for (s of dashboardRango.rankingServicios; track s.servicio; let i = $index) {
+                <div class="dash-rank-row">
+                  <span class="dash-rank-pos">{{ i + 1 }}</span>
+                  <span class="dash-rank-nombre">{{ s.servicio }}</span>
+                  <div class="dash-rank-bar-wrap">
+                    <div class="dash-rank-bar" [style.width.%]="(s.cantidad / maxRankingServicio) * 100"></div>
+                  </div>
+                  <span class="dash-rank-val">{{ s.cantidad }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Ranking barberos -->
+          @if (dashboardRango.rankingBarberos.length > 0) {
+            <p class="dash-section-label mb-3">Rendimiento por barbero</p>
+            <div class="dash-ranking mb-5">
+              @for (b of dashboardRango.rankingBarberos; track b.barberoId; let i = $index) {
+                <div class="dash-rank-row">
+                  <span class="dash-rank-pos">{{ i + 1 }}</span>
+                  <span class="dash-rank-nombre">{{ b.nombre }}</span>
+                  <div class="dash-rank-bar-wrap">
+                    <div class="dash-rank-bar gold" [style.width.%]="(b.total / maxRankingBarbero) * 100"></div>
+                  </div>
+                  <span class="dash-rank-val">{{ b.total }} turno(s)</span>
+                  <span class="dash-rank-ingreso">${{ b.ingreso | number:'1.0-0' }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Serie diaria mini -->
+          @if (dashboardRango.serieDiaria.length > 1) {
+            <p class="dash-section-label mb-3">Actividad del período</p>
+            <div class="dash-serie">
+              @for (d of dashboardRango.serieDiaria; track d.fecha) {
+                <div class="dash-serie-col" [title]="d.fecha + ': ' + d.total + ' turno(s)'">
+                  <div class="dash-serie-bar-wrap">
+                    <div class="dash-serie-bar"
+                         [style.height.%]="(d.total / maxSerieDiaria) * 100"></div>
+                  </div>
+                  <span class="dash-serie-label">{{ d.fecha | slice:8:10 }}/{{ d.fecha | slice:5:7 }}</span>
+                </div>
+              }
+            </div>
+          }
         }
       }
+
     </div>
   }
 
