@@ -1196,12 +1196,12 @@
           <!-- STEP 5: Apariencia -->
           @if (configWizardStep === 5) {
             <div class="cfg-step-content">
-              <p class="cfg-step-desc">Personalizá el color principal, logo y moneda de tu barbería.</p>
+              <p class="cfg-step-desc">Personalizá la paleta de colores de tu barbería. Los cambios se ven en tiempo real.</p>
               <div class="row g-3">
 
-                <!-- Color primario -->
+                <!-- Color de acento -->
                 <div class="col-12">
-                  <label class="form-label">Color principal del sitio</label>
+                  <label class="form-label">Color de acento <span class="cfg-color-hint">botones, highlights, gradientes</span></label>
                   <div class="cfg-color-row">
                     <input type="color" class="cfg-color-picker"
                            [value]="configForm.colorPrimario"
@@ -1212,7 +1212,36 @@
                            placeholder="#c9a84c" maxlength="7">
                     <div class="cfg-color-preview" [style.background]="configForm.colorPrimario"></div>
                   </div>
-                  <small class="form-text text-muted">Afecta botones, títulos y acentos del landing.</small>
+                </div>
+
+                <!-- Color de fondo -->
+                <div class="col-12">
+                  <label class="form-label">Color de fondo <span class="cfg-color-hint">página, tarjetas, secciones</span></label>
+                  <div class="cfg-color-row">
+                    <input type="color" class="cfg-color-picker"
+                           [value]="configForm.colorFondo"
+                           (input)="onFondoInput($event)">
+                    <input type="text" class="form-control form-dark cfg-color-text"
+                           [(ngModel)]="configForm.colorFondo"
+                           (ngModelChange)="onFondoHexChange($event)"
+                           placeholder="#0A0A10" maxlength="7">
+                    <div class="cfg-color-preview" [style.background]="configForm.colorFondo"></div>
+                  </div>
+                </div>
+
+                <!-- Color de texto -->
+                <div class="col-12">
+                  <label class="form-label">Color de texto <span class="cfg-color-hint">títulos, párrafos, etiquetas</span></label>
+                  <div class="cfg-color-row">
+                    <input type="color" class="cfg-color-picker"
+                           [value]="configForm.colorTexto"
+                           (input)="onTextoInput($event)">
+                    <input type="text" class="form-control form-dark cfg-color-text"
+                           [(ngModel)]="configForm.colorTexto"
+                           (ngModelChange)="onTextoHexChange($event)"
+                           placeholder="#F0ECE0" maxlength="7">
+                    <div class="cfg-color-preview" [style.background]="configForm.colorTexto"></div>
+                  </div>
                 </div>
 
                 <!-- Logo -->

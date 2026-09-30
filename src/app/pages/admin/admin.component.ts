@@ -167,22 +167,29 @@ export class AdminComponent implements OnInit, AfterViewInit {
     t1Nombre: '', t1Iniciales: '', t1Servicio: '', t1Texto: '',
     t2Nombre: '', t2Iniciales: '', t2Servicio: '', t2Texto: '',
     t3Nombre: '', t3Iniciales: '', t3Servicio: '', t3Texto: '',
-    colorPrimario: '#c9a84c', logoUrl: '', moneda: 'UYU', paisCodigo: 'UY',
+    colorPrimario: '#c9a84c', colorFondo: '#0A0A10', colorTexto: '#F0ECE0',
+    logoUrl: '', moneda: 'UYU', paisCodigo: 'UY',
   };
   cargandoConfig = false;
   guardandoConfig = false;
 
-  private _colorOriginal = '';
+  private _paletteOriginal = { primario: '#c9a84c', fondo: '#0A0A10', texto: '#F0ECE0' };
 
   abrirModalConfig() {
     this.configWizardStep = 1;
-    this._colorOriginal = this.configForm.colorPrimario || '#c9a84c';
+    this._paletteOriginal = {
+      primario: this.configForm.colorPrimario || '#c9a84c',
+      fondo:    this.configForm.colorFondo    || '#0A0A10',
+      texto:    this.configForm.colorTexto    || '#F0ECE0',
+    };
     this.mostrarModalConfig = true;
     if (!this.configForm.nombre) this.cargarConfig();
   }
 
   cerrarModalConfig() {
-    this.negocio.applyBrandColor(this._colorOriginal);
+    this.negocio.applyBrandColor(this._paletteOriginal.primario);
+    this.negocio.applyBackgroundColor(this._paletteOriginal.fondo);
+    this.negocio.applyTextColor(this._paletteOriginal.texto);
     this.mostrarModalConfig = false;
   }
 
@@ -192,9 +199,23 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.negocio.applyBrandColor(hex);
   }
 
-  onColorHexChange(hex: string) {
-    this.negocio.applyBrandColor(hex);
+  onColorHexChange(hex: string) { this.negocio.applyBrandColor(hex); }
+
+  onFondoInput(e: Event) {
+    const hex = (e.target as HTMLInputElement).value;
+    this.configForm.colorFondo = hex;
+    this.negocio.applyBackgroundColor(hex);
   }
+
+  onFondoHexChange(hex: string) { this.negocio.applyBackgroundColor(hex); }
+
+  onTextoInput(e: Event) {
+    const hex = (e.target as HTMLInputElement).value;
+    this.configForm.colorTexto = hex;
+    this.negocio.applyTextColor(hex);
+  }
+
+  onTextoHexChange(hex: string) { this.negocio.applyTextColor(hex); }
 
   cargarConfig() {
     this.cargandoConfig = true;

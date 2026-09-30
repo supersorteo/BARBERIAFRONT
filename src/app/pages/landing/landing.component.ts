@@ -142,9 +142,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.config = { ...this.config, ...noVacios };
         // Resolver URLs relativas de backend a absolutas
         if (this.config.logoUrl) this.config = { ...this.config, logoUrl: this.negocio.resolveImageUrl(this.config.logoUrl) };
-        if (this.config.colorPrimario) {
-          this.negocio.applyBrandColor(this.config.colorPrimario);
-        }
+        if (this.config.colorPrimario) this.negocio.applyBrandColor(this.config.colorPrimario);
+        if (this.config.colorFondo)   this.negocio.applyBackgroundColor(this.config.colorFondo);
+        if (this.config.colorTexto)   this.negocio.applyTextColor(this.config.colorTexto);
         if (this.config.heroBgUrl) {
           this.heroBgUrl = this.negocio.resolveImageUrl(this.config.heroBgUrl);
           setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);

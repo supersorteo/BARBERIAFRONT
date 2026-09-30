@@ -113,6 +113,8 @@ export interface NegocioConfig {
   t3Nombre?: string; t3Iniciales?: string; t3Servicio?: string; t3Texto?: string;
   // Personalización visual
   colorPrimario?: string;
+  colorFondo?: string;
+  colorTexto?: string;
   logoUrl?: string;
   heroBgUrl?: string;
   moneda?: string;
@@ -193,6 +195,34 @@ export class NegocioService {
     if (!url) return '';
     if (url.startsWith('http')) return url;
     return this.base.replace('/api/v1', '') + url;
+  }
+
+  applyBackgroundColor(hex: string) {
+    if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+    const mix = (c: number, t: number, p: number) => clamp(c + (t - c) * p);
+    const toHex = (rv: number, gv: number, bv: number) =>
+      '#' + [rv, gv, bv].map(x => x.toString(16).padStart(2, '0')).join('');
+    const root = document.documentElement;
+    root.style.setProperty('--bg-void',    toHex(mix(r,0,.35), mix(g,0,.35), mix(b,0,.35)));
+    root.style.setProperty('--bg-base',    hex);
+    root.style.setProperty('--bg-surface', toHex(mix(r,255,.06), mix(g,255,.06), mix(b,255,.06)));
+    root.style.setProperty('--bg-card',    toHex(mix(r,255,.12), mix(g,255,.12), mix(b,255,.12)));
+    root.style.setProperty('--bg-card-2',  toHex(mix(r,255,.18), mix(g,255,.18), mix(b,255,.18)));
+  }
+
+  applyTextColor(hex: string) {
+    if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const root = document.documentElement;
+    root.style.setProperty('--text-primary',   hex);
+    root.style.setProperty('--text-secondary', `rgba(${r},${g},${b},0.62)`);
+    root.style.setProperty('--text-muted',     `rgba(${r},${g},${b},0.36)`);
   }
 
   applyBrandColor(hex: string) {
