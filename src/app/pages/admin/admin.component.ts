@@ -173,6 +173,25 @@ export class AdminComponent implements OnInit, AfterViewInit {
   cargandoConfig = false;
   guardandoConfig = false;
 
+  configWaLocal = '';
+
+  get waAdminCfg() { return this.negocio.paisTelCfg(this.configForm.paisCodigo || 'UY'); }
+  get waAdminPrefijo(): string { return '+' + this.waAdminCfg.prefijo; }
+  get waAdminValido(): boolean {
+    const d = this.configWaLocal.replace(/\D/g, '');
+    return !d || d.length === this.waAdminCfg.digitos;
+  }
+
+  private _syncWaLocal() {
+    const cfg = this.waAdminCfg;
+    const full = (this.configForm.whatsapp || '').replace(/\D/g, '');
+    this.configWaLocal = full.startsWith(cfg.prefijo) ? full.slice(cfg.prefijo.length) : full;
+  }
+
+  onWaAdminInput(e: Event) {
+    this.configWaLocal = (e.target as HTMLInputElement).value;
+  }
+
   private _paletteOriginal = { primario: '#c9a84c', fondo: '#0A0A10', texto: '#F0ECE0' };
 
   abrirModalConfig() {
@@ -225,6 +244,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
           Object.entries(c).filter(([, v]) => v !== null && v !== undefined && v !== '')
         );
         this.configForm = { ...this.configForm, ...noVacios };
+        this._syncWaLocal();
         this.cargandoConfig = false;
         this.cdr.detectChanges();
       },
@@ -262,6 +282,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   guardarConfig() {
+    const waDigits = this.configWaLocal.replace(/\D/g, '');
+    this.configForm.whatsapp = waDigits ? this.waAdminCfg.prefijo + waDigits : '';
     this.alert.confirm({
       title: '¿Guardar configuración?',
       html: `Los cambios del landing de <strong>${this.esc(this.configForm.nombre || 'el negocio')}</strong> se publicarán inmediatamente.`,
@@ -1225,6 +1247,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     if (mapping) {
       this.configForm.paisCodigo = mapping.paisCodigo;
       this.configForm.moneda = mapping.moneda;
+      this._syncWaLocal();
     }
   }
 

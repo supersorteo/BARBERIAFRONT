@@ -30,18 +30,12 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   reservaForm = { paciente: '', servicio: '', fecha: '', hora: '', barberoId: '' };
   telefonoLocal = '';
 
-  private readonly PAIS_CONFIG: Record<string, { prefijo: string; digitos: number; placeholder: string }> = {
-    'UY': { prefijo: '598', digitos: 8,  placeholder: '91 234 567'   },
-    'AR': { prefijo: '549', digitos: 10, placeholder: '11 1234 5678' },
-    'CL': { prefijo: '56',  digitos: 9,  placeholder: '9 1234 5678'  },
-    'CO': { prefijo: '57',  digitos: 10, placeholder: '300 123 4567' },
-    'PE': { prefijo: '51',  digitos: 9,  placeholder: '987 654 321'  },
-    'MX': { prefijo: '52',  digitos: 10, placeholder: '55 1234 5678' },
-    'US': { prefijo: '1',   digitos: 10, placeholder: '555 234 5678' },
-  };
+  get paisCfg() { return this.negocio.paisTelCfg(this.config.paisCodigo || 'UY'); }
 
-  get paisCfg() {
-    return this.PAIS_CONFIG[this.config.paisCodigo || 'UY'] ?? this.PAIS_CONFIG['UY'];
+  private updateFavicon(url: string) {
+    document.querySelectorAll("link[rel*='icon']").forEach(el => {
+      (el as HTMLLinkElement).href = url;
+    });
   }
 
   get telefonoPrefijo(): string { return '+' + this.paisCfg.prefijo; }
@@ -167,6 +161,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.config.colorPrimario) this.negocio.applyBrandColor(this.config.colorPrimario);
         if (this.config.colorFondo)   this.negocio.applyBackgroundColor(this.config.colorFondo);
         if (this.config.colorTexto)   this.negocio.applyTextColor(this.config.colorTexto);
+        if (this.config.nombre) document.title = `${this.config.nombre} — Reservas Online`;
+        if (this.config.logoUrl) this.updateFavicon(this.negocio.resolveImageUrl(this.config.logoUrl));
         if (this.config.heroBgUrl) {
           this.heroBgUrl = this.negocio.resolveImageUrl(this.config.heroBgUrl);
           setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);
