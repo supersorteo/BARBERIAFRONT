@@ -144,6 +144,25 @@
   height: 60px; max-width: 200px; object-fit: cover;
   border: 1px solid var(--border); border-radius: 8px; background: #1a1a1a;
 }
+
+/* Emoji picker */
+.emoji-picker-grid {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px;
+}
+.emoji-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  height: 36px;
+  line-height: 1;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s;
+  width: 36px;
+}
+.emoji-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--border); }
+.emoji-btn--active { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.5); }
 .cfg-logo-btn { cursor: pointer; }
 
 /* Testimonios */

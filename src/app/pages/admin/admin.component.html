@@ -1225,7 +1225,7 @@
                   <label class="form-label">Logo del negocio</label>
                   <div class="cfg-logo-row">
                     @if (logoPreview || configForm.logoUrl) {
-                      <img [src]="logoPreview || configForm.logoUrl" alt="Logo" class="cfg-logo-preview">
+                      <img [src]="logoPreview || img(configForm.logoUrl)" alt="Logo" class="cfg-logo-preview">
                     } @else {
                       <div class="cfg-logo-placeholder">Sin logo</div>
                     }
@@ -1245,7 +1245,7 @@
                   <label class="form-label">Imagen de fondo del hero (portada)</label>
                   <div class="cfg-logo-row">
                     @if (heroBgPreview || configForm.heroBgUrl) {
-                      <img [src]="heroBgPreview || configForm.heroBgUrl" alt="Fondo hero" class="cfg-hero-preview">
+                      <img [src]="heroBgPreview || img(configForm.heroBgUrl)" alt="Fondo hero" class="cfg-hero-preview">
                     } @else {
                       <div class="cfg-logo-placeholder">Sin imagen</div>
                     }
@@ -1517,7 +1517,7 @@
         </div>
         <div class="row g-3 mb-4">
           <div class="col-6">
-            <label class="form-label">Precio (UYU) *</label>
+            <label class="form-label">Precio ({{ configForm.moneda || 'UYU' }}) *</label>
             <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.precio">
           </div>
           <div class="col-6">
@@ -1653,15 +1653,40 @@
           <label class="form-label">Nombre</label>
           <input class="form-control form-dark" [(ngModel)]="categoriaForm.nombre" placeholder="Ej: Corte, Barba...">
         </div>
-        <div class="form-row col-2">
-          <div class="col-4">
-            <label class="form-label">Emoji</label>
-            <input class="form-control form-dark" [(ngModel)]="categoriaForm.emoji" placeholder="✂️">
+        <!-- Emoji picker -->
+        <div class="form-group mt-2">
+          <label class="form-label">Emoji <span class="text-muted" style="font-size:0.8rem">(seleccioná uno o escribí el tuyo)</span></label>
+          <div class="emoji-picker-grid">
+            @for (e of EMOJIS_BARBERIA; track e) {
+              <button type="button" class="emoji-btn" [class.emoji-btn--active]="categoriaForm.emoji === e" (click)="categoriaForm.emoji = e">{{ e }}</button>
+            }
           </div>
-          <div class="col-8">
-            <label class="form-label">Orden</label>
-            <input class="form-control form-dark" type="number" min="1" [(ngModel)]="categoriaForm.orden">
+          <input class="form-control form-dark mt-2" [(ngModel)]="categoriaForm.emoji" placeholder="✂️" style="width:80px">
+        </div>
+
+        <!-- Imagen de categoría (opcional) -->
+        <div class="form-group mt-2">
+          <label class="form-label">Imagen <span class="text-muted" style="font-size:0.8rem">(opcional — reemplaza el emoji como portada)</span></label>
+          <div class="cfg-logo-row">
+            @if (categoriaImagenPreview || categoriaForm.imagenUrl) {
+              <img [src]="categoriaImagenPreview || img(categoriaForm.imagenUrl)" alt="Imagen categoría" class="cfg-logo-preview">
+            } @else {
+              <div class="cfg-logo-placeholder">Sin imagen</div>
+            }
+            <label class="btn-cancel-admin cfg-logo-btn">
+              @if (subiendoCategoriaImagen) { Subiendo... } @else { Subir imagen }
+              <input type="file" accept="image/*" hidden (change)="onCategoriaImagenSeleccionada($event)" [disabled]="subiendoCategoriaImagen">
+            </label>
+            @if (categoriaForm.imagenUrl) {
+              <button class="btn-cancel-admin" type="button" (click)="categoriaForm.imagenUrl = ''; categoriaImagenPreview = ''">Quitar</button>
+            }
           </div>
+        </div>
+
+        <!-- Orden -->
+        <div class="form-group mt-2">
+          <label class="form-label">Orden</label>
+          <input class="form-control form-dark" type="number" min="1" [(ngModel)]="categoriaForm.orden" style="width:80px">
         </div>
         <!-- Lista actual de categorías -->
         @if (categorias.length > 0) {

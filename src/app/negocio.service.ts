@@ -124,6 +124,7 @@ export interface Categoria {
   tenantId?: string;
   nombre: string;
   emoji: string;
+  imagenUrl?: string;
   orden: number;
   activo?: boolean;
 }

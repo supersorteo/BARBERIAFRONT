@@ -140,11 +140,13 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
           Object.entries(c).filter(([, v]) => v !== null && v !== undefined && v !== '')
         );
         this.config = { ...this.config, ...noVacios };
+        // Resolver URLs relativas de backend a absolutas
+        if (this.config.logoUrl) this.config = { ...this.config, logoUrl: this.negocio.resolveImageUrl(this.config.logoUrl) };
         if (this.config.colorPrimario) {
           document.documentElement.style.setProperty('--color-primary', this.config.colorPrimario);
         }
         if (this.config.heroBgUrl) {
-          this.heroBgUrl = this.config.heroBgUrl;
+          this.heroBgUrl = this.negocio.resolveImageUrl(this.config.heroBgUrl);
           setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);
         }
         this.cdr.detectChanges();
@@ -166,7 +168,14 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.negocio.getBarberos().subscribe({
       next: b => { this.barberos = b; this.cdr.detectChanges(); this.refreshScrollTrigger(); }
     });
-    this.heroBgUrl = '/categorias/combo.jpg';
+    // Imagen de fondo por defecto: rotación entre 4 imágenes basada en el slug
+    const HERO_BG_DEFAULTS = [
+      '/categorias/combo.jpg', '/categorias/corte.jpg',
+      '/categorias/barba.jpg', '/categorias/coloracion.jpg',
+    ];
+    const slug = this.slugActual || 'default';
+    const idx = [...slug].reduce((s, c) => s + c.charCodeAt(0), 0) % HERO_BG_DEFAULTS.length;
+    this.heroBgUrl = HERO_BG_DEFAULTS[idx];
     setTimeout(() => { this.heroBgLoaded = true; }, 80);
     this.negocio.getGaleria().subscribe({
       next: g => {
@@ -407,7 +416,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       const result: { nombre: string; imagen: string; servicios: Servicio[] }[] = [];
       for (const c of this._categoriasApi) {
         if (map.has(c.nombre)) {
-          result.push({ nombre: c.nombre, imagen: this.CAT_IMGS[c.nombre] ?? '', servicios: map.get(c.nombre)! });
+          const img = c.imagenUrl ? this.negocio.resolveImageUrl(c.imagenUrl) : (this.CAT_IMGS[c.nombre] ?? '');
+          result.push({ nombre: c.nombre, imagen: img, servicios: map.get(c.nombre)! });
         }
       }
       for (const [cat, items] of map.entries()) {

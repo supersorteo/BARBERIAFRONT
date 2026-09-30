@@ -477,7 +477,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
   categoriaForm: Categoria = this.categoriaVacia();
   categoriaEditandoId: number | null = null;
 
-  private categoriaVacia(): Categoria { return { nombre: '', emoji: '✂️', orden: 1 }; }
+  readonly EMOJIS_BARBERIA = ['✂️','🪒','💈','🎨','👶','💇','💆','🧔','🕶️','🌟','💰','🔥','⭐','🏆','💎','🧴'];
+  categoriaImagenPreview = '';
+  subiendoCategoriaImagen = false;
+
+  private categoriaVacia(): Categoria { return { nombre: '', emoji: '✂️', imagenUrl: '', orden: 1 }; }
 
   cargarCategorias() {
     this.negocio.getCategorias().subscribe({
@@ -490,6 +494,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.categoriaEditandoId = null;
     this.categoriaForm = this.categoriaVacia();
     this.categoriaForm.orden = this.categorias.length + 1;
+    this.categoriaImagenPreview = '';
     this.mostrarModalCategoria = true;
   }
 
@@ -497,7 +502,22 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.editandoCategoria = true;
     this.categoriaEditandoId = c.id!;
     this.categoriaForm = { ...c };
+    this.categoriaImagenPreview = '';
     this.mostrarModalCategoria = true;
+  }
+
+  onCategoriaImagenSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.categoriaImagenPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
+    this.subiendoCategoriaImagen = true;
+    this.negocio.uploadImagen(file).subscribe({
+      next: res => { this.categoriaForm.imagenUrl = res.url; this.subiendoCategoriaImagen = false; this.cdr.detectChanges(); },
+      error: () => { this.subiendoCategoriaImagen = false; this.alert.error('Error al subir la imagen'); }
+    });
   }
 
   guardarCategoria() {

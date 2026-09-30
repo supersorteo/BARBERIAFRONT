@@ -16,8 +16,8 @@
         <img [src]="config.logoUrl" alt="{{ config.nombre }}" class="nav-brand-logo">
       } @else {
         <span class="nav-brand-scissors">✂</span>
+        {{ config.nombre }}
       }
-      {{ config.nombre }}
     </a>
     <button class="nav-toggle" (click)="navOpen = !navOpen">☰</button>
     <ul class="nav-links" [class.open]="navOpen">
