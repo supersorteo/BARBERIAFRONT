@@ -1164,6 +1164,29 @@ export class AdminComponent implements OnInit, AfterViewInit {
     return `https://wa.me/${this.waPrefijo}${tel}?text=${encodeURIComponent(msg)}`;
   }
 
+  private readonly TZ_MAP: Record<string, { paisCodigo: string; moneda: string }> = {
+    'America/Montevideo':                    { paisCodigo: 'UY', moneda: 'UYU' },
+    'America/Argentina/Buenos_Aires':        { paisCodigo: 'AR', moneda: 'ARS' },
+    'America/Argentina/Cordoba':             { paisCodigo: 'AR', moneda: 'ARS' },
+    'America/Santiago':                      { paisCodigo: 'CL', moneda: 'CLP' },
+    'America/Bogota':                        { paisCodigo: 'CO', moneda: 'COP' },
+    'America/Lima':                          { paisCodigo: 'PE', moneda: 'PEN' },
+    'America/Mexico_City':                   { paisCodigo: 'MX', moneda: 'MXN' },
+    'America/Monterrey':                     { paisCodigo: 'MX', moneda: 'MXN' },
+    'America/New_York':                      { paisCodigo: 'US', moneda: 'USD' },
+    'America/Chicago':                       { paisCodigo: 'US', moneda: 'USD' },
+    'America/Denver':                        { paisCodigo: 'US', moneda: 'USD' },
+    'America/Los_Angeles':                   { paisCodigo: 'US', moneda: 'USD' },
+  };
+
+  onTimeZoneChange(tz: string) {
+    const mapping = this.TZ_MAP[tz];
+    if (mapping) {
+      this.configForm.paisCodigo = mapping.paisCodigo;
+      this.configForm.moneda = mapping.moneda;
+    }
+  }
+
   private get waPrefijo(): string {
     const map: Record<string, string> = { UY:'598', AR:'54', US:'1', CL:'56', CO:'57', MX:'52', PE:'51' };
     return map[this.configForm.paisCodigo || 'UY'] ?? '598';

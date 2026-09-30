@@ -16,8 +16,8 @@
         <img [src]="config.logoUrl" alt="{{ config.nombre }}" class="nav-brand-logo">
       } @else {
         <span class="nav-brand-scissors">✂</span>
-        {{ config.nombre }}
       }
+      {{ config.nombre }}
     </a>
     <button class="nav-toggle" (click)="navOpen = !navOpen">☰</button>
     <ul class="nav-links" [class.open]="navOpen">
@@ -208,10 +208,10 @@
               <img [src]="cat.imagen" [alt]="cat.nombre"
                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="cat-img-fallback" style="display:none">
-                {{ cat.servicios[0]?.emoji || '✂️' }}
+                {{ cat.emoji || '✂️' }}
               </div>
               <div class="cat-img-overlay"></div>
-              <div class="cat-img-icon">{{ cat.servicios[0]?.emoji || '✂️' }}</div>
+              <div class="cat-img-icon">{{ cat.emoji || '✂️' }}</div>
             </div>
             <div class="cat-body">
               @if (cat.servicios.length > 0) {

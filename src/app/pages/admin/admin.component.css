@@ -782,6 +782,13 @@
   padding: 3px 10px; border-radius: 20px;
 }
 
+.servicio-cat-badge {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); background: var(--bg-card);
+  border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
+}
+
 /* ─── SERVICIOS GRID + CARD ────────────────────────────────────── */
 .servicios-grid {
   display: grid;

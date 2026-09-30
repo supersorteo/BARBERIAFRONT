@@ -24,8 +24,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   barberos: Barbero[] = [];
   galeria: Galeria[] = [];
   _categoriasApi: Categoria[] = [];
-  categorias: { nombre: string; imagen: string; servicios: Servicio[] }[] = [];
-  categoriaModal: { nombre: string; imagen: string; servicios: Servicio[] } | null = null;
+  categorias: { nombre: string; emoji: string; imagen: string; servicios: Servicio[] }[] = [];
+  categoriaModal: { nombre: string; emoji: string; imagen: string; servicios: Servicio[] } | null = null;
 
   reservaForm = { paciente: '', telefono: '', servicio: '', fecha: '', hora: '', barberoId: '' };
   slotsDisponibles: SlotDisponible[] = [];
@@ -413,23 +413,23 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       map.get(cat)!.push(s);
     }
     if (this._categoriasApi.length > 0) {
-      const result: { nombre: string; imagen: string; servicios: Servicio[] }[] = [];
+      const result: { nombre: string; emoji: string; imagen: string; servicios: Servicio[] }[] = [];
       for (const c of this._categoriasApi) {
         if (map.has(c.nombre)) {
           const img = c.imagenUrl ? this.negocio.resolveImageUrl(c.imagenUrl) : (this.CAT_IMGS[c.nombre] ?? '');
-          result.push({ nombre: c.nombre, imagen: img, servicios: map.get(c.nombre)! });
+          result.push({ nombre: c.nombre, emoji: c.emoji || '✂️', imagen: img, servicios: map.get(c.nombre)! });
         }
       }
       for (const [cat, items] of map.entries()) {
         if (!this._categoriasApi.some(c => c.nombre === cat)) {
-          result.push({ nombre: cat, imagen: this.CAT_IMGS[cat] ?? '', servicios: items });
+          result.push({ nombre: cat, emoji: '✂️', imagen: this.CAT_IMGS[cat] ?? '', servicios: items });
         }
       }
       return result;
     }
     // Fallback: sin categorías de API, usar las del campo categoria del servicio
     return Array.from(map.entries())
-      .map(([nombre, svcs]) => ({ nombre, imagen: this.CAT_IMGS[nombre] ?? '', servicios: svcs }));
+      .map(([nombre, svcs]) => ({ nombre, emoji: '✂️', imagen: this.CAT_IMGS[nombre] ?? '', servicios: svcs }));
   }
 
   minPrecio(servicios: Servicio[]): number {
