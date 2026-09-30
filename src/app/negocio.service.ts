@@ -114,6 +114,7 @@ export interface NegocioConfig {
   // Personalización visual
   colorPrimario?: string;
   logoUrl?: string;
+  heroBgUrl?: string;
   moneda?: string;
   paisCodigo?: string;
 }

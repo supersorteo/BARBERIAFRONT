@@ -143,6 +143,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.config.colorPrimario) {
           document.documentElement.style.setProperty('--color-primary', this.config.colorPrimario);
         }
+        if (this.config.heroBgUrl) {
+          this.heroBgUrl = this.config.heroBgUrl;
+          setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -167,7 +171,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.negocio.getGaleria().subscribe({
       next: g => {
         this.galeria = g;
-        if (g.length > 0) {
+        if (g.length > 0 && !this.config.heroBgUrl) {
           this.heroBgUrl = this.negocio.resolveImageUrl(g[0].imagenUrl);
           setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);
         }

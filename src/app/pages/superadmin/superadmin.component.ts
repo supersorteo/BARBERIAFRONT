@@ -55,6 +55,46 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
   }
 
   eliminandoSlug = '';
+  reseteandoSlug = '';
+  credencialReset: { username: string; password: string; slug: string } | null = null;
+
+  resetPassword(t: TenantResumen): void {
+    this.alert.confirm({
+      title: `Resetear contraseña de "${t.nombre}"`,
+      html: `Se generará una contraseña nueva para <strong>${t.adminUsername}</strong>. La contraseña actual quedará inválida.`,
+      confirmText: 'Sí, resetear',
+      cancelText: 'Cancelar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.reseteandoSlug = t.slug;
+      this.sa.resetPassword(t.slug).subscribe({
+        next: res => {
+          this.reseteandoSlug = '';
+          this.credencialReset = { ...res, slug: t.slug };
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.reseteandoSlug = '';
+          this.alert.error('Error al resetear la contraseña');
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
+  copiarCredencial(): void {
+    if (!this.credencialReset) return;
+    const texto = `Usuario: ${this.credencialReset.username}\nContraseña: ${this.credencialReset.password}`;
+    navigator.clipboard.writeText(texto)
+      .then(() => this.alert.success('Credenciales copiadas'))
+      .catch(() => this.alert.error('No se pudo copiar'));
+  }
+
+  showResetPass: Record<string, boolean> = {};
+  toggleResetPassView(slug: string): void {
+    this.showResetPass[slug] = !this.showResetPass[slug];
+    this.cdr.detectChanges();
+  }
 
   eliminarTenant(t: TenantResumen): void {
     this.alert.confirm({

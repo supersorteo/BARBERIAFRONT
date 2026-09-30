@@ -13,6 +13,7 @@ import { AlertService } from '../../shared/alert.service';
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
 const DIAS = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+type PeriodoDashboard = 'hoy' | '7d' | '30d' | 'mes';
 
 @Component({
   selector: 'app-admin',
@@ -41,13 +42,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
   dashboardHoy: DashboardHoy | null = null;
   dashboardRango: DashboardRango | null = null;
   cargandoRango = false;
-  periodoActivo: 'hoy' | '7d' | '30d' | 'mes' = 'hoy';
+  periodoActivo: PeriodoDashboard = 'hoy';
 
-  readonly PERIODOS: { key: typeof this.periodoActivo; label: string }[] = [
-    { key: 'hoy',  label: 'Hoy'         },
-    { key: '7d',   label: '7 días'      },
-    { key: '30d',  label: '30 días'     },
-    { key: 'mes',  label: 'Este mes'    },
+  readonly PERIODOS: { key: PeriodoDashboard; label: string }[] = [
+    { key: 'hoy',  label: 'Hoy'      },
+    { key: '7d',   label: '7 días'   },
+    { key: '30d',  label: '30 días'  },
+    { key: 'mes',  label: 'Este mes' },
   ];
 
   // Clientes
@@ -154,6 +155,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   logoFile: File | null = null;
   logoPreview = '';
   subiendoLogo = false;
+  heroBgPreview = '';
+  subiendoHeroBg = false;
 
   configForm: NegocioConfig = {
     nombre: '', tagline: '', heroTitulo1: '', heroTitulo2: '',
@@ -202,6 +205,20 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.negocio.uploadImagen(file).subscribe({
       next: res => { this.configForm.logoUrl = res.url; this.subiendoLogo = false; this.cdr.detectChanges(); },
       error: () => { this.subiendoLogo = false; this.alert.error('Error al subir el logo'); }
+    });
+  }
+
+  onHeroBgSeleccionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.heroBgPreview = e.target?.result as string; this.cdr.detectChanges(); };
+    reader.readAsDataURL(file);
+    this.subiendoHeroBg = true;
+    this.negocio.uploadImagen(file).subscribe({
+      next: res => { this.configForm.heroBgUrl = res.url; this.subiendoHeroBg = false; this.cdr.detectChanges(); },
+      error: () => { this.subiendoHeroBg = false; this.alert.error('Error al subir la imagen de fondo'); }
     });
   }
 
@@ -292,7 +309,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
   }
 
-  seleccionarPeriodo(p: typeof this.periodoActivo) {
+  seleccionarPeriodo(p: PeriodoDashboard) {
     this.periodoActivo = p;
     if (p === 'hoy') { this.dashboardRango = null; return; }
     const hoy = new Date();

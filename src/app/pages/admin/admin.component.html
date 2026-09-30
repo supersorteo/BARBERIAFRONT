@@ -1240,6 +1240,26 @@
                   <small class="form-text text-muted">PNG o SVG con fondo transparente. Se muestra en la barra de navegación.</small>
                 </div>
 
+                <!-- Hero background -->
+                <div class="col-12">
+                  <label class="form-label">Imagen de fondo del hero (portada)</label>
+                  <div class="cfg-logo-row">
+                    @if (heroBgPreview || configForm.heroBgUrl) {
+                      <img [src]="heroBgPreview || configForm.heroBgUrl" alt="Fondo hero" class="cfg-hero-preview">
+                    } @else {
+                      <div class="cfg-logo-placeholder">Sin imagen</div>
+                    }
+                    <label class="btn-cancel-admin cfg-logo-btn">
+                      @if (subiendoHeroBg) { Subiendo... } @else { Subir imagen }
+                      <input type="file" accept="image/*" hidden (change)="onHeroBgSeleccionado($event)" [disabled]="subiendoHeroBg">
+                    </label>
+                    @if (configForm.heroBgUrl) {
+                      <button class="btn-cancel-admin" type="button" (click)="configForm.heroBgUrl = ''; heroBgPreview = ''">Quitar</button>
+                    }
+                  </div>
+                  <small class="form-text text-muted">JPG o PNG. Se muestra como fondo de la sección principal del landing.</small>
+                </div>
+
                 <!-- Moneda -->
                 <div class="col-6">
                   <label class="form-label">Moneda</label>
