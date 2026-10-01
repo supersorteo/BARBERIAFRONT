@@ -15,7 +15,9 @@ export const routes: Routes = [
   { path: 'admin',      component: AdminComponent,      canActivate: [adminGuard] },
   { path: 'mi-agenda',  component: MiAgendaComponent,   canActivate: [barberoGuard] },
   { path: 'superadmin', component: SuperAdminComponent, canActivate: [superAdminGuard], canDeactivate: [superAdminDeactivateGuard] },
-  { path: ':slug/login',  component: LoginComponent,   canActivate: [alreadyLoggedInGuard] },
-  { path: ':slug',        component: LandingComponent },
+  { path: ':slug/login',    component: LoginComponent,     canActivate: [alreadyLoggedInGuard] },
+  { path: ':slug/admin',   component: AdminComponent,     canActivate: [adminGuard] },
+  { path: ':slug/mi-agenda', component: MiAgendaComponent, canActivate: [barberoGuard] },
+  { path: ':slug',          component: LandingComponent },
   { path: '**',         redirectTo: 'barberia-demo' }
 ];

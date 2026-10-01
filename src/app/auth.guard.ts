@@ -39,7 +39,11 @@ export const barberoGuard: CanActivateFn = () => {
     return false;
   }
   if (!auth.isBarbero()) {
-    if (auth.isAdmin()) { router.navigate(['/admin']); return false; }
+    if (auth.isAdmin()) {
+      const slug = auth.getUser()?.tenantId;
+      router.navigate(slug ? ['/', slug, 'admin'] : ['/admin']);
+      return false;
+    }
     const slug = auth.getUser()?.tenantId;
     router.navigate([slug ? `/${slug}/login` : '/login']);
     return false;
@@ -73,7 +77,15 @@ export const alreadyLoggedInGuard: CanActivateFn = (route: ActivatedRouteSnapsho
     if (!route.params['slug']) { router.navigate(['/superadmin']); return false; }
     return true;
   }
-  if (auth.isAdmin())   { router.navigate(['/admin']);      return false; }
-  if (auth.isBarbero()) { router.navigate(['/mi-agenda']); return false; }
+  if (auth.isAdmin()) {
+    const slug = auth.getUser()?.tenantId;
+    router.navigate(slug ? ['/', slug, 'admin'] : ['/admin']);
+    return false;
+  }
+  if (auth.isBarbero()) {
+    const slug = auth.getUser()?.tenantId;
+    router.navigate(slug ? ['/', slug, 'mi-agenda'] : ['/mi-agenda']);
+    return false;
+  }
   return true;
 };

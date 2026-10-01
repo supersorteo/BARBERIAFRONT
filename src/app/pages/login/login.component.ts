@@ -95,8 +95,12 @@ export class LoginComponent implements OnInit {
     this.error = '';
     this.auth.login(this.form.username, this.form.password, this.tenantSlug ?? undefined).subscribe({
       next: (u) => {
-        const dest = u.rol === 'BARBERO' ? '/mi-agenda' : '/admin';
-        this.router.navigate([dest]);
+        const slug = u.tenantId;
+        if (u.rol === 'BARBERO') {
+          this.router.navigate(slug ? ['/', slug, 'mi-agenda'] : ['/mi-agenda']);
+        } else {
+          this.router.navigate(slug ? ['/', slug, 'admin'] : ['/admin']);
+        }
       },
       error: (err) => {
         if (err?.error?.code === 'TENANT_INACTIVE') {
