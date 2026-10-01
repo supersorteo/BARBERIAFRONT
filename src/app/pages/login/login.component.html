@@ -1,3 +1,11 @@
+@if (!tenantInactivo && esDemo) {
+  <nav class="demo-nav">
+    <button class="dn-btn" [class.dn-on]="vista === 'gateway'" type="button" (click)="vista = 'gateway'">Gateway</button>
+    <button class="dn-btn" [class.dn-on]="vista === 'form'"    type="button" (click)="vista = 'form'">Login</button>
+    <a      class="dn-btn"                                      routerLink="/registro">Registro</a>
+  </nav>
+}
+
 @if (tenantInactivo) {
   <div class="login-page">
     <div class="login-card login-card--inactivo">
