@@ -105,6 +105,13 @@
         <span class="brand-name">BarberOS</span>
       </div>
 
+      @if (fromRegistration) {
+        <div class="reg-success-banner" role="status">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" flex-shrink="0"><polyline points="20 6 9 17 4 12"/></svg>
+          ¡Tu barbería fue creada! Ingresá con tus credenciales para acceder al panel.
+        </div>
+      }
+
       @if (!esDemo) {
         <p class="login-negocio">{{ nombreNegocio }}</p>
       }

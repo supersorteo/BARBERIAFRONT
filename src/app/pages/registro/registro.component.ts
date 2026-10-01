@@ -106,7 +106,9 @@ export class RegistroComponent {
   }
 
   irAMiBarberia(): void {
-    this.router.navigate(['/', this.resultado!.slug], { replaceUrl: true });
+    const slug = this.resultado!.slug;
+    try { localStorage.setItem('lastRegisteredSlug', slug); } catch {}
+    this.router.navigate(['/', slug, 'login'], { replaceUrl: true });
   }
 
   copiarUrl(): void {

@@ -244,6 +244,21 @@
 .login-link { color: #c49420; font-weight: 500; text-decoration: none; }
 .login-link:hover { text-decoration: underline; }
 
+/* ── REG SUCCESS BANNER ────────────────────────────────────────────── */
+.reg-success-banner {
+  align-items: center;
+  background: rgba(34,197,94,.08);
+  border: 1px solid rgba(34,197,94,.22);
+  border-radius: 8px;
+  color: #22c55e;
+  display: flex;
+  font-size: .83rem;
+  gap: .55rem;
+  margin-bottom: 1rem;
+  padding: .55rem .9rem;
+}
+.reg-success-banner svg { flex-shrink: 0; }
+
 /* ── ERROR ─────────────────────────────────────────────────────────── */
 .form-error {
   background: rgba(224,86,86,.08);

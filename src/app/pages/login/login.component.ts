@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
   showPass = false;
+  fromRegistration = false;
   tab: 'dueno' | 'barbero' = this.loadTab();
   tenantInactivo = false;
   vista: 'gateway' | 'form' = 'gateway';
@@ -57,6 +58,22 @@ export class LoginComponent implements OnInit {
     }
     // Solo mostrar gateway para la demo o login genérico
     if (!this.esDemo) this.vista = 'form';
+
+    // Post-registro: detectar si el usuario viene de registrar un negocio
+    const lastSlug = (() => { try { return localStorage.getItem('lastRegisteredSlug'); } catch { return null; } })();
+    if (lastSlug) {
+      if (this.esDemo) {
+        // Presionó atrás al gateway demo → rebotar al login de su negocio
+        try { localStorage.removeItem('lastRegisteredSlug'); } catch {}
+        this.router.navigate(['/', lastSlug, 'login'], { replaceUrl: true });
+        return;
+      }
+      if (this.tenantSlug === lastSlug) {
+        // Llegó al login de su negocio recién creado → mostrar banner de éxito
+        this.fromRegistration = true;
+        try { localStorage.removeItem('lastRegisteredSlug'); } catch {}
+      }
+    }
   }
 
   irADemo(): void {
