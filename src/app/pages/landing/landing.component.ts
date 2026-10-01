@@ -182,10 +182,18 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.negocio.getBarberos().subscribe({
       next: b => { this.barberos = b; this.cdr.detectChanges(); this.refreshScrollTrigger(); }
     });
-    // Imagen de fondo por defecto: rotación entre 4 imágenes basada en el slug
+    // Imagen de fondo por defecto: rotación entre 10 imágenes basada en el slug
     const HERO_BG_DEFAULTS = [
-      '/categorias/combo.jpg', '/categorias/corte.jpg',
-      '/categorias/barba.jpg', '/categorias/coloracion.jpg',
+      'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1521499892833-773a6179a0d4?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1587909209111-5097ee578ec3?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1567894340315-735d7c361db0?w=1920&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1634449571010-02389ed0f9b0?w=1920&q=80&auto=format&fit=crop',
     ];
     const slugHash = this.slugActual || 'default';
     const idx = [...slugHash].reduce((s, c) => s + c.charCodeAt(0), 0) % HERO_BG_DEFAULTS.length;

@@ -9,8 +9,7 @@ import {
 } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
 import { AlertService } from '../../shared/alert.service';
-import { OnboardingService, OnboardingStatus } from '../../onboarding.service';
-import { OnboardingChecklistComponent } from '../../shared/onboarding-checklist/onboarding-checklist.component';
+import { OnboardingService } from '../../onboarding.service';
 
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
@@ -20,14 +19,12 @@ type PeriodoDashboard = 'hoy' | '7d' | '30d' | 'mes';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, OnboardingChecklistComponent],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit, AfterViewInit {
   usuario: AuthUser | null = null;
-  onboardingStatus: OnboardingStatus | null = null;
-  mostrarChecklist = false;
 
   private _tabActiva: 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente' = 'dashboard';
   get tabActiva() { return this._tabActiva; }
@@ -379,14 +376,18 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cargarGaleria();
   }
 
+  private buildSetTab(): (tab: string) => void {
+    return (tab: string) => {
+      this.tabActiva = tab as 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente';
+      this.cdr.detectChanges();
+    };
+  }
+
   cargarOnboarding() {
     this.onboarding.getStatus().subscribe({
       next: s => {
-        this.onboardingStatus = s;
-        this.mostrarChecklist = !s.configCompleta || !s.tieneServicios || !s.tieneBarberos;
-        this.cdr.detectChanges();
         if (!s.tourVisto) {
-          setTimeout(() => this.onboarding.iniciarTour(), 600);
+          setTimeout(() => this.onboarding.iniciarTour(undefined, this.buildSetTab()), 600);
         }
       },
       error: () => {}
@@ -394,19 +395,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   }
 
   relanzarTour() {
-    this.onboarding.iniciarTour(() => {
-      this.cargarOnboarding();
-      this.cdr.detectChanges();
-    });
-  }
-
-  navegarATour(tab: string) {
-    if (tab === 'config') {
-      this.abrirModalConfig();
-    } else {
-      this.tabActiva = tab as 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente';
-    }
-    this.cargarOnboarding();
+    this.onboarding.iniciarTour(undefined, this.buildSetTab());
   }
 
   cargarDashboard() {
@@ -1171,6 +1160,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
   onGaleriaFotoSeleccionada(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      this.alert.error('La imagen no debe superar 2 MB. Reducí el tamaño y volvé a intentarlo.');
+      (event.target as HTMLInputElement).value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = e => {
       this.galeriaFoto = { file, preview: e.target!.result as string, url: '' };

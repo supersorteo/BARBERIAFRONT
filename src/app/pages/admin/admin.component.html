@@ -27,29 +27,19 @@
   <!-- TABS -->
   <div class="admin-tabs">
     <button id="admin-tab-dashboard" class="admin-tab" [class.active]="tabActiva==='dashboard'" (click)="tabActiva='dashboard'">Dashboard</button>
+    <button id="admin-tab-config" class="admin-tab" (click)="abrirModalConfig()">Configuración</button>
     <button id="admin-tab-turnos" class="admin-tab" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">Reservas</button>
     <button class="admin-tab" [class.active]="tabActiva==='clientes'" (click)="tabActiva='clientes'; cargarClientes()">Clientes</button>
     <button id="admin-tab-barberos" class="admin-tab" [class.active]="tabActiva==='barberos'" (click)="tabActiva='barberos'">Barberos</button>
     <button class="admin-tab" [class.active]="tabActiva==='bloqueos'" (click)="tabActiva='bloqueos'">Bloqueos</button>
     <button id="admin-tab-galeria" class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
     <button id="admin-tab-servicios" class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
-    <button class="admin-tab" [class.active]="tabActiva==='agente'" (click)="tabActiva='agente'">Agente IA</button>
-    <button id="admin-tab-config" class="admin-tab" (click)="abrirModalConfig()">Configuración</button>
+    <!--button-- class="admin-tab" [class.active]="tabActiva==='agente'" (click)="tabActiva='agente'">Agente IA</button-->
   </div>
 
   <!-- ─── TAB DASHBOARD ─── -->
   @if (tabActiva === 'dashboard') {
     <div class="admin-tab-panel">
-
-      <!-- Checklist de onboarding (se oculta cuando todos los pasos están completos) -->
-      @if (mostrarChecklist && onboardingStatus) {
-        <app-onboarding-checklist
-          [status]="onboardingStatus"
-          (navigateTo)="navegarATour($event)"
-          (relanzarTour)="relanzarTour()"
-          (closed)="mostrarChecklist = false">
-        </app-onboarding-checklist>
-      }
 
       <!-- Selector de período -->
       <div class="dash-periodo-bar mb-4">
@@ -459,43 +449,11 @@
               <div class="bpr-admin-user">admin</div>
             </div>
           </div>
-          <button class="bpr-pass-btn" (click)="mostrarCambioPassAdmin = !mostrarCambioPassAdmin">
+          <button class="bpr-pass-btn" (click)="mostrarCambioPassAdmin = true; errorCambioPassAdmin = ''">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             Cambiar contraseña
           </button>
         </div>
-        @if (mostrarCambioPassAdmin) {
-          <div class="bpr-pass-form">
-            @if (errorCambioPassAdmin) {
-              <div class="alert-error-inline">{{ errorCambioPassAdmin }}</div>
-            }
-            <div class="bpr-pass-form-row">
-              <div class="pass-wrap">
-                <input [type]="showAdminPass.actual ? 'text' : 'password'" class="form-control form-dark" placeholder="Contraseña actual" [(ngModel)]="cambioPassAdminForm.actual">
-                <button type="button" class="pass-eye" (click)="showAdminPass.actual = !showAdminPass.actual" tabindex="-1">
-                  @if (showAdminPass.actual) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
-                </button>
-              </div>
-              <div class="pass-wrap">
-                <input [type]="showAdminPass.nueva ? 'text' : 'password'" class="form-control form-dark" placeholder="Nueva contraseña" [(ngModel)]="cambioPassAdminForm.nueva">
-                <button type="button" class="pass-eye" (click)="showAdminPass.nueva = !showAdminPass.nueva" tabindex="-1">
-                  @if (showAdminPass.nueva) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
-                </button>
-              </div>
-              <div class="pass-wrap">
-                <input [type]="showAdminPass.conf ? 'text' : 'password'" class="form-control form-dark" placeholder="Confirmar nueva" [(ngModel)]="cambioPassAdminForm.confirmar">
-                <button type="button" class="pass-eye" (click)="showAdminPass.conf = !showAdminPass.conf" tabindex="-1">
-                  @if (showAdminPass.conf) { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  } @else { <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
-                </button>
-              </div>
-              <button class="btn-primary-admin" (click)="guardarCambioPassAdmin()">Guardar</button>
-              <button class="btn-cancel-admin" (click)="mostrarCambioPassAdmin = false">Cancelar</button>
-            </div>
-          </div>
-        }
       </div>
 
       <!-- Barberos grid -->
@@ -641,8 +599,11 @@
         <div class="modal-backdrop-custom" (click)="cerrarHorarios()"></div>
         <div class="modal-custom">
           <div class="modal-content-custom" style="max-width:560px" (click)="$event.stopPropagation()">
-            <div class="modal-header-custom">
-              <h5>Horarios · {{ barberos.find(b => b.id === barberoHorariosId)?.nombre }}</h5>
+            <div class="modal-header-custom mh-premium">
+              <div class="mh-left">
+                <span class="mh-icon">🗓️</span>
+                <h5>Horarios · {{ barberos.find(b => b.id === barberoHorariosId)?.nombre }}</h5>
+              </div>
               <button class="btn-close-custom" (click)="cerrarHorarios()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
@@ -686,8 +647,11 @@
         <div class="modal-backdrop-custom" (click)="mostrarModalCrearUsuario = false"></div>
         <div class="modal-custom">
           <div class="modal-content-custom" (click)="$event.stopPropagation()">
-            <div class="modal-header-custom">
-              <h5>Crear acceso — {{ barberoParaUsuario?.nombre }}</h5>
+            <div class="modal-header-custom mh-premium">
+              <div class="mh-left">
+                <span class="mh-icon">🗝️</span>
+                <h5>Crear acceso · {{ barberoParaUsuario?.nombre }}</h5>
+              </div>
               <button class="btn-close-custom" (click)="mostrarModalCrearUsuario = false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
@@ -724,8 +688,11 @@
         <div class="modal-backdrop-custom" (click)="mostrarModalResetPass = false"></div>
         <div class="modal-custom">
           <div class="modal-content-custom" (click)="$event.stopPropagation()">
-            <div class="modal-header-custom">
-              <h5>Resetear contraseña — {{ usuarioParaReset?.username }}</h5>
+            <div class="modal-header-custom mh-premium">
+              <div class="mh-left">
+                <span class="mh-icon">🔑</span>
+                <h5>Nueva contraseña · {{ usuarioParaReset?.username }}</h5>
+              </div>
               <button class="btn-close-custom" (click)="mostrarModalResetPass = false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
@@ -758,8 +725,11 @@
         <div class="modal-backdrop-custom" (click)="mostrarModalCredencial = false"></div>
         <div class="modal-custom">
           <div class="modal-content-custom" style="max-width:440px" (click)="$event.stopPropagation()">
-            <div class="modal-header-custom">
-              <h5>✓ Credenciales listas</h5>
+            <div class="modal-header-custom mh-premium">
+              <div class="mh-left">
+                <span class="mh-icon">✅</span>
+                <h5>Credenciales listas</h5>
+              </div>
               <button class="btn-close-custom" (click)="mostrarModalCredencial = false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
@@ -841,9 +811,9 @@
       <div class="action-bar mb-4">
         <div>
           <h3 class="section-title">Galería de fotos</h3>
-          <span class="count-badge">{{ galeria.length }} imagen(es)</span>
+          <span class="count-badge">{{ galeria.length }}/10 imagen(es)</span>
         </div>
-        <button class="btn-primary-admin" (click)="abrirModalNuevaGaleria()">
+        <button class="btn-primary-admin" (click)="abrirModalNuevaGaleria()" [disabled]="galeria.length >= 10" [title]="galeria.length >= 10 ? 'Límite de 10 imágenes alcanzado' : ''">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Agregar imagen
         </button>
@@ -1354,8 +1324,11 @@
   <div class="modal-backdrop-custom" (click)="mostrarModalBarbero=false"></div>
   <div class="modal-custom">
     <div class="modal-content-custom">
-      <div class="modal-header-custom">
-        <h5>{{ editandoBarbero ? 'Editar' : 'Nuevo' }} barbero</h5>
+      <div class="modal-header-custom mh-premium">
+        <div class="mh-left">
+          <span class="mh-icon">💈</span>
+          <h5>{{ editandoBarbero ? 'Editar' : 'Nuevo' }} barbero</h5>
+        </div>
         <button class="btn-close-custom" (click)="mostrarModalBarbero=false">✕</button>
       </div>
       <div class="p-4">
@@ -1402,8 +1375,11 @@
   <div class="modal-backdrop-custom" (click)="mostrarModalBloqueo=false"></div>
   <div class="modal-custom">
     <div class="modal-content-custom">
-      <div class="modal-header-custom">
-        <h5>Nuevo bloqueo de horario</h5>
+      <div class="modal-header-custom mh-premium">
+        <div class="mh-left">
+          <span class="mh-icon">🚫</span>
+          <h5>Nuevo bloqueo de horario</h5>
+        </div>
         <button class="btn-close-custom" (click)="mostrarModalBloqueo=false">✕</button>
       </div>
       <div class="p-4">
@@ -1448,8 +1424,11 @@
   <div class="modal-backdrop-custom" (click)="mostrarModalGaleria=false"></div>
   <div class="modal-custom">
     <div class="modal-content-custom">
-      <div class="modal-header-custom">
-        <h5>{{ editandoGaleria ? 'Editar' : 'Nueva' }} imagen</h5>
+      <div class="modal-header-custom mh-premium">
+        <div class="mh-left">
+          <span class="mh-icon">🖼️</span>
+          <h5>{{ editandoGaleria ? 'Editar' : 'Nueva' }} imagen</h5>
+        </div>
         <button class="btn-close-custom" (click)="mostrarModalGaleria=false">✕</button>
       </div>
       <div class="p-4">
@@ -1495,30 +1474,33 @@
 @if (mostrarModalServicio) {
   <div class="modal-backdrop-custom" (click)="mostrarModalServicio=false"></div>
   <div class="modal-custom">
-    <div class="modal-content-custom">
-      <div class="modal-header-custom">
-        <h5>{{ editandoServicio ? 'Editar' : 'Nuevo' }} servicio</h5>
+    <div class="modal-content-custom modal-servicio">
+      <div class="modal-header-custom mh-premium msv-header">
+        <div class="msv-header-left">
+          <span class="msv-icon">✂️</span>
+          <h5>{{ editandoServicio ? 'Editar' : 'Nuevo' }} servicio</h5>
+        </div>
         <button class="btn-close-custom" (click)="mostrarModalServicio=false">✕</button>
       </div>
-      <div class="p-4">
-        <div class="mb-3">
-          <label class="form-label">Nombre *</label>
-          <input class="form-control form-dark" [(ngModel)]="servicioForm.nombre" placeholder="Corte de cabello">
+      <div class="msv-body">
+        <div class="msv-field">
+          <label class="form-label">Nombre del servicio <span class="msv-required">*</span></label>
+          <input class="form-control form-dark msv-input" [(ngModel)]="servicioForm.nombre" placeholder="Ej: Corte de cabello">
         </div>
-        <div class="mb-3">
-          <label class="form-label">Descripción</label>
-          <textarea class="form-control form-dark" [(ngModel)]="servicioForm.descripcion" rows="2"></textarea>
+        <div class="msv-field">
+          <label class="form-label">Descripción <span class="msv-optional">(opcional)</span></label>
+          <textarea class="form-control form-dark msv-input msv-textarea" [(ngModel)]="servicioForm.descripcion" rows="2" placeholder="Describí brevemente el servicio..."></textarea>
         </div>
-        <div class="mb-3">
+        <div class="msv-field">
           <label class="form-label">Categoría</label>
-          <select class="form-control form-dark" [(ngModel)]="servicioForm.categoria">
-            <option value="">— Seleccionar —</option>
+          <select class="form-control form-dark msv-input" [(ngModel)]="servicioForm.categoria">
+            <option value="">— Seleccionar categoría —</option>
             <option *ngFor="let cat of categoriasNombres" [value]="cat">{{cat}}</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Fotos del servicio (hasta 3)</label>
-          <div class="foto-slots">
+        <div class="msv-field">
+          <label class="form-label">Fotos del trabajo terminado <span class="msv-optional">(hasta 3)</span></label>
+          <div class="foto-slots msv-fotos">
             @for (slot of servicioFotos; track $index; let i = $index) {
               <div class="foto-slot">
                 @if (slot.preview) {
@@ -1534,24 +1516,31 @@
               </div>
             }
           </div>
-          <p style="color:var(--text-muted);font-size:11px;margin-top:8px">PNG, JPG, WEBP · Máx. 5 MB por imagen</p>
+          <p class="msv-hint">PNG, JPG, WEBP · Máx. 5 MB por imagen</p>
         </div>
-        <div class="row g-3 mb-4">
-          <div class="col-6">
-            <label class="form-label">Precio ({{ configForm.moneda || 'UYU' }}) *</label>
-            <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.precio">
+        <div class="msv-row-2">
+          <div class="msv-field">
+            <label class="form-label">Precio ({{ configForm.moneda || 'UYU' }}) <span class="msv-required">*</span></label>
+            <div class="msv-input-prefix">
+              <span class="msv-prefix-icon">$</span>
+              <input type="number" class="form-control form-dark msv-input" [(ngModel)]="servicioForm.precio" placeholder="0">
+            </div>
           </div>
-          <div class="col-6">
-            <label class="form-label">Duración (min)</label>
-            <input type="number" class="form-control form-dark" [(ngModel)]="servicioForm.duracionMinutos">
+          <div class="msv-field">
+            <label class="form-label">Duración</label>
+            <div class="msv-input-prefix">
+              <span class="msv-prefix-icon">⏱</span>
+              <input type="number" class="form-control form-dark msv-input" [(ngModel)]="servicioForm.duracionMinutos" placeholder="30">
+              <span class="msv-suffix">min</span>
+            </div>
           </div>
         </div>
-        <div class="modal-footer-actions">
-          <button class="btn-cancel-admin" (click)="mostrarModalServicio=false" [disabled]="subiendoFotos">Cancelar</button>
-          <button class="btn-primary-admin" (click)="guardarServicio()" [disabled]="subiendoFotos">
-            {{ subiendoFotos ? 'Subiendo fotos...' : 'Guardar' }}
-          </button>
-        </div>
+      </div>
+      <div class="msv-footer">
+        <button class="btn-cancel-admin msv-btn-cancel" (click)="mostrarModalServicio=false" [disabled]="subiendoFotos">Cancelar</button>
+        <button class="btn-primary-admin msv-btn-save" (click)="guardarServicio()" [disabled]="subiendoFotos">
+          {{ subiendoFotos ? '⏳ Subiendo fotos...' : (editandoServicio ? '💾 Guardar cambios' : '✓ Crear servicio') }}
+        </button>
       </div>
     </div>
   </div>
@@ -1562,8 +1551,11 @@
   <div class="modal-backdrop-custom" (click)="cerrarModalReserva()"></div>
   <div class="modal-custom">
     <div class="modal-content-custom" style="max-width:560px" (click)="$event.stopPropagation()">
-      <div class="modal-header-custom">
-        <h5>{{ turnoConfirmado ? 'Reserva confirmada' : 'Nueva reserva manual' }}</h5>
+      <div class="modal-header-custom mh-premium">
+        <div class="mh-left">
+          <span class="mh-icon">{{ turnoConfirmado ? '✅' : '📋' }}</span>
+          <h5>{{ turnoConfirmado ? 'Reserva confirmada' : 'Nueva reserva manual' }}</h5>
+        </div>
         <button class="btn-close-custom" (click)="cerrarModalReserva()">✕</button>
       </div>
       <div class="p-4">
@@ -1675,9 +1667,12 @@
 @if (mostrarModalCategoria) {
   <div class="modal-backdrop-custom" (click)="mostrarModalCategoria=false"></div>
   <div class="modal-custom">
-    <div class="modal-content-custom">
-      <div class="modal-header-custom">
-        <h5>{{ editandoCategoria ? 'Editar' : 'Nueva' }} categoría</h5>
+    <div class="modal-content-custom modal-cat">
+      <div class="modal-header-custom mh-premium">
+        <div class="mh-left">
+          <span class="mh-icon">🏷️</span>
+          <h5>{{ editandoCategoria ? 'Editar' : 'Nueva' }} categoría</h5>
+        </div>
         <button class="btn-close-custom" (click)="mostrarModalCategoria=false">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -1754,6 +1749,79 @@
         <button class="btn-primary-admin" (click)="guardarCategoria()"
                 [disabled]="!categoriaForm.nombre.trim()">
           {{ editandoCategoria ? 'Actualizar' : 'Agregar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── MODAL CAMBIO DE CONTRASEÑA ADMIN ─── -->
+@if (mostrarCambioPassAdmin) {
+  <div class="modal-backdrop-custom" (click)="mostrarCambioPassAdmin=false; cambioPassAdminForm={actual:'',nueva:'',confirmar:''}"></div>
+  <div class="modal-custom">
+    <div class="modal-content-custom modal-cambio-pass">
+      <div class="modal-header-custom mh-premium mcp-header">
+        <div class="mcp-header-left">
+          <span class="mcp-icon">🔒</span>
+          <div>
+            <h5>Cambiar contraseña</h5>
+            <span class="mcp-subtitle">Cuenta administrador</span>
+          </div>
+        </div>
+        <button class="btn-close-custom" (click)="mostrarCambioPassAdmin=false; cambioPassAdminForm={actual:'',nueva:'',confirmar:''}">✕</button>
+      </div>
+      <div class="mcp-body">
+        @if (errorCambioPassAdmin) {
+          <div class="mcp-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ errorCambioPassAdmin }}
+          </div>
+        }
+        <div class="mcp-field">
+          <label class="form-label">Contraseña actual</label>
+          <div class="mcp-pass-wrap">
+            <input [type]="showAdminPass.actual ? 'text' : 'password'" class="form-control form-dark mcp-input" placeholder="Ingresá tu contraseña actual" [(ngModel)]="cambioPassAdminForm.actual">
+            <button type="button" class="pass-eye mcp-eye" (click)="showAdminPass.actual = !showAdminPass.actual" tabindex="-1">
+              @if (showAdminPass.actual) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+        <div class="mcp-divider"></div>
+        <div class="mcp-field">
+          <label class="form-label">Nueva contraseña</label>
+          <div class="mcp-pass-wrap">
+            <input [type]="showAdminPass.nueva ? 'text' : 'password'" class="form-control form-dark mcp-input" placeholder="Mínimo 6 caracteres" [(ngModel)]="cambioPassAdminForm.nueva">
+            <button type="button" class="pass-eye mcp-eye" (click)="showAdminPass.nueva = !showAdminPass.nueva" tabindex="-1">
+              @if (showAdminPass.nueva) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+        <div class="mcp-field">
+          <label class="form-label">Confirmar nueva contraseña</label>
+          <div class="mcp-pass-wrap">
+            <input [type]="showAdminPass.conf ? 'text' : 'password'" class="form-control form-dark mcp-input" placeholder="Repetí la nueva contraseña" [(ngModel)]="cambioPassAdminForm.confirmar">
+            <button type="button" class="pass-eye mcp-eye" (click)="showAdminPass.conf = !showAdminPass.conf" tabindex="-1">
+              @if (showAdminPass.conf) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mcp-footer">
+        <button class="btn-cancel-admin" (click)="mostrarCambioPassAdmin=false; cambioPassAdminForm={actual:'',nueva:'',confirmar:''}">Cancelar</button>
+        <button class="btn-primary-admin mcp-btn-save" (click)="guardarCambioPassAdmin()">
+          🔑 Guardar contraseña
         </button>
       </div>
     </div>
