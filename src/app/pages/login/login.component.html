@@ -13,24 +13,79 @@
       </p>
     </div>
   </div>
+} @else if (vista === 'gateway') {
+
+  <!-- ═══════ GATEWAY ═════════════════════════════════════════════ -->
+  <div class="login-page gateway-page">
+    <div class="gateway-card">
+
+      <div class="login-brand">
+        <span class="brand-icon">✂️</span>
+        <span class="brand-name">BarberOS</span>
+      </div>
+      <h1 class="gateway-title">¿Qué querés hacer?</h1>
+
+      <div class="gateway-options">
+
+        <!-- Opción: probar demo -->
+        <div class="gw-option" (click)="irADemo()">
+          <div class="gw-option-icon">🎮</div>
+          <div class="gw-option-body">
+            <h3 class="gw-option-title">Probar el sistema</h3>
+            <p class="gw-option-desc">Explorá cómo funciona el panel de administración con la barbería demo.<br><em>No requiere registro.</em></p>
+          </div>
+          <svg class="gw-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <!-- Opción: registrar negocio -->
+        <a class="gw-option gw-option--highlight" routerLink="/registro">
+          <div class="gw-option-icon">🏪</div>
+          <div class="gw-option-body">
+            <h3 class="gw-option-title">Registrar mi negocio</h3>
+            <p class="gw-option-desc">Creá tu propia barbería online, con panel de administración, reservas y agente IA.<br><em>Gratis, en 2 minutos.</em></p>
+          </div>
+          <svg class="gw-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+
+      </div>
+
+      <p class="gateway-footer">¿Ya tenés tu negocio registrado? Ingresá en <span class="link-gold">tudominio.com/<em>tu-slug</em>/login</span></p>
+    </div>
+  </div>
+
 } @else {
+
+  <!-- ═══════ FORMULARIO DE LOGIN ═══════════════════════════════════ -->
   <div class="login-page">
     <div class="login-card">
 
-      <a [routerLink]="tenantSlug ? '/' + tenantSlug : '/barberia-demo'" class="btn-volver">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-        {{ tenantSlug ? 'Volver al sitio' : 'Ir al demo' }}
-      </a>
+      @if (esDemo) {
+        <button class="btn-volver" type="button" (click)="vista = 'gateway'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+      } @else {
+        <a [routerLink]="'/' + tenantSlug" class="btn-volver">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver al sitio
+        </a>
+      }
 
       <div class="login-brand">
         <span class="brand-icon">✂️</span>
         <span class="brand-name">BarberOS</span>
       </div>
 
-      @if (nombreNegocio) {
+      @if (esDemo) {
+        <div class="demo-notice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Estás ingresando a la barbería demo — solo para probar el sistema
+        </div>
+      } @else {
         <p class="login-negocio">{{ nombreNegocio }}</p>
       }
-      <h1 class="login-title">{{ nombreNegocio ? 'Iniciar sesión' : 'Accedé a tu panel' }}</h1>
+
+      <h1 class="login-title">Iniciar sesión</h1>
 
       <div class="login-tabs" role="tablist">
         <button
@@ -90,10 +145,12 @@
           @if (loading) { <span class="spinner" aria-label="Cargando"></span> }
         </button>
 
-        <p class="login-footer-text">
-          ¿No tenés cuenta?
-          <a routerLink="/registro" class="login-link">Registrá tu barbería</a>
-        </p>
+        @if (esDemo) {
+          <p class="login-footer-text">
+            ¿Querés tu propia barbería?
+            <a routerLink="/registro" class="login-link">Registrá tu negocio →</a>
+          </p>
+        }
       </div>
 
     </div>

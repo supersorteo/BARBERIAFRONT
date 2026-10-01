@@ -131,7 +131,10 @@
           ⚠️ Anotá tu usuario y contraseña antes de continuar.
         </div>
 
-        <a [routerLink]="urlLogin" class="btn-submit btn-link">Ir a iniciar sesión</a>
+        <button class="btn-submit" type="button" (click)="irAMiBarberia()">
+          Ver mi barbería →
+        </button>
+        <p class="exito-redirect">Serás redirigido en {{ contador }}...</p>
       </div>
     }
 

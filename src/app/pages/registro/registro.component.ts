@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
@@ -28,10 +28,11 @@ export class RegistroComponent {
   resultado: RegistroResponse | null = null;
   showPass = false;
   showConfirm = false;
+  contador = 3;
 
   private readonly apiUrl = environment.apiBase.replace('/api/v1', '') + '/api/registro';
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
 
   onNombreChange(): void {
     this.slugPreview = this.generarSlug(this.form.nombreNegocio);
@@ -81,7 +82,16 @@ export class RegistroComponent {
         this.resultado = res;
         this.vista = 'exito';
         this.loading = false;
+        this.contador = 3;
         this.cdr.detectChanges();
+        const tick = setInterval(() => {
+          this.contador--;
+          this.cdr.detectChanges();
+          if (this.contador <= 0) {
+            clearInterval(tick);
+            this.irAMiBarberia();
+          }
+        }, 1000);
       },
       error: (e) => {
         this.error = e?.error?.message ?? e?.error?.error ?? 'Ocurrió un error. Intentá de nuevo.';
@@ -95,8 +105,8 @@ export class RegistroComponent {
     return window.location.origin + '/' + (this.resultado?.slug ?? '');
   }
 
-  get urlLogin(): string {
-    return '/' + (this.resultado?.slug ?? '') + '/login';
+  irAMiBarberia(): void {
+    this.router.navigate(['/', this.resultado!.slug], { replaceUrl: true });
   }
 
   copiarUrl(): void {

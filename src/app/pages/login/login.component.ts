@@ -20,11 +20,16 @@ export class LoginComponent implements OnInit {
   showPass = false;
   tab: 'dueno' | 'barbero' = this.loadTab();
   tenantInactivo = false;
+  vista: 'gateway' | 'form' = 'gateway';
 
   /** Slug del tenant si se accede via /:slug/login, null si es /login genérico */
   tenantSlug: string | null = null;
   /** Nombre legible derivado del slug para mostrar en la UI */
   nombreNegocio = '';
+
+  get esDemo(): boolean {
+    return !this.tenantSlug || this.tenantSlug === 'barberia-demo';
+  }
 
   constructor(
     private auth: AuthService,
@@ -50,6 +55,16 @@ export class LoginComponent implements OnInit {
         }
       });
     }
+    // Solo mostrar gateway para la demo o login genérico
+    if (!this.esDemo) this.vista = 'form';
+  }
+
+  irADemo(): void {
+    if (!this.tenantSlug) {
+      this.tenantSlug = 'barberia-demo';
+      this.tenantCtx.setSlug('barberia-demo');
+    }
+    this.vista = 'form';
   }
 
   setTab(t: 'dueno' | 'barbero'): void {
