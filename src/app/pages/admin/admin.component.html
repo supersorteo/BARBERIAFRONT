@@ -5,6 +5,10 @@
     <div class="admin-user-badge">
       <span class="admin-user-dot"></span>
       <span>{{ usuario?.username || 'Admin' }}</span>
+      <button class="btn-icon btn-icon--tour" (click)="relanzarTour()" title="Ver tour guiado">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Tour
+      </button>
       <button class="btn-icon" (click)="irAlSitio()" title="Ver mi barbería">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Ver sitio
@@ -22,20 +26,30 @@
 
   <!-- TABS -->
   <div class="admin-tabs">
-    <button class="admin-tab" [class.active]="tabActiva==='dashboard'" (click)="tabActiva='dashboard'">Dashboard</button>
-    <button class="admin-tab" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">Reservas</button>
+    <button id="admin-tab-dashboard" class="admin-tab" [class.active]="tabActiva==='dashboard'" (click)="tabActiva='dashboard'">Dashboard</button>
+    <button id="admin-tab-turnos" class="admin-tab" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">Reservas</button>
     <button class="admin-tab" [class.active]="tabActiva==='clientes'" (click)="tabActiva='clientes'; cargarClientes()">Clientes</button>
-    <button class="admin-tab" [class.active]="tabActiva==='barberos'" (click)="tabActiva='barberos'">Barberos</button>
+    <button id="admin-tab-barberos" class="admin-tab" [class.active]="tabActiva==='barberos'" (click)="tabActiva='barberos'">Barberos</button>
     <button class="admin-tab" [class.active]="tabActiva==='bloqueos'" (click)="tabActiva='bloqueos'">Bloqueos</button>
-    <button class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
-    <button class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
+    <button id="admin-tab-galeria" class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
+    <button id="admin-tab-servicios" class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
     <button class="admin-tab" [class.active]="tabActiva==='agente'" (click)="tabActiva='agente'">Agente IA</button>
-    <button class="admin-tab" (click)="abrirModalConfig()">Configuración</button>
+    <button id="admin-tab-config" class="admin-tab" (click)="abrirModalConfig()">Configuración</button>
   </div>
 
   <!-- ─── TAB DASHBOARD ─── -->
   @if (tabActiva === 'dashboard') {
     <div class="admin-tab-panel">
+
+      <!-- Checklist de onboarding (se oculta cuando todos los pasos están completos) -->
+      @if (mostrarChecklist && onboardingStatus) {
+        <app-onboarding-checklist
+          [status]="onboardingStatus"
+          (navigateTo)="navegarATour($event)"
+          (relanzarTour)="relanzarTour()"
+          (closed)="mostrarChecklist = false">
+        </app-onboarding-checklist>
+      }
 
       <!-- Selector de período -->
       <div class="dash-periodo-bar mb-4">

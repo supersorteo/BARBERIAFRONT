@@ -9,6 +9,8 @@ import {
 } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
 import { AlertService } from '../../shared/alert.service';
+import { OnboardingService, OnboardingStatus } from '../../onboarding.service';
+import { OnboardingChecklistComponent } from '../../shared/onboarding-checklist/onboarding-checklist.component';
 
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
@@ -18,12 +20,14 @@ type PeriodoDashboard = 'hoy' | '7d' | '30d' | 'mes';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, OnboardingChecklistComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit, AfterViewInit {
   usuario: AuthUser | null = null;
+  onboardingStatus: OnboardingStatus | null = null;
+  mostrarChecklist = false;
 
   private _tabActiva: 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente' = 'dashboard';
   get tabActiva() { return this._tabActiva; }
@@ -331,7 +335,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
     private auth: AuthService,
     private router: Router,
     private zone: NgZone,
-    private alert: AlertService
+    private alert: AlertService,
+    private onboarding: OnboardingService
   ) {}
 
   ngAfterViewInit() {
@@ -363,6 +368,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.usuario = this.auth.getUser();
+    this.cargarOnboarding();
     this.cargarConfig();
     this.cargarDashboard();
     this.cargarTurnos();
@@ -371,6 +377,36 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cargarBarberos();
     this.cargarBloqueos();
     this.cargarGaleria();
+  }
+
+  cargarOnboarding() {
+    this.onboarding.getStatus().subscribe({
+      next: s => {
+        this.onboardingStatus = s;
+        this.mostrarChecklist = !s.configCompleta || !s.tieneServicios || !s.tieneBarberos;
+        this.cdr.detectChanges();
+        if (!s.tourVisto) {
+          setTimeout(() => this.onboarding.iniciarTour(), 600);
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  relanzarTour() {
+    this.onboarding.iniciarTour(() => {
+      this.cargarOnboarding();
+      this.cdr.detectChanges();
+    });
+  }
+
+  navegarATour(tab: string) {
+    if (tab === 'config') {
+      this.abrirModalConfig();
+    } else {
+      this.tabActiva = tab as 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente';
+    }
+    this.cargarOnboarding();
   }
 
   cargarDashboard() {

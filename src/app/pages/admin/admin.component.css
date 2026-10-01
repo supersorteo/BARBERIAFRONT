@@ -495,6 +495,8 @@
 .btn-icon.danger:hover { border-color: rgba(255,95,95,0.4); color: var(--danger); background: rgba(255,95,95,0.1); }
 .btn-icon.primary { background: var(--gold-glow); color: var(--gold); border-color: var(--border-gold); }
 .btn-icon.primary:hover { background: var(--gold-glow-strong); color: var(--gold-light); }
+.btn-icon--tour { border-color: rgba(99,102,241,0.4); color: #818cf8; }
+.btn-icon--tour:hover { border-color: #6366f1; color: #a5b4fc; background: rgba(99,102,241,0.1); }
 
 /* ─── GALLERY GRID ADMIN ───────────────────────────────────────── */
 .gallery-admin-grid { columns: 2; gap: 12px; }

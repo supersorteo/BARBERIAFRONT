@@ -1,0 +1,56 @@
+<div class="ob-card" id="admin-checklist">
+  <div class="ob-header">
+    <div class="ob-header-left">
+      <span class="ob-icon">🚀</span>
+      <div>
+        <div class="ob-title">Primeros pasos</div>
+        <div class="ob-subtitle">{{ pasosCompletados }} de {{ pasos.length }} completados</div>
+      </div>
+    </div>
+    <button class="ob-close" (click)="closed.emit()" title="Ocultar checklist">✕</button>
+  </div>
+
+  <div class="ob-progress-bar">
+    <div class="ob-progress-fill" [style.width.%]="(pasosCompletados / pasos.length) * 100"></div>
+  </div>
+
+  @if (todoCompleto) {
+    <div class="ob-done">
+      <span>🎉</span>
+      <span>¡Tu barbería está lista para recibir clientes!</span>
+    </div>
+  } @else {
+    <ul class="ob-steps">
+      @for (paso of pasos; track paso.tab) {
+        <li class="ob-step" [class.ob-step--done]="paso.completado">
+          <div class="ob-step-icon">
+            @if (paso.completado) {
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="8" fill="#22c55e"/>
+                <path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            } @else {
+              <span class="ob-step-emoji">{{ paso.icono }}</span>
+            }
+          </div>
+          <div class="ob-step-info">
+            <div class="ob-step-label">{{ paso.label }}</div>
+            <div class="ob-step-desc">{{ paso.descripcion }}</div>
+          </div>
+          @if (!paso.completado) {
+            <button class="ob-step-btn" (click)="navigateTo.emit(paso.tab)">Ir →</button>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="ob-footer">
+    <button class="ob-tour-btn" (click)="relanzarTour.emit()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+      </svg>
+      Ver tour guiado
+    </button>
+  </div>
+</div>
