@@ -99,6 +99,18 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/superadmin']);
           return;
         }
+        // Tab vs rol mismatch: informar al usuario y limpiar la sesión
+        const tabEsBarbero = this.tab === 'barbero';
+        const rolEsBarbero = u.rol === 'BARBERO';
+        if (tabEsBarbero !== rolEsBarbero) {
+          this.auth.logout();
+          this.error = rolEsBarbero
+            ? 'Estas credenciales son de un barbero. Usá el tab "Soy barbero".'
+            : 'Estas credenciales son del dueño. Usá el tab "Soy dueño".';
+          this.loading = false;
+          this.cdr.detectChanges();
+          return;
+        }
         const slug = u.tenantId;
         if (u.rol === 'BARBERO') {
           this.router.navigate(slug ? ['/', slug, 'mi-agenda'] : ['/mi-agenda']);
