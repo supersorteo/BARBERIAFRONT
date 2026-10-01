@@ -2,7 +2,7 @@
   <div class="login-page">
     <div class="login-card login-card--inactivo">
       <div class="login-brand">
-        <span class="brand-icon">✂️</span>
+        <span class="brand-icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.5"/><circle cx="9" cy="23" r="3.5"/><line x1="26" y1="6" x2="11.5" y2="20.5"/><line x1="18.5" y1="18.5" x2="26" y2="26"/><line x1="11.5" y1="11.5" x2="14.5" y2="14.5"/></svg></span>
         <span class="brand-name">BarberOS</span>
       </div>
       <div class="inactivo-icon">🚫</div>
@@ -13,125 +13,138 @@
       </p>
     </div>
   </div>
+
 } @else if (vista === 'gateway') {
 
-  <!-- ═══════ GATEWAY ═════════════════════════════════════════════ -->
+  <!-- ═══ GATEWAY ═══════════════════════════════════════════════════ -->
   <div class="login-page gateway-page">
     <div class="gateway-card">
 
-      <div class="login-brand">
-        <span class="brand-icon">✂️</span>
-        <span class="brand-name">BarberOS</span>
+      <div class="gw-back">
+        <a [routerLink]="'/barberia-demo'" class="btn-volver">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver al demo
+        </a>
       </div>
-      <h1 class="gateway-title">¿Qué querés hacer?</h1>
+
+      <div class="gw-brand">
+        <div class="login-brand">
+          <span class="brand-icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.5"/><circle cx="9" cy="23" r="3.5"/><line x1="26" y1="6" x2="11.5" y2="20.5"/><line x1="18.5" y1="18.5" x2="26" y2="26"/><line x1="11.5" y1="11.5" x2="14.5" y2="14.5"/></svg></span>
+          <span class="brand-name">BarberOS</span>
+        </div>
+      </div>
+
+      <p class="gw-eyebrow">Panel de acceso</p>
+      <h1 class="gateway-title">¿Qué querés hacer hoy?</h1>
 
       <div class="gateway-options">
 
-        <!-- Opción: probar demo -->
-        <div class="gw-option" (click)="irADemo()">
-          <div class="gw-option-icon">🎮</div>
-          <div class="gw-option-body">
-            <h3 class="gw-option-title">Probar el sistema</h3>
-            <p class="gw-option-desc">Explorá cómo funciona el panel de administración con la barbería demo.<br><em>No requiere registro.</em></p>
+        <button class="gw-option" (click)="irADemo()">
+          <div class="gw-option-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
-          <svg class="gw-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
+          <div class="gw-option-body">
+            <div class="gw-option-title">Probar el sistema</div>
+            <div class="gw-option-desc">Ingresá a la barbería demo y explorá el panel de administración. <em>No requiere cuenta propia.</em></div>
+          </div>
+          <svg class="gw-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
 
-        <!-- Opción: registrar negocio -->
         <a class="gw-option gw-option--highlight" routerLink="/registro">
-          <div class="gw-option-icon">🏪</div>
-          <div class="gw-option-body">
-            <h3 class="gw-option-title">Registrar mi negocio</h3>
-            <p class="gw-option-desc">Creá tu propia barbería online, con panel de administración, reservas y agente IA.<br><em>Gratis, en 2 minutos.</em></p>
+          <div class="gw-option-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </div>
-          <svg class="gw-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="gw-option-body">
+            <div class="gw-option-title">Registrar mi negocio</div>
+            <div class="gw-option-desc">Creá tu barbería online con reservas, agente IA y panel admin. <em>Gratis, en 2 minutos.</em></div>
+          </div>
+          <svg class="gw-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
 
       </div>
 
-      <p class="gateway-footer">¿Ya tenés tu negocio registrado? Ingresá en <span class="link-gold">tudominio.com/<em>tu-slug</em>/login</span></p>
+      <p class="gateway-footer">¿Ya registraste tu negocio? Ingresá en <span class="link-gold">tudominio.com/<em>tu-slug</em>/login</span></p>
     </div>
   </div>
 
 } @else {
 
-  <!-- ═══════ FORMULARIO DE LOGIN ═══════════════════════════════════ -->
+  <!-- ═══ FORMULARIO LOGIN ══════════════════════════════════════════ -->
   <div class="login-page">
     <div class="login-card">
 
-      @if (esDemo) {
-        <button class="btn-volver" type="button" (click)="vista = 'gateway'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-          Volver
-        </button>
-      } @else {
-        <a [routerLink]="'/' + tenantSlug" class="btn-volver">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-          Volver al sitio
-        </a>
-      }
+      <div class="login-top">
+        @if (esDemo) {
+          <button class="btn-volver" type="button" (click)="vista = 'gateway'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <div class="demo-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Modo demo
+          </div>
+        } @else {
+          <a [routerLink]="'/' + tenantSlug" class="btn-volver">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver al sitio
+          </a>
+          <span></span>
+        }
+      </div>
 
       <div class="login-brand">
-        <span class="brand-icon">✂️</span>
+        <span class="brand-icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.5"/><circle cx="9" cy="23" r="3.5"/><line x1="26" y1="6" x2="11.5" y2="20.5"/><line x1="18.5" y1="18.5" x2="26" y2="26"/><line x1="11.5" y1="11.5" x2="14.5" y2="14.5"/></svg></span>
         <span class="brand-name">BarberOS</span>
       </div>
 
-      @if (esDemo) {
-        <div class="demo-notice">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Estás ingresando a la barbería demo — solo para probar el sistema
-        </div>
-      } @else {
+      @if (!esDemo) {
         <p class="login-negocio">{{ nombreNegocio }}</p>
       }
-
-      <h1 class="login-title">Iniciar sesión</h1>
+      <h1 class="login-title">
+        @if (esDemo) { Accedé al panel<br>de la barbería demo }
+        @else { Iniciar sesión }
+      </h1>
 
       <div class="login-tabs" role="tablist">
-        <button
-          class="login-tab"
-          [class.active]="tab === 'dueno'"
-          (click)="setTab('dueno')"
-          role="tab"
-          [attr.aria-selected]="tab === 'dueno'"
-        >🏠 Soy dueño</button>
-        <button
-          class="login-tab"
-          [class.active]="tab === 'barbero'"
-          (click)="setTab('barbero')"
-          role="tab"
-          [attr.aria-selected]="tab === 'barbero'"
-        >✂️ Soy barbero</button>
+        <button class="login-tab" [class.active]="tab === 'dueno'" (click)="setTab('dueno')" role="tab" [attr.aria-selected]="tab === 'dueno'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Soy dueño
+        </button>
+        <button class="login-tab" [class.active]="tab === 'barbero'" (click)="setTab('barbero')" role="tab" [attr.aria-selected]="tab === 'barbero'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><line x1="20" y1="4" x2="8.5" y2="15.5"/><line x1="14" y1="14" x2="20" y2="20"/><line x1="8.5" y1="8.5" x2="11.5" y2="11.5"/></svg>
+          Soy barbero
+        </button>
       </div>
 
       <div class="login-form">
+
         <div class="form-group">
           <label for="username">Usuario</label>
-          <input
-            id="username"
-            type="text"
-            class="form-input"
-            [(ngModel)]="form.username"
-            (keydown)="onKey($event)"
-            [placeholder]="tab === 'dueno' ? 'Tu usuario de administrador' : 'Tu usuario de barbero'"
-            autocomplete="username"
-          />
+          <div class="input-row">
+            <span class="input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <input id="username" type="text" [(ngModel)]="form.username" (keydown)="onKey($event)"
+              [placeholder]="tab === 'dueno' ? 'Tu usuario de administrador' : 'Tu usuario de barbero'"
+              autocomplete="username">
+          </div>
         </div>
 
         <div class="form-group">
           <label for="password">Contraseña</label>
-          <div class="input-wrapper">
-            <input
-              id="password"
-              [type]="showPass ? 'text' : 'password'"
-              class="form-input"
-              [(ngModel)]="form.password"
-              (keydown)="onKey($event)"
-              placeholder="••••••••"
-              autocomplete="current-password"
-            />
-            <button class="toggle-pass" type="button" (click)="showPass = !showPass" [attr.aria-label]="showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'">
-              {{ showPass ? '🙈' : '👁️' }}
+          <div class="input-row">
+            <span class="input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input id="password" [type]="showPass ? 'text' : 'password'" [(ngModel)]="form.password"
+              (keydown)="onKey($event)" placeholder="••••••••" autocomplete="current-password">
+            <button class="toggle-pass" type="button" (click)="showPass = !showPass"
+              [attr.aria-label]="showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              @if (!showPass) {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              } @else {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              }
             </button>
           </div>
         </div>
@@ -141,7 +154,7 @@
         }
 
         <button class="btn-submit" type="button" (click)="submit()" [disabled]="loading">
-          @if (!loading) { <span>Ingresar</span> }
+          @if (!loading) { <span>Ingresar al panel</span> }
           @if (loading) { <span class="spinner" aria-label="Cargando"></span> }
         </button>
 
@@ -151,8 +164,8 @@
             <a routerLink="/registro" class="login-link">Registrá tu negocio →</a>
           </p>
         }
-      </div>
 
+      </div>
     </div>
   </div>
 }

@@ -3,17 +3,43 @@
   <!-- Panel izquierdo — solo desktop -->
   <div class="registro-left" aria-hidden="true">
     <div class="left-content">
+
       <div class="brand">
-        <span class="brand-icon">✂️</span>
+        <span class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="9" r="3.5"/><circle cx="9" cy="23" r="3.5"/>
+            <line x1="26" y1="6" x2="11.5" y2="20.5"/><line x1="18.5" y1="18.5" x2="26" y2="26"/><line x1="11.5" y1="11.5" x2="14.5" y2="14.5"/>
+          </svg>
+        </span>
         <span class="brand-name">BarberOS</span>
       </div>
-      <h2 class="left-title">Tu barbería online<br>en 60 segundos</h2>
+
+      <h2 class="left-title">Tu barbería online<br>en <em>60 segundos</em></h2>
+
       <ul class="feature-list">
-        <li><span class="fi">📅</span><span>Reservas online 24/7</span></li>
-        <li><span class="fi">🤖</span><span>Agente IA incluido</span></li>
-        <li><span class="fi">📊</span><span>Panel admin completo</span></li>
-        <li><span class="fi">✂️</span><span>Agenda para tus barberos</span></li>
+        <li>
+          <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          <span>Reservas online 24/7</span>
+        </li>
+        <li>
+          <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2a9 9 0 0 1 9 9c0 4.17-2.84 7.67-6.72 8.7L12 22l-2.28-2.3C5.84 18.67 3 15.17 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg></span>
+          <span>Agente IA incluido</span>
+        </li>
+        <li>
+          <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+          <span>Panel admin completo</span>
+        </li>
+        <li>
+          <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span>Agenda para tus barberos</span>
+        </li>
       </ul>
+
+      <div class="left-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Gratis · Sin tarjeta · Listo en 2 minutos
+      </div>
+
     </div>
   </div>
 
@@ -23,70 +49,110 @@
     <!-- ── FORMULARIO ── -->
     @if (vista === 'form') {
       <div class="registro-card">
-        <h1 class="card-title">Crear mi barbería</h1>
+        <p class="card-eyebrow">Nuevo negocio</p>
+        <h1 class="card-title">Registrar mi negocio</h1>
         <p class="card-sub">Completá los datos y empezá hoy</p>
 
+        <!-- Código de invitación -->
         <div class="form-group">
           <label for="reg-codigo">Código de invitación</label>
-          <input
-            id="reg-codigo"
-            type="text"
-            class="form-input"
-            [(ngModel)]="form.codigoInvitacion"
-            placeholder="Ej: BARBEROS2026"
-            autocomplete="off"
-          />
+          <div class="input-row">
+            <span class="input-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input id="reg-codigo" type="text" [(ngModel)]="form.codigoInvitacion"
+              placeholder="Ej: BARBEROS2026" autocomplete="off">
+          </div>
           <span class="field-hint">Solicitalo al administrador de BarberOS</span>
         </div>
 
-        <div class="form-group">
-          <label for="reg-nombre">Nombre del negocio</label>
-          <input
-            id="reg-nombre"
-            type="text"
-            class="form-input"
-            [(ngModel)]="form.nombreNegocio"
-            (ngModelChange)="onNombreChange()"
-            placeholder="Ej: Barbería El Señor"
-            maxlength="60"
-          />
-          @if (slugPreview) {
-            <div class="slug-preview">
-              <span class="slug-label">Tu URL:</span>
-              <span class="slug-value">{{ slugPreview }}</span>
+        <!-- Nombre + Usuario — 2 columnas -->
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="reg-nombre">Nombre del negocio</label>
+            <div class="input-row">
+              <span class="input-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </span>
+              <input id="reg-nombre" type="text" [(ngModel)]="form.nombreNegocio"
+                (ngModelChange)="onNombreChange()" placeholder="Ej: Barbería El Señor" maxlength="60">
             </div>
-          }
+            @if (slugPreview) {
+              <div class="slug-preview">
+                <span class="slug-label">URL:</span>
+                <span class="slug-value">{{ slugPreview }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="reg-admin">Tu nombre</label>
+            <div class="input-row">
+              <span class="input-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input id="reg-admin" type="text" [(ngModel)]="form.adminNombre"
+                placeholder="Ej: Juan García" maxlength="60">
+            </div>
+          </div>
+
         </div>
 
-        <div class="form-group">
-          <label for="reg-admin">Tu nombre</label>
-          <input id="reg-admin" type="text" class="form-input" [(ngModel)]="form.adminNombre"
-            placeholder="Ej: Juan García" maxlength="60" />
-        </div>
-
+        <!-- Usuario -->
         <div class="form-group">
           <label for="reg-user">Usuario para el panel</label>
-          <input id="reg-user" type="text" class="form-input" [(ngModel)]="form.username"
-            placeholder="Ej: juan.garcia" maxlength="30" autocomplete="username" />
+          <div class="input-row">
+            <span class="input-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </span>
+            <input id="reg-user" type="text" [(ngModel)]="form.username"
+              placeholder="Ej: juan.garcia" maxlength="30" autocomplete="username">
+          </div>
           <span class="field-hint">Letras, números, puntos, guiones</span>
         </div>
 
-        <div class="form-group">
-          <label for="reg-pass">Contraseña</label>
-          <div class="input-wrapper">
-            <input id="reg-pass" [type]="showPass ? 'text' : 'password'" class="form-input"
-              [(ngModel)]="form.password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
-            <button class="toggle-pass" type="button" (click)="showPass = !showPass">{{ showPass ? '🙈' : '👁️' }}</button>
-          </div>
-        </div>
+        <!-- Contraseña + Confirmar — 2 columnas -->
+        <div class="form-grid">
 
-        <div class="form-group">
-          <label for="reg-confirm">Confirmá tu contraseña</label>
-          <div class="input-wrapper">
-            <input id="reg-confirm" [type]="showConfirm ? 'text' : 'password'" class="form-input"
-              [(ngModel)]="form.confirmar" placeholder="Repetí la contraseña" autocomplete="new-password" />
-            <button class="toggle-pass" type="button" (click)="showConfirm = !showConfirm">{{ showConfirm ? '🙈' : '👁️' }}</button>
+          <div class="form-group">
+            <label for="reg-pass">Contraseña</label>
+            <div class="input-row">
+              <span class="input-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input id="reg-pass" [type]="showPass ? 'text' : 'password'" [(ngModel)]="form.password"
+                placeholder="Mín. 8 caracteres" autocomplete="new-password">
+              <button class="toggle-pass" type="button" (click)="showPass = !showPass"
+                [attr.aria-label]="showPass ? 'Ocultar' : 'Mostrar'">
+                @if (!showPass) {
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                } @else {
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                }
+              </button>
+            </div>
           </div>
+
+          <div class="form-group">
+            <label for="reg-confirm">Confirmá contraseña</label>
+            <div class="input-row">
+              <span class="input-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input id="reg-confirm" [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="form.confirmar"
+                placeholder="Repetí la contraseña" autocomplete="new-password">
+              <button class="toggle-pass" type="button" (click)="showConfirm = !showConfirm"
+                [attr.aria-label]="showConfirm ? 'Ocultar' : 'Mostrar'">
+                @if (!showConfirm) {
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                } @else {
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                }
+              </button>
+            </div>
+          </div>
+
         </div>
 
         @if (error) {
@@ -94,18 +160,20 @@
         }
 
         <button class="btn-submit" type="button" (click)="submit()" [disabled]="loading">
-          @if (!loading) { <span>Crear mi barbería →</span> }
+          @if (!loading) { <span>Registrar mi negocio →</span> }
           @if (loading) { <span class="spinner" aria-label="Creando..."></span> }
         </button>
 
-        <p class="footer-link">¿Ya tenés cuenta? Ingresá en <span class="link-gold">tudominio.com/<em>tu-slug</em>/login</span></p>
+        <p class="footer-note">¿Ya registraste tu negocio? Ingresá en <em>tudominio.com/tu-slug/login</em></p>
       </div>
     }
 
     <!-- ── ÉXITO ── -->
     @if (vista === 'exito' && resultado) {
       <div class="registro-card exito-card">
-        <div class="exito-check" aria-hidden="true">✓</div>
+        <div class="exito-check" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
         <h2 class="exito-title">¡Tu barbería está lista!</h2>
         <p class="exito-sub">Guardá estos datos — no los enviamos por email.</p>
 
@@ -122,7 +190,10 @@
             <span class="info-label">URL pública</span>
             <div class="url-row">
               <span class="info-value mono url-text">{{ urlPublica }}</span>
-              <button class="btn-copy" type="button" (click)="copiarUrl()" title="Copiar URL">📋</button>
+              <button class="btn-copy" type="button" (click)="copiarUrl()" title="Copiar URL">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copiar
+              </button>
             </div>
           </div>
         </div>
