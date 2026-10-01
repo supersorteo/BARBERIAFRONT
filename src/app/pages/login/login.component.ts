@@ -95,6 +95,10 @@ export class LoginComponent implements OnInit {
     this.error = '';
     this.auth.login(this.form.username, this.form.password, this.tenantSlug ?? undefined).subscribe({
       next: (u) => {
+        if (u.rol === 'SUPER_ADMIN') {
+          this.router.navigate(['/superadmin']);
+          return;
+        }
         const slug = u.tenantId;
         if (u.rol === 'BARBERO') {
           this.router.navigate(slug ? ['/', slug, 'mi-agenda'] : ['/mi-agenda']);

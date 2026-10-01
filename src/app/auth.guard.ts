@@ -63,7 +63,7 @@ export const superAdminGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
   if (auth.isLoggedIn() && auth.isSuperAdmin()) return true;
-  router.navigate(['/barberia-demo']);
+  router.navigate(['/barberia-demo', 'login']);
   return false;
 };
 

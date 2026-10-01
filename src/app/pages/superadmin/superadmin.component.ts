@@ -221,7 +221,7 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
 
   irAlLanding(): void {
     this.allowNavigation = true;
-    this.router.navigate(['/barberia-demo']);
+    this.router.navigate(['/barberia-demo', 'login']);
   }
 
   logout(): void {
@@ -234,7 +234,7 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
       if (!confirmed) return;
       this.allowNavigation = true;
       this.auth.logout();
-      this.router.navigate(['/barberia-demo']);
+      this.router.navigate(['/barberia-demo', 'login']);
     });
   }
 }
