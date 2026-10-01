@@ -646,15 +646,32 @@
   .mpanel-tab { padding: 12px 12px; font-size: 12px; }
   .mpanel-container { padding: 0 16px; }
   .mpanel-turnos-list { gap: 8px; }
-  .mpanel-turno-card { flex-wrap: wrap; }
+  /* tarjeta apila secciones verticalmente */
+  .mpanel-turno-card { flex-wrap: wrap; overflow: visible; }
   .mpanel-tc-time { flex-direction: row; gap: 6px; padding: 12px 16px; width: 100%; border-right: none; border-bottom: 1px solid var(--border); min-width: auto; }
   .mpanel-tc-hora { font-size: 15px; }
-  .mpanel-tc-right { align-items: flex-start; width: 100%; padding: 0 16px 12px; flex-direction: row; justify-content: space-between; align-items: center; }
+  /* sección derecha: badge arriba, botones abajo (wrappeable) */
+  .mpanel-tc-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 16px 14px;
+    width: 100%;
+  }
+  .mpanel-tc-actions { flex-wrap: wrap; gap: 6px; }
   .mpanel-perfil-layout { flex-direction: column; }
   .mpanel-perfil-foto-card { width: 100%; }
   .mpanel-perfil-form-wrap { width: 100%; min-width: auto; }
   .mpanel-form-grid { grid-template-columns: 1fr; }
   .mpanel-modal-dialog { border-radius: 12px; }
+}
+
+/* ── TOPBAR icono-sólo en pantallas muy pequeñas ─────────────── */
+@media (max-width: 400px) {
+  .mpanel-topbar-inner { gap: 6px; }
+  .mpanel-brand span { display: none; }
+  .nav-btn-txt { display: none; }
+  .mpanel-nav-btn { padding: 6px 8px; gap: 0; }
 }
 
 /* WhatsApp link */
