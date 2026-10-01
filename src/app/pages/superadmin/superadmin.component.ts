@@ -36,7 +36,26 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void { this.cargar(); }
+  ngOnInit(): void {
+    this.cargar();
+    // Guardar de dónde vino el super admin para poder volver al salir
+    const prevUrl = this.router.lastSuccessfulNavigation()?.previousNavigation?.finalUrl?.toString();
+    if (prevUrl && prevUrl !== '/superadmin') {
+      try { sessionStorage.setItem('sa_return_url', prevUrl); } catch {}
+    }
+  }
+
+  private returnUrl(): string {
+    try { return sessionStorage.getItem('sa_return_url') || '/barberia-demo/login'; } catch { return '/barberia-demo/login'; }
+  }
+
+  private loginUrlFrom(url: string): string {
+    const match = url.match(/^\/([^\/]+)/);
+    const slug = match?.[1];
+    return (slug && !['superadmin', 'admin', 'login', 'registro'].includes(slug))
+      ? `/${slug}/login`
+      : '/barberia-demo/login';
+  }
 
   cargar(): void {
     this.cargando = true;
@@ -221,7 +240,9 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
 
   irAlLanding(): void {
     this.allowNavigation = true;
-    this.router.navigate(['/barberia-demo', 'login']);
+    const url = this.returnUrl();
+    try { sessionStorage.removeItem('sa_return_url'); } catch {}
+    this.router.navigateByUrl(url);
   }
 
   logout(): void {
@@ -233,8 +254,11 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
     }).then(confirmed => {
       if (!confirmed) return;
       this.allowNavigation = true;
+      const returnUrl = this.returnUrl();
+      try { sessionStorage.removeItem('sa_return_url'); } catch {}
       this.auth.logout();
-      this.router.navigate(['/barberia-demo', 'login']);
+      // Tras logout volver al login del contexto donde se estaba trabajando
+      this.router.navigateByUrl(this.loginUrlFrom(returnUrl));
     });
   }
 }
