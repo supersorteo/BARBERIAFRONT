@@ -8,6 +8,16 @@
   </div>
 }
 
+@if (tenantNoExiste) {
+  <div class="tenant-inactivo-overlay">
+    <div class="ti-content">
+      <div class="ti-icono">🔍</div>
+      <h2 class="ti-titulo">Barbería no encontrada</h2>
+      <p class="ti-desc">Esta dirección no existe o fue eliminada.<br><a href="/barberia-demo" class="ti-link">Ver la demo →</a></p>
+    </div>
+  </div>
+}
+
 <!-- ═══════════════ NAVBAR ════════════════════════════════════════ -->
 <nav class="navbar-premium" [class.scrolled]="navScrolled">
   <div class="container d-flex align-items-center justify-content-between">

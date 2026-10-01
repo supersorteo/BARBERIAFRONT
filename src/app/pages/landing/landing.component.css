@@ -27,6 +27,11 @@
   font-size: 0.95rem;
   line-height: 1.6;
 }
+.ti-link {
+  color: #c9a84c;
+  text-decoration: none;
+}
+.ti-link:hover { text-decoration: underline; }
 
 /* ─── NAVBAR ──────────────────────────────────────────────────── */
 .navbar-premium {

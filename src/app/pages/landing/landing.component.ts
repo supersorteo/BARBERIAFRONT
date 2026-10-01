@@ -138,6 +138,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   slugActual = '';
   tenantInactivo = false;
+  tenantNoExiste = false;
 
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug');
@@ -165,8 +166,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         if (err?.error?.code === 'TENANT_INACTIVE') {
           this.tenantInactivo = true;
-          this.cdr.detectChanges();
+        } else if (err?.status === 404) {
+          this.tenantNoExiste = true;
         }
+        this.cdr.detectChanges();
       }
     });
     this.negocio.getCategorias(this.slugActual || undefined).subscribe({
