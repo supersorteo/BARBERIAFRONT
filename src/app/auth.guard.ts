@@ -11,48 +11,56 @@ export const authGuard: CanActivateFn = () => {
   return false;
 };
 
-export const adminGuard: CanActivateFn = () => {
+export const adminGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const auth   = inject(AuthService);
   const router = inject(Router);
+  const user   = auth.getUser();
+  const routeSlug = route.params['slug'];
   if (!auth.isLoggedIn() || !auth.isAdmin()) {
-    const slug = auth.getUser()?.tenantId;
-    router.navigate([slug ? `/${slug}/login` : '/login']);
+    router.navigate([user?.tenantId ? `/${user.tenantId}/login` : '/login']);
+    return false;
+  }
+  if (routeSlug && user?.tenantId !== routeSlug) {
+    router.navigate([`/${user!.tenantId}/admin`]);
     return false;
   }
   return auth.verificarSesion().pipe(
     map(ok => {
       if (ok) return true;
       const slug = auth.getUser()?.tenantId;
-      auth.logout(); // limpia token vencido — sin esto alreadyLoggedInGuard redirige de vuelta en bucle
+      auth.logout();
       router.navigate([slug ? `/${slug}/login` : '/login']);
       return false;
     })
   );
 };
 
-export const barberoGuard: CanActivateFn = () => {
+export const barberoGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const auth   = inject(AuthService);
   const router = inject(Router);
+  const user   = auth.getUser();
+  const routeSlug = route.params['slug'];
   if (!auth.isLoggedIn()) {
-    const slug = auth.getUser()?.tenantId;
-    router.navigate([slug ? `/${slug}/login` : '/login']);
+    router.navigate([user?.tenantId ? `/${user.tenantId}/login` : '/login']);
     return false;
   }
   if (!auth.isBarbero()) {
     if (auth.isAdmin()) {
-      const slug = auth.getUser()?.tenantId;
-      router.navigate(slug ? ['/', slug, 'admin'] : ['/admin']);
+      router.navigate(user?.tenantId ? ['/', user.tenantId, 'admin'] : ['/admin']);
       return false;
     }
-    const slug = auth.getUser()?.tenantId;
-    router.navigate([slug ? `/${slug}/login` : '/login']);
+    router.navigate([user?.tenantId ? `/${user.tenantId}/login` : '/login']);
+    return false;
+  }
+  if (routeSlug && user?.tenantId !== routeSlug) {
+    router.navigate([`/${user!.tenantId}/mi-agenda`]);
     return false;
   }
   return auth.verificarSesion().pipe(
     map(ok => {
       if (ok) return true;
       const slug = auth.getUser()?.tenantId;
-      auth.logout(); // ídem — evita bucle barberoGuard ↔ alreadyLoggedInGuard
+      auth.logout();
       router.navigate([slug ? `/${slug}/login` : '/login']);
       return false;
     })
@@ -63,7 +71,7 @@ export const superAdminGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
   if (auth.isLoggedIn() && auth.isSuperAdmin()) return true;
-  router.navigate(['/barberia-demo', 'login']);
+  router.navigate(['/']);
   return false;
 };
 
