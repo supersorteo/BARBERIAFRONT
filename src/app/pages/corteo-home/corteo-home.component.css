@@ -37,15 +37,14 @@
   justify-content: space-between;
 }
 .ch-logo {
-  display: flex; align-items: center; gap: 9px;
-  font-family: var(--font-display);
-  font-size: 20px; font-weight: 700; letter-spacing: 0.02em;
+  display: flex; align-items: center;
   text-decoration: none;
-  background: var(--grad-gold);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
-.ch-logo-icon { color: var(--gold); -webkit-text-fill-color: initial; flex-shrink: 0; }
+.ch-logo-img {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
 .ch-nav-right { display: flex; align-items: center; gap: 10px; }
 .ch-nav-link {
   color: var(--text-secondary); font-size: 13px; font-weight: 500;
@@ -438,13 +437,8 @@
 .ch-footer-inner {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
-.ch-footer-logo {
-  display: flex; align-items: center; gap: 7px;
-  font-family: var(--font-display); font-size: 14px; font-weight: 700;
-  background: var(--grad-gold);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+.ch-footer-logo { display: flex; align-items: center; }
+.ch-footer-logo-img { height: 28px; width: auto; object-fit: contain; opacity: 0.7; }
 .ch-footer-copy { font-size: 12px; color: var(--text-muted); }
 
 /* ─── KEYFRAMES ─────────────────────────────────────────────────── */
