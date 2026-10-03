@@ -18,16 +18,25 @@
   </div>
 }
 
-<!-- ═══════════════ DEMO CTA BAR ═══════════════════════════════════ -->
+<!-- ═══════════════ DEMO CTA BANNER ══════════════════════════════ -->
 @if (slugActual === DEMO_SLUG && !demoBannerDismissed) {
-  <div class="demo-cta-bar">
-    <div class="demo-cta-content">
-      <svg class="demo-cta-sparkle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="demo-cta-text"><strong>¿Te gusta lo que ves?</strong> Esto puede ser tu barbería — gratis para empezar.</span>
-      <a routerLink="/registro" class="demo-cta-btn">Registrá tu barbería →</a>
+  <div class="demo-cta-banner">
+    <div class="demo-cta-inner">
+      <span class="demo-chip">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+        DEMO
+      </span>
+      <div class="demo-cta-copy">
+        <p class="demo-cta-title">¿Te gusta lo que ves?</p>
+        <p class="demo-cta-sub">Esto puede ser tu barbería — turnos online, agenda y asistente IA incluidos.</p>
+      </div>
+      <a routerLink="/registro" class="demo-cta-action">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        Registrá tu barbería gratis
+      </a>
     </div>
-    <button class="demo-cta-close" type="button" (click)="demoBannerDismissed = true" title="Cerrar">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <button class="demo-cta-dismiss" type="button" (click)="demoBannerDismissed = true" title="Cerrar">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
 }
