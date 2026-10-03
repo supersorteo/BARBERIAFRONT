@@ -9,6 +9,7 @@ import { NegocioService, Servicio, Turno, Barbero, Galeria, SlotDisponible, Nego
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
 import { AlertService } from '../../shared/alert.service';
 import { TenantContextService } from '../../tenant-context.service';
+import { AuthService } from '../../auth.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -121,13 +122,23 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
+  get panelAcceso(): { tipo: 'panel' | 'login'; label: string; ruta: string } {
+    const u = this.auth.getUser();
+    if (u && u.tenantId === this.slugActual) {
+      if (u.rol === 'ADMIN')   return { tipo: 'panel', label: 'Panel de control', ruta: '/' + this.slugActual + '/admin' };
+      if (u.rol === 'BARBERO') return { tipo: 'panel', label: 'Mi agenda',        ruta: '/' + this.slugActual + '/mi-agenda' };
+    }
+    return { tipo: 'login', label: 'Acceso staff', ruta: '/' + this.slugActual + '/login' };
+  }
+
   constructor(
     private negocio: NegocioService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
     private alert: AlertService,
     private route: ActivatedRoute,
-    private tenantCtx: TenantContextService
+    private tenantCtx: TenantContextService,
+    private auth: AuthService
   ) {}
 
   @HostListener('window:scroll')

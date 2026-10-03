@@ -36,6 +36,20 @@ export class OnboardingService {
   }
 
   iniciarTour(onFinish?: () => void, setTab?: (tab: string) => void): void {
+    const ico = (d: string) =>
+      `<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#c9a03a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='display:inline;vertical-align:-3px;margin-right:6px'>${d}</svg>`;
+    const I = {
+      star:     ico(`<polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>`),
+      sliders:  ico(`<line x1='4' y1='21' x2='4' y2='14'/><line x1='4' y1='10' x2='4' y2='3'/><line x1='12' y1='21' x2='12' y2='12'/><line x1='12' y1='8' x2='12' y2='3'/><line x1='20' y1='21' x2='20' y2='16'/><line x1='20' y1='12' x2='20' y2='3'/><line x1='1' y1='14' x2='7' y2='14'/><line x1='9' y1='8' x2='15' y2='8'/><line x1='17' y1='16' x2='23' y2='16'/>`),
+      scissors: ico(`<circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><line x1='20' y1='4' x2='8.12' y2='15.88'/><line x1='14.47' y1='14.48' x2='20' y2='20'/><line x1='8.12' y1='8.12' x2='12' y2='12'/>`),
+      users:    ico(`<path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/>`),
+      calendar: ico(`<rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/>`),
+      image:    ico(`<rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/>`),
+      chart:    ico(`<line x1='18' y1='20' x2='18' y2='10'/><line x1='12' y1='20' x2='12' y2='4'/><line x1='6' y1='20' x2='6' y2='14'/><line x1='2' y1='20' x2='22' y2='20'/>`),
+      check:    ico(`<path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/><polyline points='22 4 12 14.01 9 11.01'/>`),
+    };
+    const scrollTab = (el?: Element) =>
+      el?.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
     const driverObj = driver({
       showProgress: true,
       nextBtnText: 'Siguiente →',
@@ -52,7 +66,7 @@ export class OnboardingService {
       steps: [
         {
           popover: {
-            title: '👋 ¡Bienvenido a tu panel!',
+            title: I.star + '¡Bienvenido a tu panel!',
             description: `
               <p>Este es el lugar desde donde vas a manejar todo tu negocio: los turnos, tu equipo, los servicios que ofrecés y el aspecto de tu página.</p>
               <p>En un momento te mostramos cada sección para que sepas bien para qué sirve cada una y cómo usarla.</p>
@@ -63,7 +77,7 @@ export class OnboardingService {
         {
           element: '#admin-tab-config',
           popover: {
-            title: '⚙️ Configuración — Empezá por acá',
+            title: I.sliders + 'Configuración — Empezá por acá',
             description: `
               <p>Antes de cualquier otra cosa, completá la configuración de tu barbería. Tocá este botón para abrir el formulario — tiene <strong>5 partes</strong>, avanzás con los botones de abajo y guardás todo al final.</p>
               <p style="margin:10px 0 5px"><span style="color:#c9a03a;font-weight:700">1 · Tu barbería</span></p>
@@ -84,7 +98,7 @@ export class OnboardingService {
         {
           element: '#admin-tab-servicios',
           popover: {
-            title: '✂️ Servicios — Lo que ofrecés',
+            title: I.scissors + 'Servicios — Lo que ofrecés',
             description: `
               <p>Acá cargás todos los cortes y tratamientos que hacés. Tus clientes los ven y los eligen cuando reservan un turno online.</p>
               <p>Tu barbería ya viene con <strong>4 tipos de servicios</strong> listos para usar: ✂️ Corte, 🪒 Barba, 💈 Combo y 🎨 Coloración. Si querés cambiarlos, crear nuevos tipos o eliminar alguno, usá el botón <em>"Gestionar categorías"</em>.</p>
@@ -100,12 +114,12 @@ export class OnboardingService {
             side: 'bottom',
             align: 'start',
           },
-          onHighlightStarted: () => setTab?.('servicios'),
+          onHighlightStarted: (el) => { setTab?.('servicios'); scrollTab(el); },
         },
         {
           element: '#admin-tab-barberos',
           popover: {
-            title: '💈 Barberos — Tu equipo',
+            title: I.users + 'Barberos — Tu equipo',
             description: `
               <p>Acá agregás a cada persona que trabaja en tu barbería. Los clientes los ven y eligen con quién quieren atenderse al reservar.</p>
               <p style="margin:8px 0 4px"><strong>Por cada barbero podés hacer dos cosas importantes:</strong></p>
@@ -117,12 +131,12 @@ export class OnboardingService {
             side: 'bottom',
             align: 'start',
           },
-          onHighlightStarted: () => setTab?.('barberos'),
+          onHighlightStarted: (el) => { setTab?.('barberos'); scrollTab(el); },
         },
         {
           element: '#admin-tab-turnos',
           popover: {
-            title: '📋 Reservas — Tus turnos del día',
+            title: I.calendar + 'Reservas — Tus turnos del día',
             description: `
               <p>Acá aparecen todos los turnos que tus clientes reservaron online. Podés ver los de hoy, buscar por otra fecha o ver el historial completo.</p>
               <p style="margin:8px 0 4px"><strong>Lo que podés hacer con cada turno:</strong></p>
@@ -136,12 +150,12 @@ export class OnboardingService {
             side: 'bottom',
             align: 'start',
           },
-          onHighlightStarted: () => setTab?.('turnos'),
+          onHighlightStarted: (el) => { setTab?.('turnos'); scrollTab(el); },
         },
         {
           element: '#admin-tab-galeria',
           popover: {
-            title: '🖼️ Galería — Mostrá tu trabajo',
+            title: I.image + 'Galería — Mostrá tu trabajo',
             description: `
               <p>Subí fotos de tus mejores trabajos — fades, diseños de barba, cortes creativos, lo que más te represente.</p>
               <p>Esas fotos aparecen en la galería de tu página y son una de las cosas más importantes para convencer a un cliente nuevo de que reserve con vos. Alguien que entra a tu sitio por primera vez quiere ver cómo trabajás antes de sacar un turno.</p>
@@ -150,12 +164,12 @@ export class OnboardingService {
             side: 'bottom',
             align: 'start',
           },
-          onHighlightStarted: () => setTab?.('galeria'),
+          onHighlightStarted: (el) => { setTab?.('galeria'); scrollTab(el); },
         },
         {
           element: '#admin-tab-dashboard',
           popover: {
-            title: '📊 Inicio — Resumen de tu negocio',
+            title: I.chart + 'Inicio — Resumen de tu negocio',
             description: `
               <p>Este es el primer lugar que ves cuando entrás al panel. Te muestra un resumen de cómo está yendo tu negocio según el período que elijas — hoy, los últimos 7 días, el último mes, etc.</p>
               <p style="margin:8px 0 4px"><strong>Qué vas a encontrar acá:</strong></p>
@@ -170,11 +184,11 @@ export class OnboardingService {
             side: 'bottom',
             align: 'start',
           },
-          onHighlightStarted: () => setTab?.('dashboard'),
+          onHighlightStarted: (el) => { setTab?.('dashboard'); scrollTab(el); },
         },
         {
           popover: {
-            title: '🚀 ¡Ya sabés cómo funciona todo!',
+            title: I.check + '¡Ya sabés cómo funciona todo!',
             description: `
               <p>Ahora que conocés cada sección, el siguiente paso es completar la información de tu barbería.</p>
               <p style="margin:10px 0 8px">Te recomendamos hacerlo en este orden:</p>

@@ -713,6 +713,26 @@ export class AdminComponent implements OnInit, AfterViewInit {
     return this.negocio.resolveImageUrl(url);
   }
 
+  private static readonly HERO_BG_DEFAULTS = [
+    'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1521499892833-773a6179a0d4?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1593702288056-f9454dc4a335?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1512690459411-b9245aed614b?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1567894340315-735d7c361db0?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1634449571010-02389ed0f9b0?w=1920&q=80&auto=format&fit=crop',
+  ];
+
+  get adminBgUrl(): string {
+    if (this.configForm.heroBgUrl) return this.img(this.configForm.heroBgUrl);
+    const slug = this.usuario?.tenantId || 'default';
+    const idx = [...slug].reduce((s, c) => s + c.charCodeAt(0), 0) % AdminComponent.HERO_BG_DEFAULTS.length;
+    return AdminComponent.HERO_BG_DEFAULTS[idx];
+  }
+
   servicioCarruselIdx = new Map<number, number>();
   servicioImagenes(s: Servicio): string[] {
     return [s.imagenUrl, s.imagenUrl2, s.imagenUrl3].filter(Boolean) as string[];
