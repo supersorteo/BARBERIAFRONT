@@ -1,110 +1,221 @@
 <div class="ch-page">
 
-  <!-- NAV -->
-  <nav class="ch-nav">
-    <div class="ch-nav-inner">
-      <span class="ch-logo">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+  <!-- ═══════════════ NAV ══════════════════════════════════════════ -->
+  <nav class="ch-nav" [class.scrolled]="scrolled">
+    <div class="ch-nav-inner container">
+      <a routerLink="/" class="ch-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="ch-logo-icon"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
         Corteo
-      </span>
-      <div class="ch-nav-actions">
-        <a routerLink="/barberia-demo" class="ch-nav-demo">Ver demo</a>
-        <a routerLink="/registro" class="ch-nav-cta">Registrarse</a>
+      </a>
+      <div class="ch-nav-right">
+        <a routerLink="/barberia-demo" class="ch-nav-link">Ver demo</a>
+        <a routerLink="/registro" class="ch-nav-cta">Registrarse gratis</a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO -->
+  <!-- ═══════════════ HERO ═════════════════════════════════════════ -->
   <section class="ch-hero">
-    <div class="ch-hero-eyebrow">
-      <span class="ch-badge">✦ Plataforma para barberías</span>
+    <!-- Fondo imagen barbería -->
+    <div class="ch-hero-bg-img"></div>
+    <!-- Overlays -->
+    <div class="ch-hero-overlay"></div>
+    <div class="ch-hero-lines"></div>
+    <div class="ch-hero-noise"></div>
+
+    <div class="container ch-hero-inner">
+      <!-- Columna izquierda: copy -->
+      <div class="ch-hero-copy">
+        <div class="ch-hero-badge">
+          <span class="ch-badge-dot"></span>
+          Sistema de turnos para barberías
+        </div>
+
+        <h1 class="ch-hero-title">
+          <span class="ch-title-line">Tu barbería</span>
+          <span class="ch-title-line ch-title-accent">en la palma</span>
+          <span class="ch-title-line">de tu cliente</span>
+        </h1>
+
+        <p class="ch-hero-desc">
+          Reservas online 24/7, agenda digital para cada barbero y asistente IA incluido.
+          Sin llamadas, sin WhatsApp, sin turnos perdidos.
+        </p>
+
+        <div class="ch-hero-actions">
+          <a routerLink="/registro" class="ch-btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+            Empezar gratis
+          </a>
+          <a routerLink="/barberia-demo" class="ch-btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Ver demo en vivo
+          </a>
+        </div>
+
+        <p class="ch-hero-note">Sin tarjeta · Configuración en 5 minutos · Código de invitación requerido</p>
+
+        <!-- Stats -->
+        <div class="ch-stats">
+          <div class="ch-stat">
+            <span class="ch-stat-num">24/7</span>
+            <span class="ch-stat-label">Disponible</span>
+          </div>
+          <div class="ch-stat-sep"></div>
+          <div class="ch-stat">
+            <span class="ch-stat-num">0 min</span>
+            <span class="ch-stat-label">Espera en agenda</span>
+          </div>
+          <div class="ch-stat-sep"></div>
+          <div class="ch-stat">
+            <span class="ch-stat-num">IA</span>
+            <span class="ch-stat-label">Chat incluido</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: floating scene -->
+      <div class="ch-hero-visual">
+        <div class="ch-float-scene">
+          <div class="ch-float-glow"></div>
+          <div class="ch-float-ring ch-ring-1"></div>
+          <div class="ch-float-ring ch-ring-2"></div>
+
+          <!-- Card: nuevo turno -->
+          <div class="ch-float-card ch-card-1">
+            <div class="ch-fc-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="ch-fc-body">
+              <span class="ch-fc-title">Nuevo turno</span>
+              <span class="ch-fc-sub">Carlos · Corte + barba · 15:30</span>
+            </div>
+            <span class="ch-fc-badge">Hoy</span>
+          </div>
+
+          <!-- Card: IA -->
+          <div class="ch-float-card ch-card-2">
+            <div class="ch-fc-icon ch-fc-icon--ai">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="ch-fc-body">
+              <span class="ch-fc-title">Asistente IA</span>
+              <span class="ch-fc-sub">"¿Cuándo tienen lugar libre?"</span>
+            </div>
+          </div>
+
+          <!-- Card: estadísticas -->
+          <div class="ch-float-card ch-card-3">
+            <div class="ch-fc-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div class="ch-fc-body">
+              <span class="ch-fc-title">8 turnos hoy</span>
+              <span class="ch-fc-sub">↑ 3 más que ayer</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <h1 class="ch-hero-title">
-      Tu barbería con<br>
-      <span class="ch-hero-accent">turnos online</span><br>
-      desde hoy
-    </h1>
-    <p class="ch-hero-desc">
-      Sistema completo de reservas, agenda digital y asistente IA.<br>
-      Sin llamadas, sin WhatsApp, sin turnos perdidos.
-    </p>
-    <div class="ch-hero-actions">
-      <a routerLink="/registro" class="ch-btn-primary">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-        Registrá tu barbería gratis
-      </a>
-      <a routerLink="/barberia-demo" class="ch-btn-ghost">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Ver la demo en vivo
-      </a>
+
+    <!-- Scroll hint -->
+    <div class="ch-scroll-hint">
+      <span>Descubrí más</span>
+      <div class="ch-scroll-line"></div>
     </div>
-    <p class="ch-hero-note">Sin tarjeta de crédito · Configuración en 5 minutos</p>
   </section>
 
-  <!-- FEATURES -->
+  <!-- ═══════════════ FEATURES ══════════════════════════════════════ -->
   <section class="ch-features">
-    <div class="ch-features-grid">
-      <div class="ch-feature-card">
-        <span class="ch-feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </span>
-        <h3 class="ch-feature-title">Reservas 24/7</h3>
-        <p class="ch-feature-desc">Tus clientes reservan desde el celular en cualquier momento, sin que vos tengas que contestar nada.</p>
+    <div class="container">
+      <div class="ch-section-header">
+        <span class="ch-section-tag">Funcionalidades</span>
+        <h2 class="ch-section-title">Todo lo que tu barbería necesita</h2>
+        <p class="ch-section-desc">Un sistema completo pensado para barberías reales, no para grandes empresas.</p>
       </div>
-      <div class="ch-feature-card">
-        <span class="ch-feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </span>
-        <h3 class="ch-feature-title">Agenda para cada barbero</h3>
-        <p class="ch-feature-desc">Cada barbero ve solo sus turnos, bloquea sus horarios y gestiona su día desde el teléfono.</p>
-      </div>
-      <div class="ch-feature-card">
-        <span class="ch-feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </span>
-        <h3 class="ch-feature-title">Asistente IA incluido</h3>
-        <p class="ch-feature-desc">Un chat inteligente atiende a tus clientes, responde preguntas y abre el formulario de reserva automáticamente.</p>
-      </div>
-      <div class="ch-feature-card">
-        <span class="ch-feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        </span>
-        <h3 class="ch-feature-title">Dashboard en tiempo real</h3>
-        <p class="ch-feature-desc">Ingresos del día, turnos por barbero, servicios más pedidos. Todo en un panel limpio y sin complicaciones.</p>
-      </div>
-      <div class="ch-feature-card">
-        <span class="ch-feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </span>
-        <h3 class="ch-feature-title">Tu propia URL</h3>
-        <p class="ch-feature-desc">Cada barbería tiene su página personalizada con nombre, logo, colores, servicios y galería de fotos.</p>
-      </div>
-      <div class="ch-feature-card">
-        <span class="ch-feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 21 12"/></svg>
-        </span>
-        <h3 class="ch-feature-title">Multi-barbero</h3>
-        <p class="ch-feature-desc">Agregá todos los barberos que quieras. Cada uno con su horario, sus bloqueos y sus turnos separados.</p>
+
+      <div class="ch-features-grid">
+        <div class="ch-feat-card">
+          <div class="ch-feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3 class="ch-feat-title">Reservas 24/7</h3>
+          <p class="ch-feat-desc">Tus clientes reservan desde el celular en cualquier momento, sin que vos tengas que contestar nada.</p>
+        </div>
+
+        <div class="ch-feat-card">
+          <div class="ch-feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3 class="ch-feat-title">Agenda por barbero</h3>
+          <p class="ch-feat-desc">Cada barbero ve solo sus turnos, bloquea sus horarios y gestiona su día desde el teléfono.</p>
+        </div>
+
+        <div class="ch-feat-card ch-feat-card--highlight">
+          <div class="ch-feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="ch-feat-ai-tag">IA Incluida</div>
+          <h3 class="ch-feat-title">Asistente inteligente</h3>
+          <p class="ch-feat-desc">Un chat con IA atiende a tus clientes, responde preguntas y abre el formulario de reserva automáticamente.</p>
+        </div>
+
+        <div class="ch-feat-card">
+          <div class="ch-feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h3 class="ch-feat-title">Dashboard en tiempo real</h3>
+          <p class="ch-feat-desc">Ingresos del día, turnos por barbero, servicios más pedidos. Todo en un panel limpio y sin complicaciones.</p>
+        </div>
+
+        <div class="ch-feat-card">
+          <div class="ch-feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+          </div>
+          <h3 class="ch-feat-title">Tu página propia</h3>
+          <p class="ch-feat-desc">Cada barbería tiene su URL personalizada con logo, colores, servicios, galería y precios.</p>
+        </div>
+
+        <div class="ch-feat-card">
+          <div class="ch-feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="ch-feat-title">Multi-barbero</h3>
+          <p class="ch-feat-desc">Agregá todos los barberos que quieras, cada uno con su horario, sus bloqueos y sus turnos separados.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA FINAL -->
+  <!-- ═══════════════ CTA FINAL ══════════════════════════════════════ -->
   <section class="ch-cta-section">
-    <div class="ch-cta-box">
+    <div class="ch-cta-bg"></div>
+    <div class="container ch-cta-inner">
+      <div class="ch-cta-badge">
+        <span class="ch-badge-dot"></span>
+        Disponible ahora
+      </div>
       <h2 class="ch-cta-title">Empezá hoy, gratis</h2>
       <p class="ch-cta-desc">Usá tu código de invitación y tenés tu barbería online en menos de 5 minutos.</p>
-      <a routerLink="/registro" class="ch-btn-primary ch-btn-lg">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-        Crear mi barbería
-      </a>
-      <a routerLink="/barberia-demo" class="ch-cta-demo-link">o explorá la demo primero →</a>
+      <div class="ch-cta-actions">
+        <a routerLink="/registro" class="ch-btn-primary ch-btn-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          Crear mi barbería
+        </a>
+        <a routerLink="/barberia-demo" class="ch-btn-ghost">Ver la demo →</a>
+      </div>
     </div>
   </section>
 
-  <!-- FOOTER MÍNIMO -->
+  <!-- ═══════════════ FOOTER ════════════════════════════════════════ -->
   <footer class="ch-footer">
-    <span>© 2026 Corteo · Sistema de turnos para barberías</span>
+    <div class="container ch-footer-inner">
+      <span class="ch-footer-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        Corteo
+      </span>
+      <span class="ch-footer-copy">© 2026 Corteo · Sistema de turnos para barberías</span>
+    </div>
   </footer>
 
 </div>

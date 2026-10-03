@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,4 +8,11 @@ import { RouterLink } from '@angular/router';
   templateUrl: './corteo-home.component.html',
   styleUrl: './corteo-home.component.css'
 })
-export class CorteoHomeComponent {}
+export class CorteoHomeComponent {
+  scrolled = false;
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.scrolled = window.scrollY > 40;
+  }
+}
