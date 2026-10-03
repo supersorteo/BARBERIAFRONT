@@ -777,6 +777,77 @@
   color: var(--text-muted); background: var(--bg-card-2); border: 1px solid var(--border);
 }
 
+/* ─── RESERVA SUCCESS STEP ─────────────────────────────────────── */
+.reserva-success-step {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 8px 8px; text-align: center;
+  animation: rssIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes rssIn {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.rss-check {
+  width: 62px; height: 62px; border-radius: 50%;
+  background: rgba(62,207,142,0.1); border: 2px solid rgba(62,207,142,0.35);
+  color: #3ecf8e; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+  animation: rssCheckPop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
+}
+@keyframes rssCheckPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.rss-title {
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
+  color: var(--text-primary); margin: 0 0 6px;
+}
+.rss-subtitle {
+  font-size: 13.5px; color: var(--text-secondary); margin: 0 0 20px; line-height: 1.5;
+}
+.rss-detail-card {
+  width: 100%; background: var(--bg-card-2); border: 1px solid var(--border-gold);
+  border-radius: var(--radius); padding: 14px 18px;
+  display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;
+  text-align: left;
+}
+.rss-detail-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13.5px; color: var(--text-primary); font-weight: 500;
+}
+.rss-detail-row svg { color: var(--gold); flex-shrink: 0; }
+
+.rss-actions {
+  display: flex; flex-direction: column; gap: 10px; width: 100%;
+}
+.rss-btn-wa {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  background: #25D366; color: #fff;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.01em;
+  padding: 12px 20px; border-radius: var(--radius);
+  text-decoration: none;
+  transition: background 180ms, transform 150ms, box-shadow 180ms;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.25);
+}
+.rss-btn-wa:hover { background: #1fba5a; transform: translateY(-1px); box-shadow: 0 6px 22px rgba(37,211,102,0.35); }
+
+.rss-btn-cal {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border-md);
+  color: var(--text-secondary); font-size: 13px; font-weight: 500;
+  padding: 10px 18px; border-radius: var(--radius);
+  text-decoration: none;
+  transition: background 180ms, border-color 180ms, color 180ms;
+}
+.rss-btn-cal:hover { background: rgba(255,255,255,0.1); border-color: var(--border-gold); color: var(--gold); }
+
+.rss-btn-close {
+  background: none; border: none; color: var(--text-muted);
+  font-size: 13px; cursor: pointer; padding: 6px; margin-top: 4px;
+  transition: color 180ms;
+}
+.rss-btn-close:hover { color: var(--text-secondary); }
+
 .reserva-loading-dots { display: inline-flex; gap: 4px; align-items: center; margin-right: 8px; }
 .reserva-loading-dots span {
   width: 5px; height: 5px; border-radius: 50%; background: currentColor;

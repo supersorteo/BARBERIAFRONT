@@ -135,6 +135,31 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   demoBannerDismissed = false;
   readonly DEMO_SLUG = 'barberia-demo';
 
+  turnoConfirmadoData: { paciente: string; telefono: string; fecha: string; hora: string; barberoNombre: string; servicio: string } | null = null;
+
+  get whatsappConfirmacionCliente(): string {
+    const d = this.turnoConfirmadoData;
+    if (!d || !this.config.whatsapp) return '';
+    const tel = this.config.whatsapp.replace(/\D/g, '');
+    const barbero = d.barberoNombre ? ` con ${d.barberoNombre}` : '';
+    const msg = `Hola! Reservé un turno en ${this.config.nombre} para el ${d.fecha} a las ${d.hora}${barbero}. Mi nombre es ${d.paciente} y mi número es ${d.telefono}.`;
+    return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  }
+
+  get googleCalendarUrl(): string {
+    const d = this.turnoConfirmadoData;
+    if (!d) return '';
+    const [y, m, day] = d.fecha.split('-');
+    const [h, min] = d.hora.split(':');
+    const endH = String(parseInt(h) + 1).padStart(2, '0');
+    const start = `${y}${m}${day}T${h}${min}00`;
+    const end   = `${y}${m}${day}T${endH}${min}00`;
+    const barbero = d.barberoNombre ? ` con ${d.barberoNombre}` : '';
+    const title   = encodeURIComponent(`Turno en ${this.config.nombre}${barbero}`);
+    const details = encodeURIComponent(`Servicio: ${d.servicio}\nBarbería: ${this.config.nombre}`);
+    return `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${start}/${end}&details=${details}`;
+  }
+
   constructor(
     private negocio: NegocioService,
     private cdr: ChangeDetectorRef,
@@ -418,6 +443,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   cerrarReservaModal() {
     this.reservaModalOpen = false;
+    this.turnoConfirmadoData = null;
     this.telefonoLocal = '';
     document.body.style.overflow = '';
     this.cdr.detectChanges();
@@ -575,13 +601,18 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.negocio.crearTurno(turno).subscribe({
       next: t => {
         const b = this.barberos.find(x => x.id === t.barberoId);
-        const conBarbero = b ? ` con ${b.nombre}` : '';
+        this.turnoConfirmadoData = {
+          paciente:     t.paciente,
+          telefono:     t.telefono || '',
+          fecha:        t.fecha,
+          hora:         t.hora,
+          barberoNombre: b?.nombre || '',
+          servicio:     t.servicio || ''
+        };
         this.reservaForm = { paciente: '', servicio: '', fecha: '', hora: '', barberoId: '' };
         this.telefonoLocal = '';
         this.slotsDisponibles = [];
         this.enviando = false;
-        this.cerrarReservaModal();
-        this.alert.success(`¡Turno confirmado! Te esperamos el ${t.fecha} a las ${t.hora}${conBarbero}.`);
         this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
