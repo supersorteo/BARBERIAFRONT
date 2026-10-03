@@ -44,7 +44,7 @@
 <!-- ═══════════════ NAVBAR ════════════════════════════════════════ -->
 <nav class="navbar-premium" [class.scrolled]="navScrolled">
   <div class="container d-flex align-items-center justify-content-between">
-    <a class="nav-brand" [routerLink]="'/' + slugActual">
+    <a class="nav-brand" [routerLink]="slugActual === DEMO_SLUG ? '/' : '/' + slugActual">
       <img [src]="config.logoUrl || 'logos/logo-black.webp'" alt="{{ config.nombre }}" class="nav-brand-logo">
       {{ config.nombre }}
     </a>
