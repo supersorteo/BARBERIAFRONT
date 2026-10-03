@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, HostLis
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -131,6 +132,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     return { tipo: 'login', label: 'Acceso staff', ruta: '/' + this.slugActual + '/login' };
   }
 
+  demoBannerDismissed = false;
+  readonly DEMO_SLUG = 'barberia-demo';
+
   constructor(
     private negocio: NegocioService,
     private cdr: ChangeDetectorRef,
@@ -138,7 +142,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     private alert: AlertService,
     private route: ActivatedRoute,
     private tenantCtx: TenantContextService,
-    private auth: AuthService
+    private auth: AuthService,
+    private metaSvc: Meta,
+    private titleSvc: Title
   ) {}
 
   @HostListener('window:scroll')
@@ -167,7 +173,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.config.colorPrimario) this.negocio.applyBrandColor(this.config.colorPrimario);
         if (this.config.colorFondo)   this.negocio.applyBackgroundColor(this.config.colorFondo);
         if (this.config.colorTexto)   this.negocio.applyTextColor(this.config.colorTexto);
-        if (this.config.nombre) document.title = `${this.config.nombre} — Reservas Online`;
+        if (this.config.nombre) this.updateSeo();
         if (this.config.heroBgUrl) {
           this.heroBgUrl = this.negocio.resolveImageUrl(this.config.heroBgUrl);
           setTimeout(() => { this.heroBgLoaded = true; this.cdr.detectChanges(); }, 80);
@@ -222,6 +228,25 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         if (g.length > 1) this.startCarousel();
       }
     });
+  }
+
+  private updateSeo(): void {
+    const nombre = this.config.nombre || 'Barbería';
+    const titulo = `${nombre} — Reservas Online`;
+    const desc = `Reservá tu turno en ${nombre} en segundos. Sin llamadas, sin esperas. ${this.config.tagline || ''}`.trim();
+    const img = this.config.heroBgUrl
+      ? this.negocio.resolveImageUrl(this.config.heroBgUrl)
+      : this.heroBgUrl;
+    const url = window.location.href;
+    this.titleSvc.setTitle(titulo);
+    this.metaSvc.updateTag({ name: 'description', content: desc });
+    this.metaSvc.updateTag({ property: 'og:title', content: titulo });
+    this.metaSvc.updateTag({ property: 'og:description', content: desc });
+    this.metaSvc.updateTag({ property: 'og:image', content: img });
+    this.metaSvc.updateTag({ property: 'og:url', content: url });
+    this.metaSvc.updateTag({ name: 'twitter:title', content: titulo });
+    this.metaSvc.updateTag({ name: 'twitter:description', content: desc });
+    this.metaSvc.updateTag({ name: 'twitter:image', content: img });
   }
 
   ngAfterViewInit() {
