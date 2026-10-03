@@ -46,7 +46,7 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
   }
 
   private returnUrl(): string {
-    try { return sessionStorage.getItem('sa_return_url') || '/barberia-demo/login'; } catch { return '/barberia-demo/login'; }
+    try { return sessionStorage.getItem('sa_return_url') || '/'; } catch { return '/'; }
   }
 
   private loginUrlFrom(url: string): string {
@@ -54,7 +54,7 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
     const slug = match?.[1];
     return (slug && !['superadmin', 'admin', 'login', 'registro'].includes(slug))
       ? `/${slug}/login`
-      : '/barberia-demo/login';
+      : '/';
   }
 
   cargar(): void {
@@ -77,27 +77,43 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
   reseteandoSlug = '';
   credencialReset: { username: string; password: string; slug: string } | null = null;
 
-  resetPassword(t: TenantResumen): void {
-    this.alert.confirm({
-      title: `Resetear contraseña de "${t.nombre}"`,
-      html: `Se generará una contraseña nueva para <strong>${t.adminUsername}</strong>. La contraseña actual quedará inválida.`,
-      confirmText: 'Sí, resetear',
-      cancelText: 'Cancelar',
-    }).then(confirmed => {
-      if (!confirmed) return;
-      this.reseteandoSlug = t.slug;
-      this.sa.resetPassword(t.slug).subscribe({
-        next: res => {
-          this.reseteandoSlug = '';
-          this.credencialReset = { ...res, slug: t.slug };
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.reseteandoSlug = '';
-          this.alert.error('Error al resetear la contraseña');
-          this.cdr.detectChanges();
-        }
-      });
+  passModal: { tenant: TenantResumen; modo: 'auto' | 'manual'; customPass: string; showCustomPass: boolean } | null = null;
+  passModalError = '';
+
+  abrirPassModal(t: TenantResumen): void {
+    this.passModal = { tenant: t, modo: 'auto', customPass: '', showCustomPass: false };
+    this.passModalError = '';
+    this.cdr.detectChanges();
+  }
+
+  cerrarPassModal(): void {
+    this.passModal = null;
+    this.passModalError = '';
+    this.cdr.detectChanges();
+  }
+
+  confirmarPassReset(): void {
+    if (!this.passModal) return;
+    const { tenant, modo, customPass } = this.passModal;
+    if (modo === 'manual' && (!customPass || customPass.length < 6)) {
+      this.passModalError = 'La contraseña debe tener al menos 6 caracteres.';
+      this.cdr.detectChanges();
+      return;
+    }
+    this.reseteandoSlug = tenant.slug;
+    const password = modo === 'manual' ? customPass : undefined;
+    this.sa.resetPassword(tenant.slug, password).subscribe({
+      next: res => {
+        this.reseteandoSlug = '';
+        this.credencialReset = { ...res, slug: tenant.slug };
+        this.cerrarPassModal();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.reseteandoSlug = '';
+        this.passModalError = 'Error al cambiar la contraseña.';
+        this.cdr.detectChanges();
+      }
     });
   }
 

@@ -37,7 +37,8 @@ export class SuperAdminService {
     return this.http.delete<{ eliminado: string }>(`${BASE}/tenants/${slug}`);
   }
 
-  resetPassword(slug: string): Observable<{ username: string; password: string }> {
-    return this.http.patch<{ username: string; password: string }>(`${BASE}/tenants/${slug}/reset-password`, {});
+  resetPassword(slug: string, password?: string): Observable<{ username: string; password: string }> {
+    const body = password ? { password } : {};
+    return this.http.patch<{ username: string; password: string }>(`${BASE}/tenants/${slug}/reset-password`, body);
   }
 }

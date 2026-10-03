@@ -147,19 +147,19 @@
                     </span>
                   </td>
                   <td class="sa-td-actions">
+                    <button
+                      class="sa-reset-btn"
+                      type="button"
+                      (click)="abrirPassModal(t)"
+                      [disabled]="reseteandoSlug === t.slug || eliminandoSlug === t.slug || togglingSlug === t.slug"
+                      title="Cambiar contraseña del admin"
+                    >
+                      @if (reseteandoSlug === t.slug) { <span class="sa-spinner sa-spinner--sm"></span> }
+                      @else {
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      }
+                    </button>
                     @if (t.slug !== DEMO_SLUG) {
-                      <button
-                        class="sa-reset-btn"
-                        type="button"
-                        (click)="resetPassword(t)"
-                        [disabled]="reseteandoSlug === t.slug || eliminandoSlug === t.slug || togglingSlug === t.slug"
-                        title="Resetear contraseña del admin"
-                      >
-                        @if (reseteandoSlug === t.slug) { <span class="sa-spinner sa-spinner--sm"></span> }
-                        @else {
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        }
-                      </button>
                       <button
                         class="sa-toggle-btn"
                         [class.sa-toggle-btn--deactivate]="t.activo"
@@ -184,7 +184,7 @@
                         }
                       </button>
                     } @else {
-                      <span class="sa-demo-lock" title="La barbería demo no se puede modificar">🔒</span>
+                      <span class="sa-demo-lock" title="La barbería demo no se puede desactivar ni eliminar">🔒</span>
                     }
                   </td>
                 </tr>
@@ -239,3 +239,100 @@
 
   </div>
 </div>
+
+<!-- Modal: cambiar contraseña -->
+@if (passModal) {
+  <div class="sa-modal-backdrop" (click)="cerrarPassModal()">
+    <div class="sa-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="sa-modal-header">
+        <div class="sa-modal-header-left">
+          <span class="sa-modal-icon-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <div>
+            <div class="sa-modal-title">Cambiar contraseña</div>
+            <div class="sa-modal-sub">{{ passModal.tenant.nombre }} · {{ passModal.tenant.adminUsername }}</div>
+          </div>
+        </div>
+        <button class="sa-modal-close" type="button" (click)="cerrarPassModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="sa-modal-body">
+        <div class="sa-pass-options">
+          <button
+            class="sa-pass-option"
+            [class.sa-pass-option--active]="passModal.modo === 'auto'"
+            type="button"
+            (click)="passModal.modo = 'auto'"
+          >
+            <span class="sa-pass-option-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </span>
+            <div>
+              <div class="sa-pass-option-label">Generar automáticamente</div>
+              <div class="sa-pass-option-desc">Contraseña segura y aleatoria</div>
+            </div>
+          </button>
+          <button
+            class="sa-pass-option"
+            [class.sa-pass-option--active]="passModal.modo === 'manual'"
+            type="button"
+            (click)="passModal.modo = 'manual'"
+          >
+            <span class="sa-pass-option-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </span>
+            <div>
+              <div class="sa-pass-option-label">Contraseña personalizada</div>
+              <div class="sa-pass-option-desc">Definí la contraseña manualmente</div>
+            </div>
+          </button>
+        </div>
+
+        @if (passModal.modo === 'manual') {
+          <div class="sa-modal-field">
+            <label class="sa-gen-label">Nueva contraseña</label>
+            <div class="sa-pass-input-wrap">
+              <input
+                class="sa-input sa-pass-field"
+                [type]="passModal.showCustomPass ? 'text' : 'password'"
+                [(ngModel)]="passModal.customPass"
+                placeholder="Mínimo 6 caracteres"
+                autocomplete="new-password"
+              />
+              <button class="sa-pass-eye-btn" type="button" (click)="passModal.showCustomPass = !passModal.showCustomPass">
+                @if (passModal.showCustomPass) {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                } @else {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                }
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (passModalError) {
+          <div class="sa-msg sa-msg--err" style="margin-top:0.75rem">{{ passModalError }}</div>
+        }
+      </div>
+
+      <div class="sa-modal-footer">
+        <button class="sa-modal-cancel" type="button" (click)="cerrarPassModal()">Cancelar</button>
+        <button
+          class="sa-btn sa-modal-confirm"
+          type="button"
+          (click)="confirmarPassReset()"
+          [disabled]="reseteandoSlug === passModal.tenant.slug"
+        >
+          @if (reseteandoSlug === passModal.tenant.slug) { <span class="sa-spinner"></span> }
+          @else {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Confirmar cambio
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
