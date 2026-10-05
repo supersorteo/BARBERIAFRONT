@@ -12,8 +12,7 @@
   padding: 2rem 1rem 3rem;
 }
 
-/* gateway page needs top-align for the card */
-.gateway-page { align-items: flex-start; padding-top: clamp(1.5rem, 5vh, 3rem); }
+.gateway-page { align-items: center; }
 
 /* ── CARD ──────────────────────────────────────────────────────────── */
 .login-card,
