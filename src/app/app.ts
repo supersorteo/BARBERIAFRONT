@@ -1,7 +1,8 @@
 import { Component, HostListener } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SuperAdminLoginComponent } from './components/superadmin-login/superadmin-login.component';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +18,17 @@ import { SuperAdminLoginComponent } from './components/superadmin-login/superadm
 export class App {
   showSuperLogin = false;
 
+  constructor(private auth: AuthService, private router: Router) {}
+
   @HostListener('document:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
     if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'p') {
       e.preventDefault();
-      this.showSuperLogin = true;
+      if (this.auth.isSuperAdmin()) {
+        this.router.navigate(['/superadmin']);
+      } else {
+        this.showSuperLogin = true;
+      }
     }
   }
 }

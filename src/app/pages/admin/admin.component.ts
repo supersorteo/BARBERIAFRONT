@@ -363,6 +363,32 @@ export class AdminComponent implements OnInit, AfterViewInit {
     if (slug) this.router.navigate([`/${slug}`]);
   }
 
+  get landingUrl(): string {
+    const slug = this.usuario?.tenantId;
+    return slug ? `${window.location.origin}/${slug}` : '';
+  }
+
+  urlCopiada = false;
+  copiarUrl(): void {
+    if (!this.landingUrl) return;
+    navigator.clipboard.writeText(this.landingUrl).then(() => {
+      this.urlCopiada = true;
+      this.cdr.detectChanges();
+      setTimeout(() => { this.urlCopiada = false; this.cdr.detectChanges(); }, 2000);
+    }).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = this.landingUrl;
+      el.style.position = 'fixed'; el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      this.urlCopiada = true;
+      this.cdr.detectChanges();
+      setTimeout(() => { this.urlCopiada = false; this.cdr.detectChanges(); }, 2000);
+    });
+  }
+
   ngOnInit() {
     this.usuario = this.auth.getUser();
     this.cargarOnboarding();

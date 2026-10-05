@@ -273,8 +273,7 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
       const returnUrl = this.returnUrl();
       try { sessionStorage.removeItem('sa_return_url'); } catch {}
       this.auth.logout();
-      // Tras logout volver al login del contexto donde se estaba trabajando
-      this.router.navigateByUrl(this.loginUrlFrom(returnUrl));
+      this.router.navigateByUrl(returnUrl || '/');
     });
   }
 }

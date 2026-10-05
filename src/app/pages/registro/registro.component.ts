@@ -12,6 +12,13 @@ interface RegistroResponse {
   mensaje: string;
 }
 
+const SUPER_ADMINS = [
+  { id: 'leo',    nombre: 'Leo',    bandera: '🇺🇾', tel: '59896909509'   },
+  { id: 'danilo', nombre: 'Danilo', bandera: '🇦🇷', tel: '5491126911817' },
+] as const;
+
+const WA_MSG = encodeURIComponent('Hola, quiero solicitar un código de activación para registrar mi barbería en Corteo.');
+
 @Component({
   selector: 'app-registro',
   standalone: true,
@@ -20,6 +27,14 @@ interface RegistroResponse {
   styleUrl: './registro.component.css'
 })
 export class RegistroComponent {
+  readonly superAdmins = SUPER_ADMINS;
+  adminSeleccionado: typeof SUPER_ADMINS[number] | null = null;
+
+  get waUrlSolicitud(): string {
+    if (!this.adminSeleccionado) return '';
+    return `whatsapp://send?phone=${this.adminSeleccionado.tel}&text=${WA_MSG}`;
+  }
+
   vista: 'form' | 'exito' = 'form';
   form = { nombreNegocio: '', adminNombre: '', username: '', password: '', confirmar: '', codigoInvitacion: '' };
   slugPreview = '';
