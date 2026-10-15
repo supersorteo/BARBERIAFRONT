@@ -5,29 +5,36 @@
   display: flex; flex-direction: column; align-items: flex-end; gap: 14px;
 }
 
-/* ─── SCISSORS — avatar header ────────────────────────────────────── */
-.scissors-avatar {
-  width: 26px; height: 26px;
-  color: var(--gold);
+/* ─── PELUSÍN — avatar header ─────────────────────────────────────── */
+.pelusin-avatar-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 12%;
+  border-radius: 50%;
+  display: block;
 }
-.scissors-avatar .blade-a { transform-origin: 21px 20px; animation: snip-a 3s ease-in-out infinite; }
-.scissors-avatar .blade-b { transform-origin: 21px 20px; animation: snip-b 3s ease-in-out infinite; }
-@keyframes snip-a { 0%,65%,100% { transform: rotate(0deg); } 80% { transform: rotate(-14deg); } }
-@keyframes snip-b { 0%,65%,100% { transform: rotate(0deg); } 80% { transform: rotate(14deg); }  }
 
-/* ─── SCISSORS — FAB button ───────────────────────────────────────── */
-.scissors-fab {
-  width: 28px; height: 28px;
-  color: #0a0a10;
+/* ─── PELUSÍN — FAB button ────────────────────────────────────────── */
+.pelusin-fab-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 12%;
+  border-radius: 50%;
+  display: block;
+  pointer-events: none;
 }
-.scissors-fab .fab-blade-a { transform-origin: 18px 16px; animation: snip-a 3s ease-in-out infinite; }
-.scissors-fab .fab-blade-b { transform-origin: 18px 16px; animation: snip-b 3s ease-in-out infinite; }
 
-/* ─── BOT msg mini icon ───────────────────────────────────────────── */
+/* ─── PELUSÍN — bot msg mini icon ─────────────────────────────────── */
 .bot-msg-icon {
-  color: var(--gold);
   margin-bottom: 4px;
-  opacity: 0.7;
+}
+.pelusin-mini-img {
+  width: 18px; height: 18px;
+  object-fit: cover;
+  object-position: 50% 12%;
+  border-radius: 50%;
+  display: block;
+  border: 1px solid rgba(201,160,58,0.3);
 }
 
 /* ─── FAB WRAPPER ─────────────────────────────────────────────────── */
@@ -75,6 +82,7 @@
   background: var(--grad-gold);
   border: none; border-radius: 50%;
   cursor: pointer;
+  overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 24px var(--gold-glow-strong), 0 0 0 0 var(--gold-glow);
   transition: transform 0.25s var(--ease-bounce), box-shadow 0.25s;
