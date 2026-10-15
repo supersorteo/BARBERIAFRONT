@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { gsap } from 'gsap';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,8 +23,10 @@ type PeriodoDashboard = 'hoy' | '7d' | '30d' | 'mes';
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
-export class AdminComponent implements OnInit, AfterViewInit {
+export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   usuario: AuthUser | null = null;
+
+  private manifestLink: HTMLLinkElement | null = null;
 
   private _tabActiva: 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente' = 'dashboard';
   get tabActiva() { return this._tabActiva; }
@@ -400,6 +402,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.cargarBarberos();
     this.cargarBloqueos();
     this.cargarGaleria();
+    this.manifestLink = document.querySelector('link[rel="manifest"]');
+    if (this.manifestLink) this.manifestLink.href = '/manifest-panel.webmanifest';
+  }
+
+  ngOnDestroy(): void {
+    if (this.manifestLink) this.manifestLink.href = '/manifest.webmanifest';
   }
 
   private buildSetTab(): (tab: string) => void {

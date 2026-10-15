@@ -1,6 +1,6 @@
 {
-  "name": "Corteo Admin",
-  "short_name": "Admin",
+  "name": "Corteo Super Admin",
+  "short_name": "Super Admin",
   "description": "Panel de administración del sistema Corteo",
   "start_url": "/superadmin",
   "scope": "/superadmin",
