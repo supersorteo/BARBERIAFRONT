@@ -6,7 +6,7 @@
       <div class="chat-header">
         <div class="chat-header-info">
           <div class="chat-avatar">
-            <img src="icons/pelusin-avatar-optimizado.webp" class="pelusin-avatar-img" alt="Pelusín">
+            <img src="/icons/pelusin-avatar-optimizado.webp" class="pelusin-avatar-img" alt="Pelusín">
           </div>
           <div class="chat-header-text">
             <div class="chat-header-row">
@@ -29,7 +29,7 @@
           <div class="msg" [class.user]="msg.rol==='user'" [class.bot]="msg.rol==='bot'">
             @if (msg.rol === 'bot') {
               <div class="bot-msg-icon">
-                <img src="icons/pelusin-avatar-optimizado.webp" class="pelusin-mini-img" alt="">
+                <img src="/icons/pelusin-avatar-optimizado.webp" class="pelusin-mini-img" alt="">
               </div>
             }
             <p style="white-space:pre-line;margin:0">{{ msg.texto }}</p>
@@ -67,7 +67,7 @@
     }
     <button class="chat-btn" (click)="toggle()" [class.active]="abierto" title="Hablar con Pelusín">
       @if (!abierto) {
-        <img src="icons/pelusin-avatar-optimizado.webp" class="pelusin-fab-img" alt="Pelusín">
+        <img src="/icons/pelusin-avatar-optimizado.webp" class="pelusin-fab-img" alt="Pelusín">
       } @else {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
              stroke-linecap="round" width="20" height="20">
