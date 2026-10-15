@@ -1,7 +1,7 @@
 {
-  "name": "Barbería El Corte",
-  "short_name": "El Corte",
-  "description": "Reservá tu turno online en segundos. Cortes clásicos y modernos en Montevideo.",
+  "name": "Corteo",
+  "short_name": "Corteo",
+  "description": "Reservá tu turno online en segundos. Barbería online 24/7.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
