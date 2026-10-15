@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,8 +14,9 @@ import { SuperAdminDeactivatable } from '../../guards/superadmin-deactivate.guar
   templateUrl: './superadmin.component.html',
   styleUrl: './superadmin.component.css'
 })
-export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
+export class SuperAdminComponent implements OnInit, OnDestroy, SuperAdminDeactivatable {
   allowNavigation = false;
+  private manifestLink: HTMLLinkElement | null = null;
   resumen: Resumen | null = null;
   tenants: TenantResumen[] = [];
   codigos: CodigoItem[] = [];
@@ -36,7 +37,13 @@ export class SuperAdminComponent implements OnInit, SuperAdminDeactivatable {
     private cdr: ChangeDetectorRef
   ) {}
 
+  ngOnDestroy(): void {
+    if (this.manifestLink) this.manifestLink.href = '/manifest.webmanifest';
+  }
+
   ngOnInit(): void {
+    this.manifestLink = document.querySelector('link[rel="manifest"]');
+    if (this.manifestLink) this.manifestLink.href = '/manifest-admin.webmanifest';
     this.cargar();
     // Guardar de dónde vino el super admin para poder volver al salir
     const prevUrl = this.router.lastSuccessfulNavigation()?.previousNavigation?.finalUrl?.toString();

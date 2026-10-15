@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { ActivacionModalComponent } from '../../components/activacion-modal/activacion-modal.component';
 
 interface RegistroResponse {
   slug: string;
@@ -12,38 +13,24 @@ interface RegistroResponse {
   mensaje: string;
 }
 
-const SUPER_ADMINS = [
-  { id: 'leo',    nombre: 'Leo',    bandera: '🇺🇾', tel: '59896909509'   },
-  { id: 'danilo', nombre: 'Danilo', bandera: '🇦🇷', tel: '5491126911817' },
-] as const;
-
-const WA_MSG = encodeURIComponent('Hola, quiero solicitar un código de activación para registrar mi barbería en Corteo.');
-
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ActivacionModalComponent],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })
 export class RegistroComponent {
-  readonly superAdmins = SUPER_ADMINS;
-  adminSeleccionado: typeof SUPER_ADMINS[number] | null = null;
-
-  get waUrlSolicitud(): string {
-    if (!this.adminSeleccionado) return '';
-    return `whatsapp://send?phone=${this.adminSeleccionado.tel}&text=${WA_MSG}`;
-  }
-
   vista: 'form' | 'exito' = 'form';
   form = { nombreNegocio: '', adminNombre: '', username: '', password: '', confirmar: '', codigoInvitacion: '' };
   slugPreview = '';
   loading = false;
   error = '';
   resultado: RegistroResponse | null = null;
-  showPass = false;
+  showPass    = false;
   showConfirm = false;
-  contador = 3;
+  contador    = 3;
+  mostrarModalActivacion = false;
 
   private readonly apiUrl = environment.apiBase.replace('/api/v1', '') + '/api/registro';
 
@@ -64,10 +51,8 @@ export class RegistroComponent {
       .substring(0, 40);
   }
 
-  private validar(): string | null {
-    const { nombreNegocio, adminNombre, username, password, confirmar, codigoInvitacion } = this.form;
-    if (!codigoInvitacion.trim())
-      return 'Ingresá el código de invitación para continuar.';
+  private validarSinCodigo(): string | null {
+    const { nombreNegocio, adminNombre, username, password, confirmar } = this.form;
     if (!nombreNegocio.trim() || nombreNegocio.length < 2 || nombreNegocio.length > 60)
       return 'El nombre del negocio debe tener entre 2 y 60 caracteres.';
     if (!adminNombre.trim() || adminNombre.length < 2 || adminNombre.length > 60)
@@ -81,35 +66,51 @@ export class RegistroComponent {
     return null;
   }
 
-  submit(): void {
+  private validar(): string | null {
+    if (!this.form.codigoInvitacion.trim())
+      return 'Ingresá el código de activación para continuar.';
+    return this.validarSinCodigo();
+  }
+
+  onClickRegistrar(): void {
+    const err = this.validarSinCodigo();
+    if (err) { this.error = err; return; }
+    this.error = '';
+    this.mostrarModalActivacion = true;
+  }
+
+  onCodigoConfirmado(codigo: string): void {
+    this.mostrarModalActivacion = false;
+    this.form.codigoInvitacion = codigo;
+    this.submit();
+  }
+
+  private submit(): void {
     const err = this.validar();
     if (err) { this.error = err; return; }
     this.loading = true;
     this.error = '';
     this.http.post<RegistroResponse>(this.apiUrl, {
-      nombreNegocio: this.form.nombreNegocio,
-      adminNombre: this.form.adminNombre,
-      username: this.form.username,
-      password: this.form.password,
+      nombreNegocio:    this.form.nombreNegocio,
+      adminNombre:      this.form.adminNombre,
+      username:         this.form.username,
+      password:         this.form.password,
       codigoInvitacion: this.form.codigoInvitacion
     }).subscribe({
       next: (res) => {
         this.resultado = res;
-        this.vista = 'exito';
-        this.loading = false;
-        this.contador = 3;
+        this.vista     = 'exito';
+        this.loading   = false;
+        this.contador  = 3;
         this.cdr.detectChanges();
         const tick = setInterval(() => {
           this.contador--;
           this.cdr.detectChanges();
-          if (this.contador <= 0) {
-            clearInterval(tick);
-            this.irAMiBarberia();
-          }
+          if (this.contador <= 0) { clearInterval(tick); this.irAMiBarberia(); }
         }, 1000);
       },
       error: (e) => {
-        this.error = e?.error?.message ?? e?.error?.error ?? 'Ocurrió un error. Intentá de nuevo.';
+        this.error   = e?.error?.message ?? e?.error?.error ?? 'Ocurrió un error. Intentá de nuevo.';
         this.loading = false;
         this.cdr.detectChanges();
       }
