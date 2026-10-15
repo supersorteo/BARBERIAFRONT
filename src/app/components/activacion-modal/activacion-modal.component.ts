@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 const ADMINS = [
-  { id: 'leo',    nombre: 'Leo',    bandera: '🇺🇾', tel: '59896909509'   },
-  { id: 'danilo', nombre: 'Danilo', bandera: '🇦🇷', tel: '5491126911817' },
+  { id: 'leo',    nombre: 'Uruguay',   bandera: '🇺🇾', tel: '59896909509'   },
+  { id: 'danilo', nombre: 'Argentina', bandera: '🇦🇷', tel: '5491126911817' },
 ] as const;
 
 const WA_MSG = encodeURIComponent('Hola, quiero solicitar un código de activación para registrar mi barbería en Corteo.');
