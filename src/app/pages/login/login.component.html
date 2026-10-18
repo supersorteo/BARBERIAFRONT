@@ -1,6 +1,6 @@
 @if (!tenantInactivo && esDemo) {
   <nav class="demo-nav">
-    <button class="dn-btn" [class.dn-on]="vista === 'gateway'" type="button" (click)="vista = 'gateway'">Gateway</button>
+    <button class="dn-btn" [class.dn-on]="vista === 'gateway'" type="button" (click)="vista = 'gateway'">Inicio</button>
     <button class="dn-btn" [class.dn-on]="vista === 'form'"    type="button" (click)="vista = 'form'">Login</button>
     <a      class="dn-btn"                                      routerLink="/registro">Registro</a>
   </nav>
@@ -35,38 +35,22 @@
         </a>
       </div>
 
-      <div class="gw-brand">
-        <div class="login-brand">
-          <span class="brand-icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.5"/><circle cx="9" cy="23" r="3.5"/><line x1="26" y1="6" x2="11.5" y2="20.5"/><line x1="18.5" y1="18.5" x2="26" y2="26"/><line x1="11.5" y1="11.5" x2="14.5" y2="14.5"/></svg></span>
-          <span class="brand-name">BarberOS</span>
-        </div>
-      </div>
-
-      <p class="gw-eyebrow">Panel de acceso</p>
-      <h1 class="gateway-title">¿Qué querés hacer hoy?</h1>
-
       <div class="gateway-options">
 
+        <div class="gw-pelusin-frame">
+          <img class="gw-pelusin" src="/icons/pelusin-banner-barberia-dorado.png" alt="Pelusin en una barbería dorada, desde la cintura hacia arriba">
+        </div>
+
         <button class="gw-option" (click)="irADemo()">
-          <div class="gw-option-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
           <div class="gw-option-body">
-            <div class="gw-option-title">Probar el sistema</div>
-            <div class="gw-option-desc">Ingresá a la barbería demo y explorá el panel de administración. <em>No requiere cuenta propia.</em></div>
+            <div class="gw-option-title">PROBAR EL PANEL DE CORTEO</div>
           </div>
-          <svg class="gw-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
 
-        <a class="gw-option gw-option--highlight" routerLink="/registro">
-          <div class="gw-option-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          </div>
+        <a #registroOption class="gw-option gw-option--highlight" routerLink="/registro" aria-label="Registrar mi negocio">
           <div class="gw-option-body">
             <div class="gw-option-title">Registrar mi negocio</div>
-            <div class="gw-option-desc">Creá tu barbería online con reservas, agente IA y panel admin <em>en 2 minutos.</em></div>
           </div>
-          <svg class="gw-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
 
       </div>
@@ -100,11 +84,6 @@
         }
       </div>
 
-      <div class="login-brand">
-        <span class="brand-icon"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.5"/><circle cx="9" cy="23" r="3.5"/><line x1="26" y1="6" x2="11.5" y2="20.5"/><line x1="18.5" y1="18.5" x2="26" y2="26"/><line x1="11.5" y1="11.5" x2="14.5" y2="14.5"/></svg></span>
-        <span class="brand-name">BarberOS</span>
-      </div>
-
       @if (fromRegistration) {
         <div class="reg-success-banner" role="status">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" flex-shrink="0"><polyline points="20 6 9 17 4 12"/></svg>
@@ -115,10 +94,13 @@
       @if (!esDemo) {
         <p class="login-negocio">{{ nombreNegocio }}</p>
       }
-      <h1 class="login-title">
-        @if (esDemo) { Accedé al panel<br>de la barbería demo }
-        @else { Iniciar sesión }
-      </h1>
+      <div class="login-title-row">
+        <h1 class="login-title">
+          @if (esDemo) { ACCEDE A TU PANEL DE ADMINISTRACIÓN }
+          @else { Iniciar sesión }
+        </h1>
+        <img class="login-corteo-logo" src="/logos/logo-white.webp" alt="Corteo">
+      </div>
 
       <div class="login-tabs" role="tablist">
         <button class="login-tab" [class.active]="tab === 'dueno'" (click)="setTab('dueno')" role="tab" [attr.aria-selected]="tab === 'dueno'">

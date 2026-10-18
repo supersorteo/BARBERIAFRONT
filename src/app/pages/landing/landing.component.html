@@ -18,6 +18,41 @@
   </div>
 }
 
+@if (slugActual === DEMO_SLUG && welcomeCarouselOpen) {
+  <div class="welcome-carousel-backdrop" role="presentation">
+    <section class="welcome-carousel" role="dialog" aria-modal="true" aria-labelledby="welcome-carousel-title">
+      <button class="welcome-carousel-close" type="button" aria-label="Cerrar presentación" (click)="closeWelcomeCarousel()">×</button>
+
+      <div class="welcome-carousel-media">
+        <img [src]="welcomeSlides[welcomeCarouselIndex].image" [alt]="welcomeSlides[welcomeCarouselIndex].title">
+      </div>
+
+      <div class="welcome-carousel-content">
+        <span class="welcome-carousel-eyebrow">{{ welcomeSlides[welcomeCarouselIndex].eyebrow }}</span>
+        <h2 id="welcome-carousel-title">{{ welcomeSlides[welcomeCarouselIndex].title }}</h2>
+        <p>{{ welcomeSlides[welcomeCarouselIndex].text }}</p>
+
+        <div class="welcome-carousel-footer">
+          <div class="welcome-carousel-dots" aria-label="Pasos de la presentación">
+            @for (slide of welcomeSlides; track slide.image; let i = $index) {
+              <button type="button" class="welcome-carousel-dot" [class.active]="i === welcomeCarouselIndex" [attr.aria-label]="'Ir al paso ' + (i + 1)" (click)="goToWelcomeSlide(i)"></button>
+            }
+          </div>
+
+          <div class="welcome-carousel-actions">
+            <button type="button" class="welcome-carousel-prev" (click)="prevWelcomeSlide()" aria-label="Paso anterior">‹</button>
+            @if (welcomeCarouselIndex === welcomeSlides.length - 1) {
+              <button type="button" class="welcome-carousel-primary" (click)="closeWelcomeCarousel()">Explorar la demo <span>→</span></button>
+            } @else {
+              <button type="button" class="welcome-carousel-primary" (click)="nextWelcomeSlide()">Siguiente <span>→</span></button>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+}
+
 <!-- ═══════════════ DEMO CTA BANNER ══════════════════════════════ -->
 @if (slugActual === DEMO_SLUG && !demoBannerDismissed) {
   <div class="demo-cta-banner">
@@ -30,7 +65,7 @@
         <p class="demo-cta-title">¿Te gusta lo que ves?</p>
         <p class="demo-cta-sub">Esto puede ser tu barbería — turnos online, agenda y asistente IA incluidos.</p>
       </div>
-      <a routerLink="/registro" class="demo-cta-action">
+      <a routerLink="/barberia-demo/login" class="demo-cta-action">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
         Registrá tu barbería gratis
       </a>
@@ -45,7 +80,11 @@
 <nav class="navbar-premium" [class.scrolled]="navScrolled">
   <div class="container d-flex align-items-center justify-content-between">
     <a class="nav-brand" [routerLink]="slugActual === DEMO_SLUG ? '/' : '/' + slugActual">
-      <img [src]="config.logoUrl || 'logos/logo-black.webp'" alt="{{ config.nombre }}" class="nav-brand-logo">
+      @if (slugActual === DEMO_SLUG) {
+        <img src="/logos/tu-logo-aqui.svg" alt="Tu logo aquí" class="nav-brand-logo nav-brand-logo-placeholder">
+      } @else {
+        <img [src]="config.logoUrl || 'logos/logo-black.webp'" alt="{{ config.nombre }}" class="nav-brand-logo">
+      }
       {{ config.nombre }}
     </a>
     <button class="nav-toggle" (click)="navOpen = !navOpen">☰</button>

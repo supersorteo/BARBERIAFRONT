@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -13,7 +13,7 @@ import { TenantContextService } from '../../tenant-context.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
   form = { username: '', password: '' };
   loading = false;
   error = '';
@@ -22,6 +22,8 @@ export class LoginComponent implements OnInit {
   tab: 'dueno' | 'barbero' = this.loadTab();
   tenantInactivo = false;
   vista: 'gateway' | 'form' = 'gateway';
+
+  @ViewChild('registroOption') private registroOption?: ElementRef<HTMLAnchorElement>;
 
   /** Slug del tenant si se accede via /:slug/login, null si es /login genérico */
   tenantSlug: string | null = null;
@@ -73,6 +75,12 @@ export class LoginComponent implements OnInit {
         this.fromRegistration = true;
         try { localStorage.removeItem('lastRegisteredSlug'); } catch {}
       }
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.vista === 'gateway') {
+      queueMicrotask(() => this.registroOption?.nativeElement.focus());
     }
   }
 

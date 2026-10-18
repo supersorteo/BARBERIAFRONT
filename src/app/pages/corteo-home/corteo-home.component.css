@@ -148,6 +148,16 @@
   font-style: italic;
 }
 
+.ch-hero-sprite {
+  animation: fadeInUp 0.9s var(--ease) 0.05s both;
+  display: block;
+  height: auto;
+  margin: 0 0 18px;
+  max-width: 360px;
+  object-fit: contain;
+  width: 100%;
+}
+
 .ch-hero-desc {
   font-size: 1rem; color: var(--text-secondary);
   line-height: 1.75; max-width: 440px; margin: 0 0 36px;
@@ -155,6 +165,22 @@
 
 .ch-hero-actions {
   display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.ch-btn-demo-hero {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border-color: var(--gold-light);
+  box-shadow: 0 8px 26px var(--gold-glow-strong);
+  color: var(--text-inverse);
+  font-size: .95rem;
+  font-weight: 800;
+  padding: 14px 24px;
+}
+.ch-btn-demo-hero:hover {
+  background: linear-gradient(135deg, #ffe18a, var(--gold-light));
+  border-color: #ffe18a;
+  box-shadow: 0 12px 34px rgba(201,160,58,.55);
+  color: var(--text-inverse);
+  transform: translateY(-2px);
 }
 .ch-hero-note { font-size: 11.5px; color: var(--text-muted); margin: 0; }
 
@@ -343,11 +369,17 @@
 }
 
 .ch-feat-icon {
-  width: 48px; height: 48px; border-radius: var(--radius-sm);
+  width: 132px; height: 132px; border-radius: var(--radius-sm);
   background: rgba(201,160,58,0.08); border: 1px solid var(--border-gold);
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--gold); margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold); margin: 0 auto 16px;
   transition: transform 0.3s var(--ease-bounce), background 0.25s;
+}
+.ch-feat-img {
+  display: block;
+  height: 124px;
+  object-fit: contain;
+  width: 124px;
 }
 .ch-feat-card:hover .ch-feat-icon {
   transform: scale(1.12) rotate(-4deg);
@@ -427,6 +459,16 @@
   background: rgba(255,255,255,0.09);
   border-color: rgba(255,255,255,0.18);
   color: var(--text-primary);
+}
+.ch-hero-actions .ch-btn-demo-hero {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border-color: var(--gold-light);
+  color: var(--text-inverse);
+}
+.ch-hero-actions .ch-btn-demo-hero:hover {
+  background: linear-gradient(135deg, #ffe18a, var(--gold-light));
+  border-color: #ffe18a;
+  color: var(--text-inverse);
 }
 
 /* ─── FOOTER ────────────────────────────────────────────────────── */

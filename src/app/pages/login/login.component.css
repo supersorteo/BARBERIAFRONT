@@ -43,9 +43,32 @@
   max-width: 400px;
   padding: 1.5rem 1.75rem 1.75rem;
 }
+.login-card:not(.login-card--inactivo) {
+  animation: login-form-fade-in .55s ease-out both;
+}
+
+@keyframes login-form-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-card:not(.login-card--inactivo),
+  .gateway-card,
+  .gw-pelusin-frame {
+    animation: none;
+  }
+}
 .gateway-card {
   max-width: 480px;
   padding: 1.5rem 1.75rem 2rem;
+  animation: login-form-fade-in .55s ease-out both;
 }
 
 /* ── BRAND ─────────────────────────────────────────────────────────── */
@@ -111,13 +134,26 @@
   margin: 0 0 .25rem;
   text-transform: uppercase;
 }
+.login-title-row {
+  align-items: center;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-bottom: .9rem;
+}
 .login-title {
   color: #edeaf8;
   font-family: 'Sora', system-ui, sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.2;
-  margin: 0 0 .9rem;
+  margin: 0;
+}
+.login-corteo-logo {
+  display: block;
+  height: 58px;
+  object-fit: contain;
+  width: 78px;
 }
 
 /* ── TABS ──────────────────────────────────────────────────────────── */
@@ -315,28 +351,70 @@
 
 .gateway-options { display: flex; flex-direction: column; gap: .6rem; }
 
+.gw-pelusin-frame {
+  background: #15142a;
+  border: 1px solid rgba(196,148,32,.25);
+  border-radius: 12px;
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+  animation: pelusin-banner-fade-in .7s .12s ease-out both;
+}
+
+@keyframes pelusin-banner-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(.98) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.gw-pelusin {
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  width: 100%;
+}
+
 .gw-option {
   align-items: center;
-  background: #15142a;
-  border: 1px solid rgba(255,255,255,0.07);
+  background: linear-gradient(135deg, #1e1b39 0%, #15142a 100%);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   cursor: pointer;
   display: flex;
-  gap: 1rem;
-  padding: 1rem 1.1rem;
-  text-align: left;
+  justify-content: center;
+  min-height: 58px;
+  padding: .95rem 1.1rem;
+  text-align: center;
   text-decoration: none;
-  transition: border-color .2s, background .2s, transform .15s;
+  transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
   width: 100%;
   font-family: inherit;
 }
 .gw-option:hover {
-  background: rgba(255,255,255,.02);
-  border-color: rgba(255,255,255,.13);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #29234a 0%, #1b1934 100%);
+  border-color: rgba(255,255,255,.28);
+  box-shadow: 0 10px 24px rgba(0,0,0,.24);
+  transform: translateY(-2px);
 }
-.gw-option--highlight { border-color: rgba(196,148,32,.3); }
-.gw-option--highlight:hover { background: rgba(196,148,32,.06); border-color: rgba(196,148,32,.55); }
+.gw-option:focus-visible {
+  outline: 2px solid #f0d060;
+  outline-offset: 3px;
+}
+.gw-option--highlight {
+  background: linear-gradient(135deg, #c49420 0%, #e0b43d 100%);
+  border-color: #f0d060;
+  box-shadow: 0 8px 22px rgba(196,148,32,.2);
+}
+.gw-option--highlight:hover {
+  background: linear-gradient(135deg, #d6a72d 0%, #f0c653 100%);
+  border-color: #ffe79a;
+  box-shadow: 0 12px 28px rgba(196,148,32,.3);
+}
 
 .gw-option-icon {
   align-items: center;
@@ -359,11 +437,12 @@
 .gw-option-body { flex: 1; min-width: 0; }
 .gw-option-title {
   color: #edeaf8;
-  font-size: .9rem;
-  font-weight: 600;
-  margin: 0 0 .2rem;
+  font-size: .95rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  margin: 0;
 }
-.gw-option--highlight .gw-option-title { color: #dba928; }
+.gw-option--highlight .gw-option-title { color: #171329; }
 .gw-option-desc {
   color: #56527a;
   font-size: .78rem;
@@ -426,4 +505,6 @@
 @media (max-width: 480px) {
   .gateway-card, .login-card { padding: 1.25rem 1rem 1.5rem; }
   .login-page { padding: 1.25rem .75rem 3rem; }
+  .login-title-row { gap: .6rem; }
+  .login-corteo-logo { height: 48px; width: 64px; }
 }

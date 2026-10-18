@@ -53,6 +53,36 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   carouselIndex = 0;
   private carouselTimer: any;
 
+  welcomeCarouselOpen = false;
+  welcomeCarouselIndex = 0;
+  private welcomeCarouselTimer: any;
+  readonly welcomeSlides = [
+    {
+      image: '/icons/welcome-demo-web.png',
+      eyebrow: 'Tu próxima barbería online',
+      title: 'Esta demo puede ser tu página',
+      text: 'Lo que estás por explorar es el sitio que obtendrás al registrar tu barbería en Corteo: una experiencia profesional para que tus clientes te encuentren y reserven.'
+    },
+    {
+      image: '/icons/welcome-demo-brand.png',
+      eyebrow: 'Tu marca, tu estilo',
+      title: 'Personalizá cada detalle',
+      text: 'Desde tu Panel de Administración podrás cargar tu logo, imágenes, colores, horarios y la información que hace única a tu barbería.'
+    },
+    {
+      image: '/icons/welcome-demo-panel.png',
+      eyebrow: 'Control simple y completo',
+      title: 'Administrá tu negocio desde un solo lugar',
+      text: 'Organizá servicios detallados, barberos, agenda y disponibilidad desde un panel pensado para que trabajes con claridad.'
+    },
+    {
+      image: '/icons/welcome-demo-reservas.png',
+      eyebrow: 'Más reservas, menos mensajes',
+      title: 'Conectá tu barbería con tus clientes',
+      text: 'Tomá reservas online y conectá tus redes sociales para que tu comunidad llegue a tu página y agende en cualquier momento.'
+    }
+  ];
+
   heroBgUrl = '';
   heroBgLoaded = false;
   reservaModalOpen = false;
@@ -176,7 +206,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   onScroll() { this.navScrolled = window.scrollY > 60; }
 
   @HostListener('document:keydown.escape')
-  onEscape() { if (this.reservaModalOpen) this.cerrarReservaModal(); }
+  onEscape() {
+    if (this.reservaModalOpen) this.cerrarReservaModal();
+    else if (this.welcomeCarouselOpen) this.closeWelcomeCarousel();
+  }
 
   slugActual = '';
   tenantInactivo = false;
@@ -185,6 +218,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug');
     if (slug) { this.slugActual = slug; this.tenantCtx.setSlug(slug); }
+    if (this.slugActual === this.DEMO_SLUG) this.startWelcomeCarousel();
 
     this.negocio.getConfig().subscribe({
       next: c => {
@@ -285,7 +319,50 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     ScrollTrigger.getAll().forEach(t => t.kill());
     clearInterval(this.carouselTimer);
+    clearInterval(this.welcomeCarouselTimer);
     document.body.style.overflow = '';
+  }
+
+  // ── Demo welcome carousel ────────────────────────────────────────
+  startWelcomeCarousel() {
+    clearInterval(this.welcomeCarouselTimer);
+    this.welcomeCarouselOpen = true;
+    document.body.style.overflow = 'hidden';
+    this.welcomeCarouselTimer = setInterval(() => {
+      this.zone.run(() => {
+        this.welcomeCarouselIndex = (this.welcomeCarouselIndex + 1) % this.welcomeSlides.length;
+      });
+    }, 7500);
+  }
+
+  nextWelcomeSlide() {
+    this.welcomeCarouselIndex = (this.welcomeCarouselIndex + 1) % this.welcomeSlides.length;
+    this.restartWelcomeCarouselTimer();
+  }
+
+  prevWelcomeSlide() {
+    this.welcomeCarouselIndex = (this.welcomeCarouselIndex - 1 + this.welcomeSlides.length) % this.welcomeSlides.length;
+    this.restartWelcomeCarouselTimer();
+  }
+
+  goToWelcomeSlide(index: number) {
+    this.welcomeCarouselIndex = index;
+    this.restartWelcomeCarouselTimer();
+  }
+
+  closeWelcomeCarousel() {
+    this.welcomeCarouselOpen = false;
+    clearInterval(this.welcomeCarouselTimer);
+    document.body.style.overflow = '';
+  }
+
+  private restartWelcomeCarouselTimer() {
+    clearInterval(this.welcomeCarouselTimer);
+    this.welcomeCarouselTimer = setInterval(() => {
+      this.zone.run(() => {
+        this.welcomeCarouselIndex = (this.welcomeCarouselIndex + 1) % this.welcomeSlides.length;
+      });
+    }, 7500);
   }
 
   private animateHero() {

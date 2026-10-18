@@ -8,7 +8,7 @@
       </div>
       <div class="ac-header-text">
         <div class="ac-title" id="ac-title">Obtené tu código</div>
-        <div class="ac-subtitle">Escribile a un super admin por WhatsApp</div>
+        <div class="ac-subtitle">Solicitá tu código por WhatsApp</div>
       </div>
       <button class="ac-close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -21,7 +21,7 @@
       <!-- Step 1 -->
       <div class="ac-step-label">
         <span class="ac-step-num">1</span>
-        Elegí un super admin
+        Elegí un país
       </div>
 
       <div class="ac-admins">
@@ -36,7 +36,6 @@
             }
             <span class="ac-admin-flag">{{ admin.bandera }}</span>
             <span class="ac-admin-name">{{ admin.nombre }}</span>
-            <span class="ac-admin-rol">Super Admin</span>
           </button>
         }
       </div>
@@ -50,7 +49,7 @@
       } @else {
         <div class="ac-wa-placeholder">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-          Seleccioná un super admin para continuar
+          Seleccioná un país para continuar
         </div>
       }
 
