@@ -693,7 +693,7 @@
 </footer>
 
 <!-- CHAT FLOTANTE -->
-<app-chat-widget [nombreNegocio]="config.nombre" (abrirReserva)="onChatReserva()" />
+<app-chat-widget [nombreNegocio]="config.nombre" [elevarFab]="slugActual === DEMO_SLUG && !demoBannerDismissed" (abrirReserva)="onChatReserva()" />
 
 <!-- ACCESO PANEL / LOGIN -->
 @if (panelAcceso.tipo === 'panel') {

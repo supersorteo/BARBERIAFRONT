@@ -18,6 +18,7 @@ const MARKER = '[ABRIR_MODAL_RESERVA]';
 })
 export class ChatWidgetComponent {
   @Input() nombreNegocio = '';
+  @Input() elevarFab = false;
 
   abierto = false;
   mensajes: Mensaje[] = [];
