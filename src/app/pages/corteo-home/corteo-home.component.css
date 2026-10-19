@@ -273,6 +273,7 @@
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.3s var(--ease-bounce);
 }
+.ch-fc-img { display: block; height: 30px; object-fit: contain; width: 30px; }
 .ch-float-card:hover .ch-fc-icon { transform: scale(1.15) rotate(-5deg); }
 .ch-fc-body { display: flex; flex-direction: column; gap: 2px; }
 .ch-fc-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
