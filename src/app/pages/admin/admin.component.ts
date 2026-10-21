@@ -338,10 +338,32 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     private onboarding: OnboardingService
   ) {}
 
+  sidebarCollapsed = false;
+  sidebarOpen = false;
+
+  toggleSidebar() {
+    if (window.innerWidth <= 768) {
+      this.sidebarOpen = !this.sidebarOpen;
+    } else {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+  }
+
+  get turnosRecientesHoy(): Turno[] {
+    const hoy = new Date().toISOString().split('T')[0];
+    return this.turnos
+      .filter(t => t.fecha === hoy)
+      .sort((a, b) => (a.hora || '').localeCompare(b.hora || ''))
+      .slice(0, 6);
+  }
+
   ngAfterViewInit() {
     this.zone.runOutsideAngular(() => {
-      gsap.from('.admin-topbar', { y: -28, opacity: 0, duration: 0.5, ease: 'power3.out' });
-      gsap.from('.admin-tabs', { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.18 });
+      gsap.from('.admin-topbar-pro', { y: -28, opacity: 0, duration: 0.5, ease: 'power3.out' });
+      // En móvil no animar el sidebar — GSAP sobreescribiría el translateX(-100%) del CSS
+      if (window.innerWidth > 768) {
+        gsap.from('.admin-sidebar', { x: -28, opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.1 });
+      }
       gsap.from('.admin-tab-panel', { y: 28, opacity: 0, duration: 0.45, ease: 'power2.out', delay: 0.28 });
     });
   }

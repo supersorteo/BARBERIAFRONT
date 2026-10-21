@@ -1,58 +1,121 @@
-<!-- FONDO HERO (misma imagen q el landing, muy baja opacidad) -->
+<!-- FONDO HERO (baja opacidad) -->
 <div class="admin-bg-layer" [style.backgroundImage]="'url(' + adminBgUrl + ')'"></div>
 
-<!-- TOPBAR ADMIN -->
-<div class="admin-topbar">
-  <div class="container admin-topbar-inner">
-    <span class="admin-brand">{{ configForm.nombre || 'El Corte' }} · Panel Admin</span>
-    @if (landingUrl) {
-      <div class="admin-url-bar">
-        <span class="admin-url-text">{{ landingUrl }}</span>
-        <button class="admin-url-copy" (click)="copiarUrl()" [title]="urlCopiada ? '¡Enlace copiado!' : 'Copiar enlace de tu barbería'">
-          @if (urlCopiada) {
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Copiado</span>
-          } @else {
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span>Copiar</span>
-          }
-        </button>
+<!-- ── SHELL: sidebar + main ── -->
+<div class="admin-shell">
+
+  <!-- OVERLAY MÓVIL dentro del shell para que comparta stacking context -->
+  <div class="sb-overlay" [class.visible]="sidebarOpen" (click)="sidebarOpen=false"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="admin-sidebar" [class.collapsed]="sidebarCollapsed" [class.open]="sidebarOpen">
+
+    <!-- Brand -->
+    <div class="sb-brand">
+      <div class="sb-brand-avatar">{{ (configForm.nombre || 'C').charAt(0).toUpperCase() }}</div>
+      <span class="sb-brand-name">{{ configForm.nombre || 'Mi Panel' }}</span>
+    </div>
+
+    <div class="sb-body">
+    <!-- Nav -->
+    <nav class="sb-nav">
+      <button id="admin-tab-dashboard" class="sb-nav-btn" [class.active]="tabActiva==='dashboard'"
+              (click)="tabActiva='dashboard'; sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="sb-label">Dashboard</span>
+      </button>
+      <button id="admin-tab-config" class="sb-nav-btn" (click)="abrirModalConfig(); sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <span class="sb-label">Configuración</span>
+      </button>
+      <button id="admin-tab-turnos" class="sb-nav-btn" [class.active]="tabActiva==='turnos'"
+              (click)="tabActiva='turnos'; sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="sb-label">Reservas</span>
+      </button>
+      <button class="sb-nav-btn" [class.active]="tabActiva==='clientes'"
+              (click)="tabActiva='clientes'; cargarClientes(); sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="sb-label">Clientes</span>
+      </button>
+      <button id="admin-tab-barberos" class="sb-nav-btn" [class.active]="tabActiva==='barberos'"
+              (click)="tabActiva='barberos'; sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="sb-label">Barberos</span>
+      </button>
+      <button class="sb-nav-btn" [class.active]="tabActiva==='bloqueos'"
+              (click)="tabActiva='bloqueos'; sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="sb-label">Bloqueos</span>
+      </button>
+      <button id="admin-tab-galeria" class="sb-nav-btn" [class.active]="tabActiva==='galeria'"
+              (click)="tabActiva='galeria'; sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span class="sb-label">Galería</span>
+      </button>
+      <button id="admin-tab-servicios" class="sb-nav-btn" [class.active]="tabActiva==='servicios'"
+              (click)="tabActiva='servicios'; sidebarOpen=false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span class="sb-label">Servicios</span>
+      </button>
+    </nav>
+
+    <div class="sb-barber-art" aria-hidden="true">
+      <img src="images/admin-barber-sidebar.webp" alt="" width="480" height="640" loading="lazy" decoding="async">
+    </div>
+    </div>
+
+    <!-- Footer sidebar -->
+    <div class="sb-footer">
+      <div class="sb-admin-avatar">{{ (usuario?.username || 'A').charAt(0).toUpperCase() }}</div>
+      <div class="sb-admin-info">
+        <span class="sb-admin-name">{{ usuario?.username || 'Admin' }}</span>
+        <span class="sb-admin-role">Administrador</span>
       </div>
-    }
-    <div class="admin-user-badge">
-      <span class="admin-user-dot"></span>
-      <span>{{ usuario?.username || 'Admin' }}</span>
-      <button class="btn-icon btn-icon--tour" (click)="relanzarTour()" title="Ver tour guiado">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        Tour
-      </button>
-      <button class="btn-icon" (click)="irAlSitio()" title="Ver mi barbería">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Ver sitio
-      </button>
-      <button class="btn-icon btn-icon--exit ms-2" (click)="cerrarSesion()" title="Cerrar sesión">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Salir
+      <button class="sb-logout-btn" (click)="cerrarSesion()" title="Cerrar sesión">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
-  </div>
-</div>
+  </aside>
 
-<div class="admin-content">
-  <div class="container">
+  <!-- ── MAIN ── -->
+  <div class="admin-main">
 
-  <!-- TABS -->
-  <div class="admin-tabs">
-    <button id="admin-tab-dashboard" class="admin-tab" [class.active]="tabActiva==='dashboard'" (click)="tabActiva='dashboard'">Dashboard</button>
-    <button id="admin-tab-config" class="admin-tab" (click)="abrirModalConfig()">Configuración</button>
-    <button id="admin-tab-turnos" class="admin-tab" [class.active]="tabActiva==='turnos'" (click)="tabActiva='turnos'">Reservas</button>
-    <button class="admin-tab" [class.active]="tabActiva==='clientes'" (click)="tabActiva='clientes'; cargarClientes()">Clientes</button>
-    <button id="admin-tab-barberos" class="admin-tab" [class.active]="tabActiva==='barberos'" (click)="tabActiva='barberos'">Barberos</button>
-    <button class="admin-tab" [class.active]="tabActiva==='bloqueos'" (click)="tabActiva='bloqueos'">Bloqueos</button>
-    <button id="admin-tab-galeria" class="admin-tab" [class.active]="tabActiva==='galeria'" (click)="tabActiva='galeria'">Galería</button>
-    <button id="admin-tab-servicios" class="admin-tab" [class.active]="tabActiva==='servicios'" (click)="tabActiva='servicios'">Servicios</button>
-    <!--button-- class="admin-tab" [class.active]="tabActiva==='agente'" (click)="tabActiva='agente'">Agente IA</button-->
-  </div>
+    <!-- TOPBAR PRO -->
+    <header class="admin-topbar-pro">
+      <!-- Toggle sidebar -->
+      <button class="sb-toggle-btn" (click)="toggleSidebar()" title="Menú">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <!-- URL pública -->
+      @if (landingUrl) {
+        <div class="atp-url-bar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="atp-url-text">{{ landingUrl }}</span>
+          <button class="atp-copy-btn" (click)="copiarUrl()" [title]="urlCopiada ? '¡Copiado!' : 'Copiar URL'">
+            @if (urlCopiada) {
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            } @else {
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            }
+          </button>
+        </div>
+      }
+      <!-- Acciones rápidas -->
+      <div class="atp-actions">
+        <button class="atp-btn" (click)="relanzarTour()" title="Tour guiado">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <span class="atp-btn-label">Tour</span>
+        </button>
+        <button class="atp-btn" (click)="irAlSitio()" title="Ver mi barbería">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="atp-btn-label">Ver sitio</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <div class="admin-content-area">
 
   <!-- ─── TAB DASHBOARD ─── -->
   @if (tabActiva === 'dashboard') {
@@ -125,38 +188,73 @@
             </div>
           </div>
 
-          <!-- Barberos hoy -->
-          @if (dashboardHoy.porBarbero.length > 0) {
-            <div class="dash-card">
+          <!-- Grid hoy: barberos + reservas recientes -->
+          <div class="dash-today-grid">
+
+            <!-- Barberos hoy -->
+            @if (dashboardHoy.porBarbero.length > 0) {
+              <div class="dash-card">
+                <div class="dash-card-header">
+                  <span class="dash-card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Rendimiento por barbero
+                  </span>
+                  <span class="dash-card-meta">{{ dashboardHoy.fecha }}</span>
+                </div>
+                <div class="bpc-list">
+                  @for (b of dashboardHoy.porBarbero; track b.barberoId; let i = $index) {
+                    <div class="bpc-row">
+                      <div class="bpc-avatar">{{ b.nombre.charAt(0).toUpperCase() }}</div>
+                      <div class="bpc-info">
+                        <span class="bpc-nombre">{{ b.nombre }}</span>
+                        <span class="bpc-sub">{{ b.completados }} / {{ b.total }} completados</span>
+                      </div>
+                      <div class="bpc-bar-section">
+                        <div class="bpc-bar-track">
+                          <div class="bpc-bar-fill" [style.width.%]="b.total > 0 ? (b.completados / b.total) * 100 : 0"></div>
+                        </div>
+                        <span class="bpc-pct">{{ b.total > 0 ? ((b.completados / b.total) * 100 | number:'1.0-0') : 0 }}%</span>
+                      </div>
+                      <div class="bpc-badges">
+                        <span class="bpc-badge bpc-total">{{ b.total }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Reservas recientes hoy -->
+            <div class="dash-card dash-recientes-card">
               <div class="dash-card-header">
                 <span class="dash-card-title">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  Rendimiento por barbero
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Reservas de hoy
                 </span>
-                <span class="dash-card-meta">{{ dashboardHoy.fecha }}</span>
+                <button class="dash-ver-todas-btn" (click)="tabActiva='turnos'">Ver todas →</button>
               </div>
-              <div class="bpc-list">
-                @for (b of dashboardHoy.porBarbero; track b.barberoId; let i = $index) {
-                  <div class="bpc-row">
-                    <div class="bpc-avatar">{{ b.nombre.charAt(0).toUpperCase() }}</div>
-                    <div class="bpc-info">
-                      <span class="bpc-nombre">{{ b.nombre }}</span>
-                      <span class="bpc-sub">{{ b.completados }} / {{ b.total }} completados</span>
-                    </div>
-                    <div class="bpc-bar-section">
-                      <div class="bpc-bar-track">
-                        <div class="bpc-bar-fill" [style.width.%]="b.total > 0 ? (b.completados / b.total) * 100 : 0"></div>
+              @if (turnosRecientesHoy.length === 0) {
+                <div class="recientes-empty">Sin reservas para hoy</div>
+              } @else {
+                <div class="recientes-list">
+                  @for (t of turnosRecientesHoy; track t.id) {
+                    <div class="reciente-row">
+                      <div class="reciente-avatar">{{ (t.paciente || '?').charAt(0).toUpperCase() }}</div>
+                      <div class="reciente-info">
+                        <span class="reciente-nombre">{{ t.paciente }}</span>
+                        <span class="reciente-servicio">{{ t.servicio || '—' }}</span>
                       </div>
-                      <span class="bpc-pct">{{ b.total > 0 ? ((b.completados / b.total) * 100 | number:'1.0-0') : 0 }}%</span>
+                      <div class="reciente-right">
+                        <span class="reciente-hora">{{ t.hora }}</span>
+                        <span class="status-badge" [ngClass]="estadoBadge(t.estado || '')">{{ t.estado }}</span>
+                      </div>
                     </div>
-                    <div class="bpc-badges">
-                      <span class="bpc-badge bpc-total">{{ b.total }}</span>
-                    </div>
-                  </div>
-                }
-              </div>
+                  }
+                </div>
+              }
             </div>
-          }
+
+          </div><!-- /dash-today-grid -->
         }
       }
 
@@ -1028,8 +1126,9 @@
     </div>
   }
 
-  </div>
-</div>
+    </div><!-- /admin-content-area -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-shell -->
 
 <!-- ─── TAB AGENTE IA ─── -->
 @if (tabActiva === 'agente') {
