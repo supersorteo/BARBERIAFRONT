@@ -4,6 +4,7 @@
   z-index: 1000;
   display: flex; flex-direction: column; align-items: flex-end; gap: 14px;
 }
+.chat-widget--elevated { bottom: 112px; }
 
 /* ─── PELUSÍN — avatar header ─────────────────────────────────────── */
 .pelusin-avatar-img {
@@ -135,6 +136,7 @@
 @media (max-width: 480px) {
   .chat-window { width: calc(100vw - 32px); height: 75vh; }
   .chat-widget { right: 16px; bottom: 16px; }
+  .chat-widget--elevated { bottom: 126px; }
 }
 
 /* ─── HEADER ──────────────────────────────────────────────────────── */

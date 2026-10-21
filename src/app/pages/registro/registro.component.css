@@ -43,6 +43,7 @@
 
 /* brand */
 .brand { align-items: center; display: flex; gap: .6rem; margin-bottom: 1.5rem; }
+.brand-logo { display: block; height: auto; max-width: 150px; width: 100%; }
 .brand-icon { color: #c49420; display: flex; }
 .brand-name {
   color: #edeaf8;
