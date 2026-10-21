@@ -220,7 +220,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     if (slug) { this.slugActual = slug; this.tenantCtx.setSlug(slug); }
     const desdePanelAdmin = sessionStorage.getItem('desde-panel') === '1';
     sessionStorage.removeItem('desde-panel');
-    if (this.slugActual === this.DEMO_SLUG && !desdePanelAdmin) this.startWelcomeCarousel();
+    const navType = (performance?.getEntriesByType?.('navigation')?.[0] as PerformanceNavigationTiming | undefined)?.type;
+    const esRecarga = navType === 'reload';
+    if (this.slugActual === this.DEMO_SLUG && !desdePanelAdmin && !esRecarga) this.startWelcomeCarousel();
 
     this.negocio.getConfig().subscribe({
       next: c => {

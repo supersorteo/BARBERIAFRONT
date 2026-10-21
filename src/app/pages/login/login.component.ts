@@ -41,7 +41,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private tenantCtx: TenantContextService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    // Router state existe solo durante la navegación activa — nunca llega a ningún storage
+    const state = this.router.getCurrentNavigation()?.extras?.state;
+    if (state?.['registroUsername']) this.form.username = state['registroUsername'];
+    if (state?.['registroPassword']) this.form.password = state['registroPassword'];
+  }
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug');

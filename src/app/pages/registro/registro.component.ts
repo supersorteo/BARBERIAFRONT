@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ActivacionModalComponent } from '../../components/activacion-modal/activacion-modal.component';
+import { AuthService } from '../../auth.service';
 
 interface RegistroResponse {
   slug: string;
@@ -34,7 +35,7 @@ export class RegistroComponent {
 
   private readonly apiUrl = environment.apiBase.replace('/api/v1', '') + '/api/registro';
 
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef, private auth: AuthService) {}
 
   onNombreChange(): void {
     this.slugPreview = this.generarSlug(this.form.nombreNegocio);
@@ -123,8 +124,12 @@ export class RegistroComponent {
 
   irAMiBarberia(): void {
     const slug = this.resultado!.slug;
+    this.auth.logout();
     try { localStorage.setItem('lastRegisteredSlug', slug); } catch {}
-    this.router.navigate(['/', slug, 'login'], { replaceUrl: true });
+    this.router.navigate(['/', slug, 'login'], {
+      replaceUrl: true,
+      state: { registroUsername: this.form.username, registroPassword: this.form.password }
+    });
   }
 
   copiarUrl(): void {
