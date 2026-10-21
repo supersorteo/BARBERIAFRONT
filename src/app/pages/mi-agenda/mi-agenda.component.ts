@@ -27,6 +27,7 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
   }
 
   nombreNegocio = '';
+  logoNegocio = '';
 
   // Agenda
   turnos: Turno[] = [];
@@ -72,7 +73,10 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
     this.cargar();
     this.cargarBloqueos();
     this.cargarPerfil();
-    this.negocio.getConfig().subscribe({ next: c => this.nombreNegocio = c.nombre || '' });
+    this.negocio.getConfig().subscribe({ next: c => {
+      this.nombreNegocio = c.nombre || '';
+      this.logoNegocio = c.logoUrl ? this.negocio.resolveImageUrl(c.logoUrl) : '';
+    }});
   }
 
   ngAfterViewInit() {
@@ -297,7 +301,10 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
 
   irAlSitio() {
     const slug = this.usuario?.tenantId;
-    if (slug) this.router.navigate([`/${slug}`]);
+    if (slug) {
+      sessionStorage.setItem('desde-panel', '1');
+      this.router.navigate([`/${slug}`]);
+    }
   }
 
   // ── Sidebar ───────────────────────────────────────────────────

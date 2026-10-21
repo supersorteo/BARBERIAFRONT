@@ -58,7 +58,13 @@
 
     <!-- Brand -->
     <div class="sb-brand">
-      <div class="sb-brand-avatar">{{ (configForm.nombre || 'C').charAt(0).toUpperCase() }}</div>
+      <div class="sb-brand-avatar">
+        @if (logoPreview || configForm.logoUrl) {
+          <img [src]="logoPreview || img(configForm.logoUrl)" alt="Logo" class="sb-brand-logo-img">
+        } @else {
+          {{ (configForm.nombre || 'C').charAt(0).toUpperCase() }}
+        }
+      </div>
       <div class="sb-brand-name"><strong>{{ configForm.nombre || 'Mi barbería' }}</strong><span>Panel de administración</span></div>
       <button class="sb-close" (click)="sidebarOpen=false" aria-label="Cerrar menú">×</button>
     </div>

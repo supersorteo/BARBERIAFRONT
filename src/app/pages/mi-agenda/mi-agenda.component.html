@@ -13,7 +13,11 @@
     <!-- Brand -->
     <div class="mpa-brand">
       <div class="mpa-brand-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+        @if (logoNegocio) {
+          <img [src]="logoNegocio" alt="Logo" class="mpa-brand-logo-img">
+        } @else {
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+        }
       </div>
       <span class="mpa-brand-name">{{ nombreNegocio || 'Panel Barbero' }}</span>
       <button class="mpa-sb-close" (click)="sidebarOpen = false" aria-label="Cerrar menú">×</button>
@@ -100,40 +104,40 @@
 
         <!-- KPI row -->
         <div class="mpa-kpi-grid">
-          <div class="mpa-kpi-card mpa-kpi-card--gold">
+          <div class="mpa-kpi-card">
             <div class="mpa-kpi-icon mpa-kpi-icon--gold">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
             <div class="mpa-kpi-body">
-              <div class="mpa-kpi-value">{{ kpiTotal }}</div>
               <div class="mpa-kpi-label">Total turnos</div>
+              <div class="mpa-kpi-value">{{ kpiTotal }}</div>
             </div>
           </div>
-          <div class="mpa-kpi-card mpa-kpi-card--green">
+          <div class="mpa-kpi-card">
             <div class="mpa-kpi-icon mpa-kpi-icon--green">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div class="mpa-kpi-body">
-              <div class="mpa-kpi-value mpa-kpi-value--green">{{ kpiCompletados }}</div>
               <div class="mpa-kpi-label">Completados</div>
+              <div class="mpa-kpi-value mpa-kpi-value--green">{{ kpiCompletados }}</div>
             </div>
           </div>
-          <div class="mpa-kpi-card mpa-kpi-card--blue">
+          <div class="mpa-kpi-card">
             <div class="mpa-kpi-icon mpa-kpi-icon--blue">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
             <div class="mpa-kpi-body">
-              <div class="mpa-kpi-value mpa-kpi-value--blue">{{ kpiPendientes }}</div>
               <div class="mpa-kpi-label">Pendientes</div>
+              <div class="mpa-kpi-value mpa-kpi-value--blue">{{ kpiPendientes }}</div>
             </div>
           </div>
-          <div class="mpa-kpi-card mpa-kpi-card--red">
+          <div class="mpa-kpi-card">
             <div class="mpa-kpi-icon mpa-kpi-icon--red">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
             <div class="mpa-kpi-body">
-              <div class="mpa-kpi-value mpa-kpi-value--red">{{ kpiCancelados }}</div>
               <div class="mpa-kpi-label">Cancelados</div>
+              <div class="mpa-kpi-value mpa-kpi-value--red">{{ kpiCancelados }}</div>
             </div>
           </div>
         </div>
@@ -361,10 +365,32 @@
       @if (tabActiva === 'perfil') {
         <div class="mpa-tab-section">
 
-          <div class="mpa-section-head">
-            <div>
-              <h2 class="mpa-section-title">Mi perfil público</h2>
-              <p class="mpa-section-desc">Los clientes ven tu nombre, foto y especialidad al reservar.</p>
+          <!-- Hero card -->
+          <div class="mpanel-perfil-hero">
+            <div class="mpanel-perfil-hero-left">
+              <div class="mpanel-perfil-hero-avatar">
+                @if (perfilFoto.preview) {
+                  <img [src]="perfilFoto.preview" alt="">
+                } @else if (perfilBarbero?.foto) {
+                  <img [src]="img(perfilBarbero!.foto)" alt="">
+                } @else {
+                  {{ (perfilBarbero?.nombre || usuario?.username || 'B').charAt(0).toUpperCase() }}
+                }
+              </div>
+              <div class="mpanel-perfil-hero-info">
+                <h2 class="mpanel-perfil-hero-name">{{ perfilBarbero?.nombre || usuario?.username }}</h2>
+                <div class="mpanel-perfil-hero-tags">
+                  <span class="mpanel-perfil-hero-badge">Barbero</span>
+                  @if (perfilBarbero?.especialidad || perfilForm.especialidad) {
+                    <span class="mpanel-perfil-hero-esp">{{ perfilForm.especialidad || perfilBarbero?.especialidad }}</span>
+                  }
+                </div>
+                <div class="mpanel-perfil-hero-hint">Así te ven tus clientes al reservar</div>
+              </div>
+            </div>
+            <div class="mpanel-perfil-hero-stat">
+              <span class="mpanel-perfil-hero-stat-val">{{ kpiTotal }}</span>
+              <span class="mpanel-perfil-hero-stat-lbl">Turnos hoy</span>
             </div>
           </div>
 

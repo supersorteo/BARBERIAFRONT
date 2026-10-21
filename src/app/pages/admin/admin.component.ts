@@ -453,7 +453,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   irAlSitio() {
     const slug = this.usuario?.tenantId;
-    if (slug) this.router.navigate([`/${slug}`]);
+    if (slug) {
+      sessionStorage.setItem('desde-panel', '1');
+      this.router.navigate([`/${slug}`]);
+    }
   }
 
   get landingUrl(): string {

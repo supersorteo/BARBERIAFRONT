@@ -218,7 +218,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug');
     if (slug) { this.slugActual = slug; this.tenantCtx.setSlug(slug); }
-    if (this.slugActual === this.DEMO_SLUG) this.startWelcomeCarousel();
+    const desdePanelAdmin = sessionStorage.getItem('desde-panel') === '1';
+    sessionStorage.removeItem('desde-panel');
+    if (this.slugActual === this.DEMO_SLUG && !desdePanelAdmin) this.startWelcomeCarousel();
 
     this.negocio.getConfig().subscribe({
       next: c => {

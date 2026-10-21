@@ -35,7 +35,9 @@
 .admin-shell { background: radial-gradient(ellipse at 75% 0, #19170f 0, #0b0c0d 45%); padding: 14px; gap: 18px; }
 .admin-sidebar { width: 236px; border: 1px solid var(--border-md); border-radius: 14px; background: linear-gradient(155deg, #131414, #0c0e0f); }
 .sb-brand { padding: 24px 16px; gap: 12px; min-height: 95px; }
-.sb-brand-avatar { width: 42px; height: 46px; border-radius: 12px; font-family: Georgia, serif; font-size: 25px; }
+.sb-brand-avatar { width: 42px; height: 46px; border-radius: 12px; font-family: Georgia, serif; font-size: 25px; overflow: hidden; }
+.sb-brand-avatar:has(img) { background: transparent; border: 1px solid var(--border-md); }
+.sb-brand-logo-img { width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box; display: block; }
 .sb-brand-name { display: flex; flex-direction: column; gap: 5px; }
 .sb-brand-name strong { overflow: hidden; text-overflow: ellipsis; color: var(--gold-light); font-family: Georgia, serif; font-size: 18px; }
 .sb-brand-name > span { font-size: 9px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
@@ -157,12 +159,82 @@ button:disabled { opacity: .5; cursor: wait; }
   .btn-primary-admin, .btn-cancel-admin { min-height: 44px; }
   .modal-custom { padding: 10px; }
   .form-control, .form-select { font-size: 16px; }
+  /* ── Reservas: card list on mobile ── */
+  /* Wrapper transparent — cada card tiene su propio borde */
+  .admin-table-wrap.table-responsive {
+    overflow: visible;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+  }
+  .admin-table-wrap.table-responsive .reservas-table { min-width: 0; }
   .reservas-table, .reservas-table tbody { display: block; width: 100%; }
   .reservas-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  .reservas-table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 14px; border-bottom: 1px solid var(--border-md); gap: 12px; }
-  .reservas-table td { display: block; min-width: 0; padding: 0; border: 0; overflow-wrap: anywhere; background: transparent; box-shadow: none; }
-  .reservas-table td::before { content: attr(data-label); display: block; color: var(--text-muted); font-size: 10px; margin-bottom: 4px; }
-  .reservas-table td:last-child, .reservas-table td:nth-child(7) { grid-column: 1 / -1; }
+
+  /* Cada fila = tarjeta independiente con separación visible */
+  .reservas-table tr {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border-md);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .reservas-table tr:last-child { margin-bottom: 0; }
+
+  /* Cada celda = fila etiqueta + valor */
+  .reservas-table td {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 7px 14px;
+    border: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    background: transparent;
+    box-shadow: none;
+    font-size: 13px;
+  }
+  .reservas-table td::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex: 0 0 76px;
+  }
+
+  /* Cabecera dorada: Fecha + Hora */
+  .reservas-table td[data-label="Fecha"] {
+    background: rgba(219,175,82,.07);
+    padding-top: 10px;
+    border-bottom: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .reservas-table td[data-label="Hora"] {
+    background: rgba(219,175,82,.07);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-md);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--gold-light);
+  }
+  /* Fin (hora fin) es dato secundario — ocultar */
+  .reservas-table td[data-label="Fin"] { display: none; }
+
+  /* Fila de acciones al fondo — fondo más oscuro */
+  .reservas-table td[data-label="Acciones"] {
+    background: rgba(0,0,0,.22);
+    padding: 10px 14px;
+    border-bottom: 0;
+    border-top: 1px solid var(--border);
+    gap: 8px;
+    min-height: 0;
+  }
+  .reservas-table td[data-label="Acciones"]::before { display: none; }
   .table-actions { flex-wrap: wrap; gap: 8px; }
 }
 @media (max-width: 359px) {

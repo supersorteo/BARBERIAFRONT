@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, concat, of } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AuthService } from './auth.service';
 import { TenantContextService } from './tenant-context.service';
@@ -158,6 +158,18 @@ export interface DashboardRango {
   ingresoEstimado: number;
   rankingBarberos: { barberoId: number; nombre: string; total: number; completados: number; ingreso: number }[];
   rankingServicios: { servicio: string; cantidad: number }[];
+  serieDiaria: { fecha: string; total: number; completados: number }[];
+}
+
+export interface MisStats {
+  desde: string;
+  hasta: string;
+  total: number;
+  completados: number;
+  cancelados: number;
+  reservados: number;
+  ingresoEstimado: number;
+  topServicios: { servicio: string; cantidad: number }[];
   serieDiaria: { fecha: string; total: number; completados: number }[];
 }
 
@@ -400,6 +412,9 @@ export class NegocioService {
   getDashboardRango(desde: string, hasta: string): Observable<DashboardRango> {
     return this.http.get<DashboardRango>(`${this.base}/dashboard/${this.tenantId}/rango?desde=${desde}&hasta=${hasta}`);
   }
+  getMisStats(desde: string, hasta: string): Observable<MisStats> {
+    return this.http.get<MisStats>(`${this.base}/dashboard/${this.tenantId}/mis-stats?desde=${desde}&hasta=${hasta}`);
+  }
 
   // Disponibilidad
   getDisponibilidad(fecha: string, servicio: string, barberoId?: number): Observable<SlotDisponible[]> {
@@ -428,14 +443,36 @@ export class NegocioService {
   }
 
   // Config dinámica del landing
-  getConfig(): Observable<NegocioConfig> {
-    return this.http.get<NegocioConfig>(`${this.base}/config/${this.tenantId}`).pipe(
-      tap(config => this.applyBusinessIcons(config.logoUrl))
-    );
+  private configCacheKey(): string { return `ngc_${this.tenantId}`; }
+
+  private readConfigCache(): NegocioConfig | null {
+    try {
+      const raw = localStorage.getItem(this.configCacheKey());
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
   }
+
+  private writeConfigCache(c: NegocioConfig): void {
+    try { localStorage.setItem(this.configCacheKey(), JSON.stringify(c)); } catch {}
+  }
+
+  getConfig(): Observable<NegocioConfig> {
+    const http$ = this.http.get<NegocioConfig>(`${this.base}/config/${this.tenantId}`).pipe(
+      tap(config => {
+        this.applyBusinessIcons(config.logoUrl);
+        this.writeConfigCache(config);
+      })
+    );
+    const cached = this.readConfigCache();
+    return cached ? concat(of(cached), http$) : http$;
+  }
+
   updateConfig(c: NegocioConfig): Observable<NegocioConfig> {
     return this.http.put<NegocioConfig>(`${this.base}/config/${this.tenantId}`, c).pipe(
-      tap(config => this.applyBusinessIcons(config.logoUrl))
+      tap(config => {
+        this.applyBusinessIcons(config.logoUrl);
+        this.writeConfigCache(config);
+      })
     );
   }
 
