@@ -1,0 +1,83 @@
+<section class="agenda" aria-label="Calendario de reservas">
+  <div class="agenda-heading">
+    <div><span class="eyebrow">ORGANIZÁ TU JORNADA</span><h1>Agenda de reservas</h1><p>Consultá horarios, reservas y bloqueos de tu equipo.</p></div>
+    <button class="gold-button" (click)="nueva.emit({fecha, barberoId: filtroBarbero})">+ Nueva reserva</button>
+  </div>
+  <div class="agenda-toolbar">
+    <div class="date-navigation">
+      <button (click)="mover(-1)" aria-label="Período anterior">‹</button>
+      <button (click)="hoy()">Hoy</button>
+      <button (click)="mover(1)" aria-label="Período siguiente">›</button>
+      <label class="sr-only" for="agenda-fecha">Fecha de la agenda</label>
+      <input id="agenda-fecha" type="date" [ngModel]="fecha" (ngModelChange)="cambiarFecha($event)">
+    </div>
+    <div class="agenda-filters">
+      <label for="agenda-barbero">Barbero</label>
+      <select id="agenda-barbero" [(ngModel)]="filtroBarbero" (ngModelChange)="organizar()">
+        <option value="">Todo el equipo</option>
+        @for (b of barberos; track b.id) { <option [value]="b.id">{{ b.nombre }}</option> }
+      </select>
+      <div class="view-switch" aria-label="Vista de la agenda">
+        <button [class.active]="vista === 'semana'" [attr.aria-pressed]="vista === 'semana'" (click)="vista='semana'">Semana</button>
+        <button [class.active]="vista === 'dia'" [attr.aria-pressed]="vista === 'dia'" (click)="vista='dia'">Día</button>
+      </div>
+      <button (click)="cargar()" [disabled]="cargando" aria-label="Actualizar agenda">↻</button>
+      @if (eventos.length > 0) {
+        <button (click)="exportarCSV()" aria-label="Descargar CSV de la semana" title="Descargar CSV">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+      }
+    </div>
+  </div>
+  <div class="agenda-legend"><span><i class="reserved"></i>Reservado</span><span><i class="completed"></i>Completado</span><span><i class="cancelled"></i>Cancelado</span><span><i class="blocked"></i>Bloqueado</span></div>
+  @if (cargando) {
+    <div class="agenda-message" role="status">Cargando reservas y bloqueos…</div>
+  } @else if (error) {
+    <div class="agenda-message" role="alert"><p>{{ error }}</p><button (click)="cargar()">Reintentar</button></div>
+  } @else {
+    <div class="week-view" [class.hidden-view]="vista === 'dia'">
+      <div class="period-title">Semana del {{ dias[0] | date:'dd/MM/yyyy' }} al {{ dias[6] | date:'dd/MM/yyyy' }} <span>{{ eventos.length }} reservas y bloqueos</span></div>
+      <div class="week-scroll" tabindex="0" aria-label="Calendario semanal, desplazable">
+        <div class="week-grid">
+          <div class="week-header"><span class="timezone-label">Hora local</span>
+            @for (dia of dias; track dia) {
+              <button [class.today]="esHoy(dia)" (click)="cambiarFecha(dia); vista='dia'" [attr.aria-label]="'Ver agenda del ' + dia">
+                <span>{{ ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][$index] }}</span><strong>{{ dia | date:'dd/MM' }}</strong>
+              </button>
+            }
+          </div>
+          <div class="week-body" [style.height.px]="(fin - inicio) * 1.5">
+            <div class="time-axis">@for (h of horas; track h) { <span [style.top.px]="(h - inicio) * 1.5">{{ hora(h) }}</span> }</div>
+            @for (dia of columnas; track dia.fecha) {
+              <div class="day-column" [class.today-column]="esHoy(dia.fecha)">
+                @for (e of dia.eventos; track e.clave) {
+                  <button class="calendar-event" [class.completed]="e.estado === 'COMPLETADO'" [class.cancelled]="e.estado === 'CANCELADO'" [class.blocked]="e.estado === 'BLOQUEADO'"
+                    [style.top.px]="(e.inicio - inicio) * 1.5" [style.height.px]="(e.fin - e.inicio) * 1.5"
+                    [style.left.%]="e.columna * 100 / e.columnas" [style.width.%]="100 / e.columnas"
+                    [disabled]="!e.turno" (click)="e.turno && seleccionar.emit(e.turno)"
+                    [title]="e.titulo + ' · ' + e.horario + ' · ' + nombreBarbero(e.barberoId) + ' · ' + e.estado + (e.estimado ? ' · Fin estimado' : '')">
+                    <strong>{{ e.titulo }}</strong><span>{{ e.horario }}{{ e.estimado ? ' *' : '' }}</span><span>{{ e.subtitulo }}</span><span>{{ nombreBarbero(e.barberoId) }} · {{ e.estado }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      @if (!eventos.length) { <p class="empty-note">No hay reservas ni bloqueos para esta semana y este filtro.</p> }
+    </div>
+    <div class="day-view" [class.visible-view]="vista === 'dia'">
+      <div class="period-title">{{ fecha | date:'dd/MM/yyyy' }} <span>{{ eventosDia.length }} reservas y bloqueos</span></div>
+      @for (e of eventosDia; track e.clave) {
+        <button class="day-event" [disabled]="!e.turno" (click)="e.turno && seleccionar.emit(e.turno)" [class.completed]="e.estado === 'COMPLETADO'" [class.cancelled]="e.estado === 'CANCELADO'" [class.blocked]="e.estado === 'BLOQUEADO'">
+          <span class="event-time">{{ e.horario }}{{ e.estimado ? ' *' : '' }}</span>
+          <strong>{{ e.titulo }}</strong><span>{{ e.subtitulo }} · {{ nombreBarbero(e.barberoId) }}</span><span class="event-status">{{ e.estado }}</span>
+        </button>
+      } @empty {
+        <div class="agenda-message"><p>No hay reservas ni bloqueos para este día y este filtro.</p><button (click)="nueva.emit({fecha, barberoId: filtroBarbero})">Nueva reserva</button></div>
+      }
+    </div>
+    <p class="agenda-footnote">* Fin estimado según la duración del servicio, o 30 minutos si no está disponible. Los espacios vacíos no garantizan disponibilidad: se valida al reservar.</p>
+  }
+</section>

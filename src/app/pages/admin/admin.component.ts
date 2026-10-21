@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, NgZone 
 import { gsap } from 'gsap';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { forkJoin, tap } from 'rxjs';
 import {
   NegocioService, Servicio, Turno, Barbero, HorarioBarbero, BloqueoHorario, Galeria, DashboardHoy, DashboardRango, ClienteResumen, SlotDisponible, UsuarioAdmin, NegocioConfig, Categoria
@@ -10,6 +10,7 @@ import {
 import { AuthService, AuthUser } from '../../auth.service';
 import { AlertService } from '../../shared/alert.service';
 import { OnboardingService } from '../../onboarding.service';
+import { AdminAgendaComponent } from './agenda/admin-agenda.component';
 
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
@@ -19,16 +20,16 @@ type PeriodoDashboard = 'hoy' | '7d' | '30d' | 'mes';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, AdminAgendaComponent],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css'
+  styleUrls: ['./admin.component.css', './admin-premium.css']
 })
 export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   usuario: AuthUser | null = null;
 
   private manifestLink: HTMLLinkElement | null = null;
 
-  private _tabActiva: 'dashboard' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente' = 'dashboard';
+  private _tabActiva: 'dashboard' | 'agenda' | 'turnos' | 'clientes' | 'servicios' | 'barberos' | 'bloqueos' | 'galeria' | 'agente' = 'dashboard';
   get tabActiva() { return this._tabActiva; }
   set tabActiva(v: typeof this._tabActiva) {
     this._tabActiva = v;
@@ -45,6 +46,14 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   dashboardHoy: DashboardHoy | null = null;
   dashboardRango: DashboardRango | null = null;
   cargandoRango = false;
+  cargandoDashboard = false;
+  errorDashboard = '';
+  errorRango = '';
+  errorReservasDashboard = '';
+  cargandoReservasDashboard = false;
+  turnosDashboard: Turno[] = [];
+  private solicitudRango = 0;
+  private solicitudHoy = 0;
   periodoActivo: PeriodoDashboard = 'hoy';
 
   readonly PERIODOS: { key: PeriodoDashboard; label: string }[] = [
@@ -340,6 +349,51 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sidebarCollapsed = false;
   sidebarOpen = false;
+  revisionAgenda = 0;
+  turnoAgenda: Turno | null = null;
+  private focoAgenda: HTMLElement | null = null;
+
+  abrirDetalleAgenda(turno: Turno) {
+    this.focoAgenda = document.activeElement as HTMLElement;
+    this.cancelarReasignar();
+    this.turnoAgenda = turno;
+    setTimeout(() => document.querySelector<HTMLButtonElement>('.agenda-detail .btn-close-custom')?.focus());
+  }
+
+  cerrarDetalleAgenda() {
+    this.turnoAgenda = null;
+    this.cancelarReasignar();
+    setTimeout(() => {
+      if (this.focoAgenda?.isConnected) this.focoAgenda.focus();
+      else document.querySelector<HTMLButtonElement>('#admin-tab-agenda')?.focus();
+    });
+  }
+
+  nuevaReservaAgenda(datos: { fecha: string; barberoId: string }) {
+    this.abrirModalReserva();
+    this.reservaManualForm.fecha = datos.fecha;
+    this.reservaManualForm.barberoId = datos.barberoId;
+  }
+
+  eliminarTurnoAgenda(turno: Turno) {
+    this.alert.confirm({
+      title: '¿Eliminar reserva?',
+      html: `La reserva de <strong>${this.esc(turno.paciente)}</strong> del ${this.esc(turno.fecha)} a las ${this.esc(turno.hora)} se eliminará permanentemente.`,
+      confirmText: 'Sí, eliminar',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.negocio.eliminarTurno(turno.id!).subscribe({
+        next: () => {
+          this.turnos = this.turnos.filter(t => t.id !== turno.id);
+          this.cerrarDetalleAgenda();
+          this.revisionAgenda++;
+          this.alert.success('Reserva eliminada');
+          this.cdr.detectChanges();
+        },
+        error: () => this.alert.error('Error al eliminar la reserva')
+      });
+    });
+  }
 
   toggleSidebar() {
     if (window.innerWidth <= 768) {
@@ -349,11 +403,26 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  get tituloSeccion(): string {
+    return ({ dashboard: 'Resumen del negocio', agenda: 'Agenda', turnos: 'Reservas', clientes: 'Clientes',
+      servicios: 'Servicios', barberos: 'Barberos', bloqueos: 'Bloqueos',
+      galeria: 'Galería', agente: 'Asistente' })[this.tabActiva];
+  }
+
+  private fechaLocal(d = new Date()): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  verReservasHoy() {
+    this.fechaFiltro = this.dashboardHoy?.fecha || this.fechaLocal();
+    this.tabActiva = 'turnos';
+  }
+
   get turnosRecientesHoy(): Turno[] {
-    const hoy = new Date().toISOString().split('T')[0];
-    return this.turnos
+    const hoy = this.dashboardHoy?.fecha || this.fechaLocal();
+    return this.turnosDashboard
       .filter(t => t.fecha === hoy)
-      .sort((a, b) => (a.hora || '').localeCompare(b.hora || ''))
+      .sort((a, b) => (a.hora || '').localeCompare(b.hora || '', undefined, { numeric: true }))
       .slice(0, 6);
   }
 
@@ -455,25 +524,54 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargarDashboard() {
+    const solicitud = ++this.solicitudHoy;
+    this.cargandoDashboard = true;
+    this.errorDashboard = '';
+    this.errorReservasDashboard = '';
+    this.cargandoReservasDashboard = true;
+    if (this.periodoActivo !== 'hoy') this.seleccionarPeriodo(this.periodoActivo);
     this.negocio.getDashboardHoy().subscribe({
       next: d => {
+        if (solicitud !== this.solicitudHoy) return;
         this.dashboardHoy = d;
+        this.cargandoDashboard = false;
+        this.negocio.getTurnos(d.fecha || this.fechaLocal()).subscribe({
+          next: turnos => {
+            if (solicitud !== this.solicitudHoy) return;
+            this.turnosDashboard = turnos;
+            this.cargandoReservasDashboard = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            if (solicitud !== this.solicitudHoy) return;
+            this.errorReservasDashboard = 'No pudimos cargar las reservas. Intentá actualizar.';
+            this.cargandoReservasDashboard = false;
+            this.cdr.detectChanges();
+          }
+        });
         this.cdr.detectChanges();
         this.animateStatCards();
       },
       error: err => {
+        if (solicitud !== this.solicitudHoy) return;
         console.error('[Dashboard] Error al cargar resumen:', err);
-        this.dashboardHoy = { fecha: '', total: 0, reservados: 0, completados: 0, cancelados: 0, ingresoEstimadoUYU: 0, porBarbero: [] };
+        this.dashboardHoy = null;
+        this.cargandoDashboard = false;
+        this.cargandoReservasDashboard = false;
+        this.errorDashboard = 'No pudimos cargar el resumen. Intentá actualizar.';
         this.cdr.detectChanges();
       }
     });
   }
 
   seleccionarPeriodo(p: PeriodoDashboard) {
+    const solicitud = ++this.solicitudRango;
     this.periodoActivo = p;
-    if (p === 'hoy') { this.dashboardRango = null; return; }
+    this.errorRango = '';
+    this.dashboardRango = null;
+    if (p === 'hoy') { this.cargandoRango = false; this.cargarDashboard(); return; }
     const hoy = new Date();
-    const fmt = (d: Date) => d.toISOString().split('T')[0];
+    const fmt = (d: Date) => this.fechaLocal(d);
     let desde: string;
     if (p === '7d') {
       const d = new Date(hoy); d.setDate(d.getDate() - 6);
@@ -486,8 +584,16 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.cargandoRango = true;
     this.negocio.getDashboardRango(desde, fmt(hoy)).subscribe({
-      next: d => { this.dashboardRango = d; this.cargandoRango = false; this.cdr.detectChanges(); this.animateStatCards(); },
-      error: () => { this.cargandoRango = false; }
+      next: d => {
+        if (solicitud !== this.solicitudRango) return;
+        this.dashboardRango = d; this.cargandoRango = false; this.cdr.detectChanges(); this.animateStatCards();
+      },
+      error: () => {
+        if (solicitud !== this.solicitudRango) return;
+        this.cargandoRango = false;
+        this.errorRango = 'No pudimos cargar este período. Intentá actualizar.';
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -509,20 +615,12 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private animateStatCards() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
-        gsap.from('.stat-card', {
-          y: 44, scale: 0.88, opacity: 0, duration: 0.65,
-          stagger: 0.1, ease: 'back.out(1.8)'
-        });
-        document.querySelectorAll('[data-count-admin]').forEach(el => {
-          const target = +(el.getAttribute('data-count-admin') || 0);
-          const prefix = el.getAttribute('data-prefix') || '';
-          const obj = { v: 0 };
-          gsap.to(obj, {
-            v: target, duration: 1.5, ease: 'power2.out',
-            onUpdate: () => { el.textContent = prefix + Math.round(obj.v).toLocaleString('es-UY'); }
-          });
+        gsap.fromTo('.kpi-card', { y: 10, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.3, stagger: 0.04,
+          ease: 'power2.out', clearProps: 'transform,opacity', overwrite: true
         });
       }, 0);
     });
@@ -599,6 +697,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
           this.reasignandoId = null;
           this.reasignarBarberoId = '';
           this.alert.success('Turno reasignado');
+          this.revisionAgenda++;
           this.cdr.detectChanges();
         },
         error: err => {
@@ -618,7 +717,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     }).then(confirmed => {
       if (!confirmed) return;
       this.negocio.actualizarEstado(turno.id!, estado).subscribe({
-        next: t => { turno.estado = t.estado; this.cdr.detectChanges(); },
+        next: t => { turno.estado = t.estado; this.revisionAgenda++; this.cdr.detectChanges(); },
         error: () => this.alert.error('Error al cambiar el estado')
       });
     });
@@ -1454,6 +1553,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.negocio.crearTurno(turno).subscribe({
       next: (resp) => {
         console.log('[Admin] crearTurno OK:', resp);
+        this.revisionAgenda++;
         this.enviandoReservaManual = false;
         this.turnoConfirmado = {
           paciente: f.paciente,
