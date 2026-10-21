@@ -107,6 +107,11 @@ export class AdminAgendaComponent implements OnChanges, OnDestroy {
   hora(minutos: number) { return `${String(Math.floor(minutos / 60)).padStart(2, '0')}:${String(minutos % 60).padStart(2, '0')}`; }
 
   exportarCSV() {
+    const safe = (v: unknown) => {
+      let s = String(v ?? '');
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return `"${s.replace(/"/g, '""')}"`;
+    };
     const cabecera = 'Fecha,Hora,Fin,Cliente,Telefono,Servicio,Barbero,Estado';
     const filas = this.eventos
       .filter(e => e.turno)
@@ -114,7 +119,7 @@ export class AdminAgendaComponent implements OnChanges, OnDestroy {
         const t = e.turno!;
         return [t.fecha, t.hora, t.horaFin || '', t.paciente, t.telefono || '',
                 t.servicio || '', this.nombreBarbero(e.barberoId), e.estado]
-          .map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+          .map(safe).join(',');
       });
     const csv = [cabecera, ...filas].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

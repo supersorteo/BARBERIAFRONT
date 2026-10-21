@@ -582,6 +582,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       desde = fmt(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
     }
+    if (this.clientes.length === 0) this.cargarClientes();
     this.cargandoRango = true;
     this.negocio.getDashboardRango(desde, fmt(hoy)).subscribe({
       next: d => {
@@ -602,6 +603,24 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   get maxRankingServicio(): number {
     return Math.max(1, ...(this.dashboardRango?.rankingServicios.map(s => s.cantidad) ?? [0]));
+  }
+
+  get mejorDiaDelPeriodo(): { fecha: string; total: number } | null {
+    const serie = this.dashboardRango?.serieDiaria;
+    if (!serie || serie.length === 0) return null;
+    return serie.reduce((best, d) => d.total > best.total ? d : best);
+  }
+
+  get clientesNuevos(): number {
+    return this.clientes.filter(c => c.totalVisitas === 1).length;
+  }
+
+  get clientesRecurrentes(): number {
+    return this.clientes.filter(c => c.totalVisitas > 1).length;
+  }
+
+  rankingBarberoEnPeriodo(barberoId: number) {
+    return this.dashboardRango?.rankingBarberos.find(b => b.barberoId === barberoId) ?? null;
   }
 
   get tasaCompletado(): number {
@@ -1430,12 +1449,17 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Exportar CSV ────────────────────────────────────────────────
 
   exportarCSV() {
+    const safe = (v: unknown) => {
+      let s = String(v ?? '');
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return `"${s.replace(/"/g, '""')}"`;
+    };
     const fecha = this.fechaFiltro || 'todos';
     const cabecera = 'Fecha,Hora,Fin,Cliente,Telefono,Servicio,Barbero,Estado';
     const filas = this.turnos.map(t =>
       [t.fecha, t.hora, t.horaFin || '', t.paciente,
        t.telefono || '', t.servicio || '',
-       this.nombreBarbero(t.barberoId), t.estado || ''].join(',')
+       this.nombreBarbero(t.barberoId), t.estado || ''].map(safe).join(',')
     );
     const csv = [cabecera, ...filas].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

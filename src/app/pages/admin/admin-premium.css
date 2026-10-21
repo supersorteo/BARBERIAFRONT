@@ -176,3 +176,63 @@ button:disabled { opacity: .5; cursor: wait; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ── MEJORA DASHBOARD: mejor día + clientes insight ─────────── */
+.dm-blue { color: #5b9cf6; }
+.dash-metric-value.dm-blue { color: #5b9cf6; }
+
+.dash-clientes-insight { margin-top: 0; }
+.dci-body {
+  display: flex; align-items: center; gap: 20px; padding: 6px 0;
+  flex-wrap: wrap;
+}
+.dci-stat {
+  display: flex; flex-direction: column; align-items: center; min-width: 72px;
+}
+.dci-num {
+  font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: -1px;
+}
+.dci-num--new { color: #5b9cf6; }
+.dci-num--rec { color: var(--gold); }
+.dci-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.dci-sub { font-size: 11px; color: var(--text-muted); }
+.dci-divider { width: 1px; height: 52px; background: var(--border-md); flex-shrink: 0; }
+.dci-bar-section { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 8px; }
+.dci-bar-track {
+  display: flex; height: 8px; border-radius: 4px; overflow: hidden;
+  background: var(--bg-card-2);
+}
+.dci-bar-new { background: #5b9cf6; transition: width .4s ease; }
+.dci-bar-rec { background: var(--gold); transition: width .4s ease; }
+.dci-bar-legend {
+  display: flex; gap: 16px; font-size: 11px; color: var(--text-muted);
+}
+.dci-leg-new::before { content: '■ '; color: #5b9cf6; }
+.dci-leg-rec::before { content: '■ '; color: var(--gold); }
+
+/* ── MEJORA BARBEROS: stats de período ───────────────────────── */
+.bpr-periodo-stats {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 10px 16px 6px;
+  border-top: 1px solid var(--border);
+}
+.bps-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 12px;
+  background: var(--bg-card-2); border: 1px solid var(--border);
+  font-size: 11px; color: var(--text-muted);
+}
+.bps-chip svg { opacity: .7; flex-shrink: 0; }
+.bps-chip--green { color: #4ade80; border-color: rgba(74,222,128,.2); background: rgba(74,222,128,.06); }
+.bps-chip--gold { color: var(--gold); border-color: var(--border-gold); background: rgba(219,175,82,.06); }
+.bps-period-label {
+  margin-left: auto; font-size: 10px; color: var(--text-muted); font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .dci-body { gap: 14px; }
+  .dci-divider { display: none; }
+  .dci-stat { flex-direction: row; gap: 8px; align-items: baseline; }
+  .dci-sub { display: none; }
+  .bps-period-label { display: none; }
+}

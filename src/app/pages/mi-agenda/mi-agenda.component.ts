@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { gsap } from 'gsap';
 import { NegocioService, Turno, BloqueoHorario, Barbero } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
@@ -12,7 +12,7 @@ interface FotoSlot { file: File | null; preview: string; url: string; }
 @Component({
   selector: 'app-mi-agenda',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './mi-agenda.component.html',
   styleUrl: './mi-agenda.component.css'
 })
@@ -23,7 +23,7 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
   get tabActiva() { return this._tab; }
   set tabActiva(v: typeof this._tab) {
     this._tab = v;
-    setTimeout(() => gsap.from('.mpanel-tab-content', { y: 18, opacity: 0, duration: 0.3, ease: 'power2.out' }), 0);
+    setTimeout(() => gsap.from('.mpa-content', { y: 12, opacity: 0, duration: 0.25, ease: 'power2.out' }), 0);
   }
 
   nombreNegocio = '';
@@ -32,6 +32,10 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
   turnos: Turno[] = [];
   fechaFiltro = new Date().toISOString().split('T')[0];
   cargando = false;
+  turnoSeleccionado: Turno | null = null;
+
+  abrirDetalle(t: Turno) { this.turnoSeleccionado = { ...t }; }
+  cerrarDetalle() { this.turnoSeleccionado = null; }
 
   // Perfil propio
   perfilBarbero: Barbero | null = null;
@@ -72,9 +76,11 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    gsap.from('.mpanel-topbar', { y: -40, opacity: 0, duration: 0.45, ease: 'power3.out' });
-    gsap.from('.mpanel-tabs', { y: -8, opacity: 0, duration: 0.35, ease: 'power2.out', delay: 0.1 });
-    gsap.from('.mpanel-tab-content', { y: 22, opacity: 0, duration: 0.38, ease: 'power2.out', delay: 0.2 });
+    if (window.innerWidth > 768) {
+      gsap.from('.mpa-sidebar', { x: -30, opacity: 0, duration: 0.4, ease: 'power3.out' });
+    }
+    gsap.from('.mpa-topbar', { y: -20, opacity: 0, duration: 0.35, ease: 'power2.out' });
+    gsap.from('.mpa-content', { y: 16, opacity: 0, duration: 0.35, ease: 'power2.out', delay: 0.1 });
   }
 
   // ── Agenda ───────────────────────────────────────────────────────
@@ -99,7 +105,12 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
       this.negocio.actualizarEstado(t.id!, estado).subscribe({
         next: actualizado => {
           t.estado = actualizado.estado;
+          if (this.turnoSeleccionado?.id === t.id) {
+            this.turnoSeleccionado = { ...t };
+          }
           if (estado === 'COMPLETADO') this.alert.success('Turno completado ✓');
+          else this.alert.success('Turno cancelado');
+          this.cerrarDetalle();
           this.cdr.detectChanges();
         },
         error: () => this.alert.error('Error al cambiar el estado')
@@ -288,6 +299,76 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
     const slug = this.usuario?.tenantId;
     if (slug) this.router.navigate([`/${slug}`]);
   }
+
+  // ── Sidebar ───────────────────────────────────────────────────
+  sidebarCollapsed = false;
+  sidebarOpen = false;
+  toggleSidebar() {
+    if (window.innerWidth <= 768) {
+      this.sidebarOpen = !this.sidebarOpen;
+    } else {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+  }
+
+  // ── Navegación de fecha ───────────────────────────────────────
+  diaAnterior() {
+    const d = new Date(this.fechaFiltro + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    this.fechaFiltro = d.toISOString().split('T')[0];
+    this.cargar();
+  }
+  diaSiguiente() {
+    const d = new Date(this.fechaFiltro + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    this.fechaFiltro = d.toISOString().split('T')[0];
+    this.cargar();
+  }
+  irAHoy() { this.fechaFiltro = new Date().toISOString().split('T')[0]; this.cargar(); }
+  esHoy(): boolean { return this.fechaFiltro === new Date().toISOString().split('T')[0]; }
+
+  fechaLegible(): string {
+    const [y, m, d] = this.fechaFiltro.split('-').map(Number);
+    const fecha = new Date(y, m - 1, d);
+    const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return `${dias[fecha.getDay()]} ${d} de ${meses[m - 1]}`;
+  }
+
+  // ── KPI cards ─────────────────────────────────────────────────
+  get kpiTotal(): number { return this.turnos.length; }
+  get kpiCompletados(): number { return this.turnos.filter(t => t.estado === 'COMPLETADO').length; }
+  get kpiPendientes(): number { return this.turnos.filter(t => t.estado === 'RESERVADO').length; }
+  get kpiCancelados(): number { return this.turnos.filter(t => t.estado === 'CANCELADO').length; }
+
+  // ── Próximas citas ────────────────────────────────────────────
+  get proximasCitas(): Turno[] {
+    if (!this.esHoy()) return this.turnos.filter(t => t.estado === 'RESERVADO').slice(0, 5);
+    const ahora = new Date();
+    const horaActual = `${ahora.getHours().toString().padStart(2,'0')}:${ahora.getMinutes().toString().padStart(2,'0')}`;
+    return this.turnos.filter(t => t.estado === 'RESERVADO' && t.hora >= horaActual).slice(0, 5);
+  }
+
+  // ── Timeline ──────────────────────────────────────────────────
+  private minTL = 8 * 60;
+  private maxTL = 20 * 60;
+  private get spanTL(): number { return this.maxTL - this.minTL; }
+
+  tlTop(hora: string): number {
+    const [h, m] = hora.split(':').map(Number);
+    return Math.max(0, Math.min(100, ((h * 60 + m) - this.minTL) / this.spanTL * 100));
+  }
+  tlHeight(hora: string, horaFin?: string): number {
+    const [h, m] = hora.split(':').map(Number);
+    const ini = h * 60 + m;
+    let fin = ini + 45;
+    if (horaFin) { const [fh, fm] = horaFin.split(':').map(Number); fin = fh * 60 + fm; }
+    return Math.max(4, (fin - ini) / this.spanTL * 100);
+  }
+  get horasTL(): number[] {
+    return Array.from({ length: (this.maxTL - this.minTL) / 60 }, (_, i) => this.minTL / 60 + i);
+  }
+  fmtHora(h: number): string { return `${String(h).padStart(2,'0')}:00`; }
 
   waRecordatorio(t: Turno): string {
     if (!t.telefono) return '';
