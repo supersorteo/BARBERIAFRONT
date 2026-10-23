@@ -2433,6 +2433,35 @@
 
 .dash-panel { display: flex; flex-direction: column; gap: 20px; }
 
+/* ── URL Pública ─────────────────────────────────────────────────── */
+.dash-url-banner {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-card-2); border: 1px solid var(--border-md);
+  border-radius: 10px;
+}
+.dash-url-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+}
+.dash-url-link {
+  flex: 1; min-width: 0;
+  font-size: 13px; color: var(--accent-gold);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-decoration: none;
+}
+.dash-url-link:hover { text-decoration: underline; }
+.dash-url-copy {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px;
+  background: var(--bg-card); border: 1px solid var(--border-md);
+  border-radius: 6px; color: var(--text-secondary);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; transition: all 140ms ease;
+}
+.dash-url-copy:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+.dash-url-copy.copiada { border-color: #4caf7d; color: #4caf7d; }
+
 /* ── Topbar ──────────────────────────────────────────────────────── */
 .dash-topbar {
   display: flex; align-items: center; justify-content: space-between;

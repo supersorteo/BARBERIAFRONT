@@ -191,6 +191,23 @@
         <div class="btn-group-admin"><button class="btn-cancel-admin" (click)="tabActiva='agenda'">Ver agenda</button><button class="btn-primary-admin" (click)="abrirModalReserva()"><span aria-hidden="true">+</span> Nueva reserva</button></div>
       </div>
 
+      <!-- ── URL PÚBLICA ── -->
+      @if (landingUrl) {
+        <div class="dash-url-banner">
+          <span class="dash-url-label">Tu página web</span>
+          <a class="dash-url-link" [href]="landingUrl" target="_blank" rel="noopener">{{ landingUrl }}</a>
+          <button class="dash-url-copy" (click)="copiarUrl()" [class.copiada]="urlCopiada" title="Copiar enlace">
+            @if (urlCopiada) {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Copiado
+            } @else {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
+            }
+          </button>
+        </div>
+      }
+
       <!-- ── TOPBAR ── -->
       <div class="dash-topbar">
         <div class="dash-periodo-bar">
