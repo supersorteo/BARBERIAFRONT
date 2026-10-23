@@ -827,12 +827,29 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
       title: '¿Cambiar estado?',
       html: `El turno de <strong>${this.esc(turno.paciente)}</strong> quedará marcado como <strong>${this.esc(etiqueta)}</strong>.`,
       confirmText: 'Sí, cambiar',
+      danger: estado === 'CANCELADO',
     }).then(confirmed => {
       if (!confirmed) return;
       this.negocio.actualizarEstado(turno.id!, estado).subscribe({
-        next: t => { turno.estado = t.estado; this.revisionAgenda++; this.cdr.detectChanges(); },
+        next: t => {
+          turno.estado = t.estado;
+          this.revisionAgenda++;
+          // Sincronizar en la lista del dashboard si el turno aparece ahí
+          const idx = this.turnosDashboard.findIndex(td => td.id === t.id);
+          if (idx >= 0) this.turnosDashboard[idx].estado = t.estado;
+          this.cdr.detectChanges();
+          // Refrescar stats silenciosamente para reflejar completados/cancelados
+          this.refrescarStatsHoy();
+        },
         error: () => this.alert.error('Error al cambiar el estado')
       });
+    });
+  }
+
+  private refrescarStatsHoy() {
+    this.negocio.getDashboardHoy().subscribe({
+      next: d => { this.dashboardHoy = d; this.cdr.detectChanges(); this.animateStatCards(); },
+      error: () => {}
     });
   }
   nombreBarbero(id?: number) {
