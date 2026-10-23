@@ -15,7 +15,7 @@ import { AdminAgendaComponent } from './agenda/admin-agenda.component';
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
 const DIAS = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-type PeriodoDashboard = 'hoy' | '7d' | '30d' | 'mes';
+type PeriodoDashboard = 'hoy' | 'semana' | 'mes';
 
 @Component({
   selector: 'app-admin',
@@ -55,12 +55,12 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   private solicitudRango = 0;
   private solicitudHoy = 0;
   periodoActivo: PeriodoDashboard = 'hoy';
+  periodoOffset = 0;
 
   readonly PERIODOS: { key: PeriodoDashboard; label: string }[] = [
-    { key: 'hoy',  label: 'Hoy'      },
-    { key: '7d',   label: '7 días'   },
-    { key: '30d',  label: '30 días'  },
-    { key: 'mes',  label: 'Este mes' },
+    { key: 'hoy',    label: 'Hoy'    },
+    { key: 'semana', label: 'Semana' },
+    { key: 'mes',    label: 'Mes'    },
   ];
 
   // Clientes
@@ -567,27 +567,118 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private calcSemana(): { desde: string; hasta: string } {
+    const hoy = new Date();
+    const diaSemana = (hoy.getDay() + 6) % 7; // 0=lun
+    const lunes = new Date(hoy);
+    lunes.setDate(hoy.getDate() - diaSemana + this.periodoOffset * 7);
+    const domingo = new Date(lunes);
+    domingo.setDate(lunes.getDate() + 6);
+    return { desde: this.fechaLocal(lunes), hasta: this.fechaLocal(domingo) };
+  }
+
+  private calcMes(): { desde: string; hasta: string } {
+    const hoy = new Date();
+    const mes = hoy.getMonth() + this.periodoOffset;
+    const desde = new Date(hoy.getFullYear(), mes, 1);
+    const hasta = new Date(hoy.getFullYear(), mes + 1, 0);
+    return { desde: this.fechaLocal(desde), hasta: this.fechaLocal(hasta) };
+  }
+
+  get periodoLabel(): string {
+    if (this.periodoActivo === 'semana') {
+      const { desde, hasta } = this.calcSemana();
+      const d = new Date(desde + 'T00:00:00');
+      const h = new Date(hasta + 'T00:00:00');
+      const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      const inicio = `${d.getDate()} ${meses[d.getMonth()]}`;
+      const fin = d.getMonth() === h.getMonth()
+        ? `${h.getDate()}`
+        : `${h.getDate()} ${meses[h.getMonth()]}`;
+      return `${inicio}–${fin} ${h.getFullYear()}`;
+    }
+    if (this.periodoActivo === 'mes') {
+      const hoy = new Date();
+      const mes = hoy.getMonth() + this.periodoOffset;
+      const fecha = new Date(hoy.getFullYear(), mes, 1);
+      return fecha.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+    }
+    return '';
+  }
+
+  navAnterior() { this.periodoOffset--; this.seleccionarPeriodo(this.periodoActivo); }
+  navSiguiente() { if (this.periodoOffset < 0) { this.periodoOffset++; this.seleccionarPeriodo(this.periodoActivo); } }
+
+  imprimir(): void { window.print(); }
+
+  exportarDashboardCSV(): void {
+    const safe = (v: unknown) => {
+      let s = String(v ?? '');
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return `"${s.replace(/"/g, '""')}"`;
+    };
+    const row = (...cells: unknown[]) => cells.map(safe).join(',');
+    const lines: string[] = [];
+
+    if (this.periodoActivo === 'hoy' && this.dashboardHoy) {
+      const d = this.dashboardHoy;
+      lines.push(row('Resumen del día', d.fecha));
+      lines.push(row('Total', 'Reservados', 'Completados', 'Cancelados', 'Ingreso estimado ($)', 'Ingreso real ($)'));
+      lines.push(row(d.total, d.reservados, d.completados, d.cancelados, d.ingresoEstimado, d.ingresoReal));
+      lines.push('');
+      lines.push(row('Desglose por barbero'));
+      lines.push(row('Barbero', 'Total', 'Completados'));
+      for (const b of d.porBarbero) lines.push(row(b.nombre, b.total, b.completados));
+    } else if (this.dashboardRango) {
+      const d = this.dashboardRango;
+      lines.push(row('Período', `${d.desde} a ${d.hasta}`));
+      lines.push(row('Total', 'Reservados', 'Completados', 'Cancelados', 'Ingreso estimado ($)', 'Ingreso real ($)'));
+      lines.push(row(d.total, d.reservados, d.completados, d.cancelados, d.ingresoEstimado, d.ingresoReal));
+      lines.push('');
+      lines.push(row('Serie diaria'));
+      lines.push(row('Fecha', 'Total', 'Completados'));
+      for (const s of d.serieDiaria) lines.push(row(s.fecha, s.total, s.completados));
+      lines.push('');
+      lines.push(row('Ranking de barberos'));
+      lines.push(row('Barbero', 'Total', 'Completados', 'Ingreso ($)'));
+      for (const b of d.rankingBarberos) lines.push(row(b.nombre, b.total, b.completados, b.ingreso));
+      lines.push('');
+      lines.push(row('Servicios más solicitados'));
+      lines.push(row('Servicio', 'Cantidad'));
+      for (const s of d.rankingServicios) lines.push(row(s.servicio, s.cantidad));
+    }
+
+    if (!lines.length) return;
+    const csv = '﻿' + lines.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const label = this.periodoActivo === 'hoy'
+      ? (this.dashboardHoy?.fecha ?? 'hoy')
+      : `${this.dashboardRango?.desde}_${this.dashboardRango?.hasta}`;
+    a.download = `reporte-${label}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   seleccionarPeriodo(p: PeriodoDashboard) {
     const solicitud = ++this.solicitudRango;
     this.periodoActivo = p;
     this.errorRango = '';
     this.dashboardRango = null;
     if (p === 'hoy') { this.cargandoRango = false; this.cargarDashboard(); return; }
-    const hoy = new Date();
     const fmt = (d: Date) => this.fechaLocal(d);
     let desde: string;
-    if (p === '7d') {
-      const d = new Date(hoy); d.setDate(d.getDate() - 6);
-      desde = fmt(d);
-    } else if (p === '30d') {
-      const d = new Date(hoy); d.setDate(d.getDate() - 29);
-      desde = fmt(d);
+    let hasta: string;
+    if (p === 'semana') {
+      ({ desde, hasta } = this.calcSemana());
     } else {
-      desde = fmt(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+      ({ desde, hasta } = this.calcMes());
     }
     if (this.clientes.length === 0) this.cargarClientes();
     this.cargandoRango = true;
-    this.negocio.getDashboardRango(desde, fmt(hoy)).subscribe({
+    this.negocio.getDashboardRango(desde, hasta).subscribe({
       next: d => {
         if (solicitud !== this.solicitudRango) return;
         this.dashboardRango = d; this.cargandoRango = false; this.cdr.detectChanges(); this.animateStatCards();

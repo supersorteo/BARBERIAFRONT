@@ -89,18 +89,65 @@
       }
       {{ config.nombre }}
     </a>
-    <button class="nav-toggle" (click)="navOpen = !navOpen">☰</button>
+    <button class="nav-toggle" (click)="navOpen = !navOpen" aria-label="Abrir menú">☰</button>
     <ul class="nav-links" [class.open]="navOpen">
-      <li><a (click)="scrollTo('servicios')">Servicios</a></li>
-      <li><a (click)="scrollTo('barberos')">Equipo</a></li>
-      <li><a (click)="scrollTo('galeria')">Galería</a></li>
-      <li><a (click)="abrirReservaModal()">Reservar</a></li>
-      <li><a (click)="scrollTo('contacto')">Contacto</a></li>
+      <!-- Botón cerrar esquina superior izquierda -->
+      <li class="nav-sb-header">
+        <button class="nav-close" (click)="navOpen=false" aria-label="Cerrar menú">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </li>
+      <li class="nav-sb-divider"></li>
+      <!-- Links -->
+      <li class="nav-sb-item">
+        <a (click)="scrollTo('servicios')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+          Servicios
+        </a>
+      </li>
+      <li class="nav-sb-item">
+        <a (click)="scrollTo('barberos')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Nuestro equipo
+        </a>
+      </li>
+      <li class="nav-sb-item">
+        <a (click)="scrollTo('galeria')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Galería
+        </a>
+      </li>
+      <li class="nav-sb-item">
+        <a (click)="scrollTo('contacto')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.18 2 2 0 0 1 3.64 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Contacto
+        </a>
+      </li>
+      <li class="nav-sb-divider"></li>
+      <!-- CTA reserva -->
+      <li class="nav-sb-cta">
+        <button class="nav-sb-reservar-btn" (click)="navOpen=false; abrirReservaModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Reservar turno
+        </button>
+      </li>
       @if (panelAcceso.tipo === 'panel') {
-        <li><a [routerLink]="panelAcceso.ruta" class="admin-link" (click)="navOpen=false">{{ panelAcceso.label }}</a></li>
+        <li class="nav-sb-item nav-sb-item-admin">
+          <a [routerLink]="panelAcceso.ruta" class="admin-link" (click)="navOpen=false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            {{ panelAcceso.label }}
+          </a>
+        </li>
       }
+      <!-- Barber art image -->
+      <li class="nav-sb-art" aria-hidden="true">
+        <img src="images/admin-barber-sidebar.webp" alt="" width="300" height="400" loading="lazy" decoding="async">
+      </li>
     </ul>
   </div>
+  @if (navOpen) {
+    <div class="nav-overlay" (click)="navOpen = false"></div>
+  }
 </nav>
 
 <!-- ═══════════════ HERO ══════════════════════════════════════════ -->

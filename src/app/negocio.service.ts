@@ -144,7 +144,8 @@ export interface DashboardHoy {
   reservados: number;
   completados: number;
   cancelados: number;
-  ingresoEstimadoUYU: number;
+  ingresoEstimado: number;
+  ingresoReal: number;
   porBarbero: { barberoId: number; nombre: string; total: number; completados: number }[];
 }
 
@@ -156,6 +157,7 @@ export interface DashboardRango {
   cancelados: number;
   reservados: number;
   ingresoEstimado: number;
+  ingresoReal: number;
   rankingBarberos: { barberoId: number; nombre: string; total: number; completados: number; ingreso: number }[];
   rankingServicios: { servicio: string; cantidad: number }[];
   serieDiaria: { fecha: string; total: number; completados: number }[];

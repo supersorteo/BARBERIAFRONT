@@ -255,16 +255,148 @@
 .nav-links a.admin-link:hover { background: var(--gold-glow); color: var(--gold-light); }
 
 .nav-toggle { display: none; background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; color: var(--text-secondary); cursor: pointer; }
+/* Sidebar elements: ocultos en desktop */
+.nav-sb-header, .nav-sb-divider, .nav-sb-art { display: none; }
+/* CTA Reservar: visible en desktop como botón inline */
+.nav-sb-cta { list-style: none; }
+.nav-sb-reservar-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px;
+  background: linear-gradient(90deg, #7a5c1e, #c9a03a);
+  border: none; border-radius: var(--radius-sm);
+  color: #0c0d0e; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.03em; cursor: pointer;
+  box-shadow: 0 2px 12px rgba(201,160,58,0.2);
+  transition: all 180ms ease;
+  white-space: nowrap;
+}
+.nav-sb-reservar-btn:hover {
+  background: linear-gradient(90deg, #8f6b22, #e0b845);
+  box-shadow: 0 4px 20px rgba(201,160,58,0.35);
+  transform: translateY(-1px);
+}
+.nav-sb-reservar-btn svg { color: #0c0d0e; display: block; }
+.nav-close { display: none; }
+.nav-overlay { display: none; }
+/* En desktop: nav-sb-item es li normal de navbar, sin íconos */
+.nav-sb-item, .nav-sb-item-admin { display: block; }
+.nav-sb-item a, .nav-sb-item-admin a { display: block; }
+.nav-sb-item a svg, .nav-sb-item-admin a svg { display: none; }
+
 @media(max-width:768px){
   .nav-toggle { display: flex; align-items: center; }
-  .nav-links {
-    display: none; position: absolute; top: 100%; left: 0; right: 0;
-    flex-direction: column; gap: 0; background: rgba(5,5,8,0.98);
-    backdrop-filter: blur(24px); border-bottom: 1px solid var(--border);
-    padding: 12px 16px;
+
+  /* Overlay */
+  .nav-overlay {
+    display: block; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 999;
+    animation: nav-fade-in 0.2s ease;
   }
-  .nav-links.open { display: flex; }
-  .nav-links a { width: 100%; padding: 12px 16px; }
+  @keyframes nav-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Sidebar */
+  .nav-links {
+    position: fixed; top: 0; right: 0; height: 100dvh;
+    width: min(280px, 85vw);
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: linear-gradient(160deg, #141516 0%, #0c0d0e 100%);
+    border-left: 1px solid rgba(201,160,58,0.18);
+    border-radius: 16px 0 0 16px;
+    box-shadow: -8px 0 60px rgba(0,0,0,0.75);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000; display: flex !important; overflow-y: auto;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .nav-links.open { transform: translateX(0); }
+
+  /* Fila del botón cerrar — esquina superior izquierda */
+  .nav-sb-header {
+    display: flex; align-items: flex-start;
+    padding: 14px 14px 6px;
+    flex-shrink: 0;
+  }
+  .nav-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; color: rgba(255,255,255,0.5); cursor: pointer;
+    transition: all 180ms ease; flex-shrink: 0;
+  }
+  .nav-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* Divisor */
+  .nav-sb-divider {
+    display: block; height: 1px; margin: 4px 0;
+    background: rgba(255,255,255,0.07); flex-shrink: 0;
+  }
+
+  /* Links de navegación — alineados a la izquierda */
+  .nav-sb-item { display: block; }
+  .nav-sb-item a {
+    display: flex; align-items: center; gap: 13px;
+    padding: 13px 22px;
+    color: rgba(255,255,255,0.55); font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+    transition: all 170ms ease;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+    width: 100%; box-sizing: border-box;
+  }
+  .nav-sb-item a svg { color: rgba(201,160,58,0.5); flex-shrink: 0; transition: color 170ms ease; display: block; }
+  .nav-sb-item a:hover {
+    color: #fff; background: rgba(201,160,58,0.06);
+    border-left-color: rgba(201,160,58,0.55);
+  }
+  .nav-sb-item a:hover svg { color: #efc76c; }
+
+  /* Link admin dorado */
+  .nav-sb-item-admin { display: block; }
+  .nav-sb-item-admin a, .nav-sb-item-admin a.admin-link {
+    display: flex; align-items: center; gap: 13px;
+    padding: 13px 22px; width: 100%; box-sizing: border-box;
+    color: #c9a03a; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+    border: none; border-left: 3px solid transparent;
+    background: transparent;
+    transition: all 170ms ease;
+  }
+  .nav-sb-item-admin a svg { color: #c9a03a; flex-shrink: 0; display: block; }
+  .nav-sb-item-admin a:hover, .nav-sb-item-admin a.admin-link:hover {
+    background: rgba(201,160,58,0.08); border-left-color: #c9a03a;
+    color: #efc76c;
+  }
+  .nav-sb-item-admin a:hover svg { color: #efc76c; }
+
+  /* CTA Reservar */
+  .nav-sb-cta { display: block; padding: 16px 20px 10px; }
+  .nav-sb-reservar-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 20px;
+    background: linear-gradient(90deg, #7a5c1e, #c9a03a);
+    border: none; border-radius: 10px;
+    color: #0c0d0e; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.03em; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(201,160,58,0.2);
+    transition: all 220ms ease;
+  }
+  .nav-sb-reservar-btn:hover {
+    background: linear-gradient(90deg, #8f6b22, #e0b845);
+    box-shadow: 0 6px 28px rgba(201,160,58,0.38);
+    transform: translateY(-1px);
+  }
+  .nav-sb-reservar-btn svg { color: #0c0d0e; display: block; }
+
+  /* Imagen sillón debajo del último botón */
+  .nav-sb-art {
+    display: block; margin-top: 20px; flex-shrink: 0;
+    overflow: hidden; border-radius: 12px; margin-inline: 16px; margin-bottom: 16px;
+    background: #0b0906;
+  }
+  .nav-sb-art img {
+    display: block; width: 100%; height: auto;
+    object-fit: contain; opacity: 0.88;
+  }
 }
 
 /* ─── HERO ────────────────────────────────────────────────────── */

@@ -196,13 +196,29 @@
         <div class="dash-periodo-bar">
           @for (p of PERIODOS; track p.key) {
             <button class="dash-periodo-btn" [class.active]="periodoActivo === p.key"
-                    [attr.aria-pressed]="periodoActivo === p.key" (click)="seleccionarPeriodo(p.key)">{{ p.label }}</button>
+                    [attr.aria-pressed]="periodoActivo === p.key"
+                    (click)="periodoOffset=0; seleccionarPeriodo(p.key)">{{ p.label }}</button>
           }
         </div>
         <button class="dash-refresh-btn" (click)="cargarDashboard()" [disabled]="cargandoDashboard || cargandoRango" title="Actualizar" aria-label="Actualizar resumen">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
+        <button class="dash-print-btn" (click)="exportarDashboardCSV()"
+                [disabled]="!dashboardHoy && !dashboardRango"
+                title="Descargar CSV" aria-label="Descargar reporte CSV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button class="dash-print-btn" (click)="imprimir()" title="Imprimir reporte" aria-label="Imprimir reporte">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </button>
       </div>
+      @if (periodoActivo !== 'hoy') {
+        <div class="dash-nav-periodo">
+          <button class="dash-nav-btn" (click)="navAnterior()">‹</button>
+          <span class="dash-nav-label">{{ periodoLabel }}</span>
+          <button class="dash-nav-btn" (click)="navSiguiente()" [disabled]="periodoOffset >= 0">›</button>
+        </div>
+      }
 
       <!-- ── VISTA HOY ── -->
       @if (periodoActivo === 'hoy') {
@@ -249,8 +265,18 @@
               </div>
               <div class="kpi-body">
                 <span class="kpi-label">Ingresos est.</span>
-                <span class="kpi-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimadoUYU">${{ dashboardHoy.ingresoEstimadoUYU | number:'1.0-0' }}</span>
+                <span class="kpi-value" [attr.data-count-admin]="dashboardHoy.ingresoEstimado">${{ dashboardHoy.ingresoEstimado | number:'1.0-0' }}</span>
                 <span class="kpi-sub">Reservados y completados</span>
+              </div>
+            </div>
+            <div class="kpi-card kpi-card-green-real">
+              <div class="kpi-icon-box kpi-green-real">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="kpi-body">
+                <span class="kpi-label">Ingreso real</span>
+                <span class="kpi-value kpi-green-real" [attr.data-count-admin]="dashboardHoy.ingresoReal">${{ dashboardHoy.ingresoReal | number:'1.0-0' }}</span>
+                <span class="kpi-sub">Solo completados</span>
               </div>
             </div>
           </div>
@@ -387,6 +413,16 @@
                 <span class="kpi-label">Ingresos est.</span>
                 <span class="kpi-value" [attr.data-count-admin]="dashboardRango.ingresoEstimado">${{ dashboardRango.ingresoEstimado | number:'1.0-0' }}</span>
                 <span class="kpi-sub">Reservados y completados</span>
+              </div>
+            </div>
+            <div class="kpi-card kpi-card-green-real">
+              <div class="kpi-icon-box kpi-green-real">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="kpi-body">
+                <span class="kpi-label">Ingreso real</span>
+                <span class="kpi-value kpi-green-real" [attr.data-count-admin]="dashboardRango.ingresoReal">${{ dashboardRango.ingresoReal | number:'1.0-0' }}</span>
+                <span class="kpi-sub">Solo completados</span>
               </div>
             </div>
           </div>
@@ -875,7 +911,7 @@
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     ${{ bStats.ingreso | number:'1.0-0' }}
                   </span>
-                  <span class="bps-period-label">{{ periodoActivo === '7d' ? 'últ. 7 días' : periodoActivo === '30d' ? 'últ. 30 días' : 'este mes' }}</span>
+                  <span class="bps-period-label">{{ periodoActivo === 'semana' ? periodoLabel : periodoActivo === 'mes' ? periodoLabel : '' }}</span>
                 </div>
               }
 

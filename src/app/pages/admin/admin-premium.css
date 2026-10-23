@@ -70,8 +70,18 @@
 .dash-periodo-btn { min-height: 38px; padding: 8px 16px; border-color: transparent; border-radius: 7px; color: var(--text-secondary); }
 .dash-periodo-btn.active { background: #3b301c; color: var(--gold-light); border-color: #66502b; }
 .dash-refresh-btn { width: 44px; height: 44px; }
+.dash-print-btn { width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--border-md); border-radius: 9px; color: var(--text-secondary); cursor: pointer; }
+.dash-print-btn:hover { background: #1a1c1e; color: var(--text-primary); }
+.dash-nav-periodo { display: flex; align-items: center; gap: 10px; margin: 8px 0 4px; }
+.dash-nav-btn { width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--border-md); border-radius: 7px; color: var(--text-secondary); cursor: pointer; font-size: 18px; line-height: 1; }
+.dash-nav-btn:hover:not(:disabled) { background: #1a1c1e; color: var(--text-primary); }
+.dash-nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+.dash-nav-label { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .dash-range-caption { color: var(--text-muted); font-size: 12px; margin: -6px 0 0; }
-.kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.kpi-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.kpi-card-green-real { border-color: #1e4a2e; background: linear-gradient(135deg, #111c14, #0d1410); }
+.kpi-icon-box.kpi-green-real { background: #112016; border-color: #1e4a2e; color: #4ade80; }
+.kpi-value.kpi-green-real { color: #4ade80; }
 .kpi-card { min-width: 0; min-height: 158px; display: block; padding: 20px; border: 1px solid var(--border-gold); border-radius: 12px; background: linear-gradient(135deg, #191b1b, #101213); box-shadow: 0 6px 22px #0002; }
 .kpi-icon-box { position: absolute; top: 17px; left: 18px; width: 34px; height: 34px; border-radius: 9px; }
 .kpi-icon-box.kpi-blue, .kpi-icon-box.kpi-gold, .kpi-icon-box.kpi-amber { background: #211e15; border-color: var(--border-gold); color: var(--gold-light); }
@@ -122,7 +132,7 @@ button:disabled { opacity: .5; cursor: wait; }
 .modal-content-custom { margin: auto; }
 
 @media (max-width: 1200px) {
-  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .atp-url-bar { display: none; }
   .atp-actions { margin-left: auto; }
   .dash-today-grid, .dash-main-grid { grid-template-columns: minmax(0, 1fr); }
@@ -146,6 +156,7 @@ button:disabled { opacity: .5; cursor: wait; }
   .dash-heading p { font-size: 12px; }
   .dash-heading .btn-primary-admin { font-size: 12px; }
   .dash-periodo-btn { padding-inline: 10px; font-size: 12px; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kpi-card { padding: 16px; min-height: 145px; }
   .kpi-icon-box { top: 14px; left: 14px; width: 30px; height: 30px; }
   .kpi-label { padding-left: 38px; font-size: 11px; }
@@ -247,6 +258,18 @@ button:disabled { opacity: .5; cursor: wait; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+@media print {
+  .admin-sidebar, .admin-topbar-pro, .dash-periodo-bar, .dash-nav-periodo,
+  .dash-refresh-btn, .dash-print-btn, .btn-primary-admin, .btn-cancel-admin,
+  .btn-group-admin, .dash-heading .btn-group-admin { display: none !important; }
+  .admin-shell { display: block; }
+  .admin-content-area { overflow: visible; padding: 0; background: white; }
+  .kpi-grid { break-inside: avoid; }
+  body { background: white; color: black; }
+  .kpi-card, .dash-card, .dash-metric-card { border: 1px solid #ccc; background: white; }
+  .kpi-value, .kpi-label, .kpi-sub, .dash-metric-value, .dash-metric-label { color: black !important; }
+  .kpi-card-gold, .kpi-card-green-real { background: white; }
 }
 
 /* ── MEJORA DASHBOARD: mejor día + clientes insight ─────────── */
