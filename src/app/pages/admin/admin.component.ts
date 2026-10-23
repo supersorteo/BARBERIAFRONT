@@ -498,9 +498,33 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarGaleria();
     this.manifestLink = document.querySelector('link[rel="manifest"]');
     if (this.manifestLink) this.manifestLink.href = '/manifest-panel.webmanifest';
+    this.iniciarPolling();
+  }
+
+  private pollInterval: ReturnType<typeof setInterval> | null = null;
+  private onVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && this.tabActiva === 'dashboard') {
+      this.refrescarStatsHoy();
+    }
+  };
+
+  private iniciarPolling() {
+    this.detenerPolling();
+    this.pollInterval = setInterval(() => {
+      if (document.visibilityState === 'visible' && this.tabActiva === 'dashboard') {
+        this.refrescarStatsHoy();
+      }
+    }, 60_000);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  private detenerPolling() {
+    if (this.pollInterval) { clearInterval(this.pollInterval); this.pollInterval = null; }
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   ngOnDestroy(): void {
+    this.detenerPolling();
     if (this.manifestLink) this.manifestLink.href = '/manifest.webmanifest';
   }
 

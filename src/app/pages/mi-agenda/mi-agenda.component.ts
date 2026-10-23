@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ interface FotoSlot { file: File | null; preview: string; url: string; }
   templateUrl: './mi-agenda.component.html',
   styleUrl: './mi-agenda.component.css'
 })
-export class MiAgendaComponent implements OnInit, AfterViewInit {
+export class MiAgendaComponent implements OnInit, AfterViewInit, OnDestroy {
   usuario: AuthUser | null = null;
 
   private _tab: 'agenda' | 'horario' | 'perfil' = 'agenda';
@@ -77,6 +77,10 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
       this.nombreNegocio = c.nombre || '';
       this.logoNegocio = c.logoUrl ? this.negocio.resolveImageUrl(c.logoUrl) : '';
     }});
+    this.pollInterval = setInterval(() => {
+      if (document.visibilityState === 'visible' && this.tabActiva === 'agenda') this.cargar();
+    }, 60_000);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   ngAfterViewInit() {
@@ -85,6 +89,16 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
     }
     gsap.from('.mpa-topbar', { y: -20, opacity: 0, duration: 0.35, ease: 'power2.out' });
     gsap.from('.mpa-content', { y: 16, opacity: 0, duration: 0.35, ease: 'power2.out', delay: 0.1 });
+  }
+
+  private pollInterval: ReturnType<typeof setInterval> | null = null;
+  private onVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && this.tabActiva === 'agenda') this.cargar();
+  };
+
+  ngOnDestroy() {
+    if (this.pollInterval) { clearInterval(this.pollInterval); this.pollInterval = null; }
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   // ── Agenda ───────────────────────────────────────────────────────
