@@ -124,6 +124,9 @@ export class MiAgendaComponent implements OnInit, AfterViewInit, OnDestroy {
       this.negocio.actualizarEstado(t.id!, estado).subscribe({
         next: actualizado => {
           t.estado = actualizado.estado;
+          // abrirDetalle hace spread-copy, hay que actualizar el original en el array
+          const orig = this.turnos.find(tu => tu.id === actualizado.id);
+          if (orig) orig.estado = actualizado.estado;
           if (this.turnoSeleccionado?.id === t.id) {
             this.turnoSeleccionado = { ...t };
           }
