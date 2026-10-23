@@ -104,6 +104,7 @@ export class MiAgendaComponent implements OnInit, AfterViewInit {
       title: estado === 'COMPLETADO' ? '¿Marcar completado?' : '¿Cancelar turno?',
       html: `El turno de <strong>${this.esc(t.paciente)}</strong> quedará <strong>${estado === 'COMPLETADO' ? 'completado' : 'cancelado'}</strong>.`,
       confirmText: estado === 'COMPLETADO' ? 'Sí, completar' : 'Sí, cancelar',
+      danger: estado === 'CANCELADO',
     }).then(confirmed => {
       if (!confirmed) return;
       this.negocio.actualizarEstado(t.id!, estado).subscribe({
