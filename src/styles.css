@@ -326,8 +326,8 @@ h1,h2,h3,h4,h5,h6 {
 /* ─── MODAL ────────────────────────────────────────────────────── */
 .modal-backdrop-custom {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(6px);
   z-index: 1040;
 }
 .modal-custom {
@@ -335,78 +335,135 @@ h1,h2,h3,h4,h5,h6 {
   display: flex; align-items: center; justify-content: center; padding: 16px;
 }
 .modal-content-custom {
-  background: var(--bg-card);
-  border: 1px solid var(--border-md);
-  border-top: 3px solid var(--gold);
-  border-radius: var(--radius-xl);
+  background: #0e0e16;
+  border: 1px solid rgba(201,160,58,0.22);
+  border-top: 2px solid #c9a03a;
+  border-radius: 18px;
   width: 100%; max-width: 500px;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
-  animation: modalIn 0.22s var(--ease-bounce);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.75), 0 0 50px rgba(201,160,58,0.07);
+  animation: modalIn 0.24s cubic-bezier(0.34,1.56,0.64,1);
+  overflow: hidden;
 }
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  from { opacity: 0; transform: scale(0.92) translateY(14px); }
   to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 .modal-header-custom {
-  padding: 18px 24px;
-  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(201,160,58,0.12);
   display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(135deg, rgba(201,160,58,0.07) 0%, transparent 100%);
 }
 .modal-header-custom h5 {
   font-family: var(--font-display);
-  font-size: 18px;
-  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 700;
+  color: #f0e6c8;
+  letter-spacing: 0.01em;
 }
 .btn-close-custom {
-  background: none; border: none;
-  color: var(--text-secondary);
-  font-size: 18px; cursor: pointer;
-  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,160,58,0.15);
+  color: #6b6b80;
+  font-size: 15px; cursor: pointer;
+  width: 30px; height: 30px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 8px;
-  transition: all var(--dur-fast);
+  transition: all 160ms ease;
+  line-height: 1;
 }
-.btn-close-custom:hover { color: var(--text-primary); background: var(--bg-card-2); }
+.btn-close-custom:hover {
+  color: #f0e6c8;
+  border-color: rgba(201,160,58,0.45);
+  background: rgba(201,160,58,0.08);
+}
 
 .form-label { color: var(--text-secondary); font-size: 12px; font-weight: 500; letter-spacing: 0.05em; margin-bottom: 6px; }
 
-/* ─── SWEETALERT2 ADMIN THEME ───────────────────────────────────── */
+/* ─── SWEETALERT2 ADMIN THEME — Premium Gold ────────────────────── */
 .swal-admin-popup {
-  background: #14141F !important;
-  border: 1px solid #2a2a3a !important;
-  border-radius: 14px !important;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6) !important;
-  font-family: 'Inter', sans-serif !important;
+  background: #0e0e16 !important;
+  border: 1px solid rgba(201,160,58,0.25) !important;
+  border-top: 2px solid #c9a03a !important;
+  border-radius: 18px !important;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.75), 0 0 50px rgba(201,160,58,0.08) !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  overflow: hidden !important;
+  padding-bottom: 8px !important;
+}
+/* Icono SVG custom — quitar borde animado de Swal */
+.swal-icon-custom.swal2-icon {
+  border: none !important;
+  margin: 24px auto 4px !important;
+  width: 68px !important; height: 68px !important;
+  border-radius: 50% !important;
+  background: rgba(201,160,58,0.09) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  animation: none !important;
+}
+.swal-icon-custom.swal2-icon .swal2-icon-content { line-height: 1 !important; }
+.swal-icon-success-bg.swal2-icon {
+  background: rgba(76,175,125,0.09) !important;
+}
+.swal-icon-danger-bg.swal2-icon {
+  background: rgba(214,48,49,0.1) !important;
+}
+.swal-icon-error-bg.swal2-icon {
+  background: rgba(214,48,49,0.1) !important;
 }
 .swal-admin-title {
   color: #f0e6c8 !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
+  font-size: 19px !important;
+  font-weight: 700 !important;
+  padding-top: 12px !important;
+  letter-spacing: 0.01em !important;
 }
 .swal-admin-html {
-  color: #9898b0 !important;
+  color: #7a7a96 !important;
   font-size: 14px !important;
-  line-height: 1.6 !important;
+  line-height: 1.65 !important;
+  padding: 0 8px !important;
 }
-.swal2-icon.swal2-warning { border-color: #c9a03a !important; color: #c9a03a !important; }
-.swal2-icon.swal2-success { border-color: #27ae60 !important; color: #27ae60 !important; }
-.swal2-icon.swal2-success [class^='swal2-success-line'] { background: #27ae60 !important; }
-.swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(39,174,96,0.3) !important; }
-.swal2-icon.swal2-error { border-color: #c0392b !important; color: #c0392b !important; }
-.swal2-icon.swal2-error [class^='swal2-x-mark-line'] { background: #c0392b !important; }
+/* Progress bar (timer) */
+.swal2-timer-progress-bar { background: rgba(201,160,58,0.5) !important; }
+/* Botón confirmar dorado */
 .swal-admin-confirm, .swal-admin-confirm-gold {
-  border-radius: 8px !important;
+  background: linear-gradient(135deg, #c9a03a, #a07828) !important;
+  border: none !important;
+  border-radius: 10px !important;
   font-size: 13px !important;
-  font-weight: 600 !important;
-  padding: 10px 22px !important;
+  font-weight: 700 !important;
+  padding: 11px 26px !important;
+  color: #0c0d0e !important;
+  box-shadow: 0 4px 18px rgba(201,160,58,0.35) !important;
+  letter-spacing: 0.02em !important;
+  transition: filter 160ms ease !important;
 }
-.swal-admin-confirm-gold { background: #c9a03a !important; }
+.swal-admin-confirm:hover, .swal-admin-confirm-gold:hover { filter: brightness(1.12) !important; }
+/* Botón confirmar peligro (rojo) */
+.swal-btn-danger {
+  background: linear-gradient(135deg, #d63031, #a02020) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 18px rgba(214,48,49,0.38) !important;
+}
+.swal-btn-danger:hover { filter: brightness(1.1) !important; }
+/* Botón cancelar — borde sutil dorado */
 .swal-admin-cancel {
-  border-radius: 8px !important;
+  background: transparent !important;
+  border: 1px solid rgba(201,160,58,0.2) !important;
+  border-radius: 10px !important;
   font-size: 13px !important;
   font-weight: 500 !important;
-  padding: 10px 22px !important;
+  padding: 11px 26px !important;
+  color: #7a7a96 !important;
+  transition: all 160ms ease !important;
 }
+.swal-admin-cancel:hover {
+  border-color: rgba(201,160,58,0.5) !important;
+  color: #f0e6c8 !important;
+  background: rgba(201,160,58,0.06) !important;
+}
+/* Loader */
 .swal2-loader { border-color: #c9a03a transparent #c9a03a transparent !important; }
 
 /* ── Driver.js Tour — Dark Gold Premium ──────────────────────────── */
