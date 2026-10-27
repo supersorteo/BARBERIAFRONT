@@ -5,9 +5,11 @@ import { environment } from '../environments/environment';
 
 const BASE = environment.apiBase.replace('/api/v1', '') + '/api/superadmin';
 
-export interface TenantResumen { slug: string; nombre: string; activo: boolean; adminUsername: string; }
+export interface TenantResumen { slug: string; nombre: string; activo: boolean; adminUsername: string; fechaRegistro: string | null; fechaVencimientoSuscripcion: string | null; }
 export interface Resumen { totalTenants: number; tenantActivos: number; totalAdmins: number; codigosDisponibles: number; }
-export interface CodigoItem { codigo: string; usado: boolean; usadoPorUsername: string | null; usadoAt: string | null; creadoAt: string; }
+export type TipoCodigo = 'PLAN_1M' | 'PLAN_3M' | 'PLAN_6M' | 'PLAN_12M';
+export interface CodigoItem { codigo: string; tipo: TipoCodigo | null; usado: boolean; usadoPorUsername: string | null; usadoAt: string | null; fechaVencimiento: string | null; creadoAt: string; }
+export interface PlanPrecio { tipo: TipoCodigo; precioUsd: number; precioUyu: number; precioArs: number; }
 
 @Injectable({ providedIn: 'root' })
 export class SuperAdminService {
@@ -29,8 +31,20 @@ export class SuperAdminService {
     return this.http.get<CodigoItem[]>(`${BASE}/codigos`);
   }
 
-  generarCodigos(cantidad: number): Observable<{ codigo: string; creadoAt: string }[]> {
-    return this.http.post<{ codigo: string; creadoAt: string }[]>(`${BASE}/codigos/generar`, { cantidad });
+  generarCodigos(cantidad: number, tipo: string): Observable<{ codigo: string; tipo: string; creadoAt: string }[]> {
+    return this.http.post<{ codigo: string; tipo: string; creadoAt: string }[]>(`${BASE}/codigos/generar`, { cantidad, tipo });
+  }
+
+  getPlanPrecios(): Observable<PlanPrecio[]> {
+    return this.http.get<PlanPrecio[]>(`${BASE}/plan-precios`);
+  }
+
+  updatePlanPrecio(tipo: TipoCodigo, precios: Partial<Pick<PlanPrecio, 'precioUsd' | 'precioUyu' | 'precioArs'>>): Observable<PlanPrecio> {
+    return this.http.put<PlanPrecio>(`${BASE}/plan-precios/${tipo}`, precios);
+  }
+
+  eliminarCodigosLegacy(): Observable<{ eliminados: number }> {
+    return this.http.delete<{ eliminados: number }>(`${BASE}/codigos/legacy`);
   }
 
   eliminarTenant(slug: string): Observable<{ eliminado: string }> {
@@ -40,5 +54,9 @@ export class SuperAdminService {
   resetPassword(slug: string, password?: string): Observable<{ username: string; password: string }> {
     const body = password ? { password } : {};
     return this.http.patch<{ username: string; password: string }>(`${BASE}/tenants/${slug}/reset-password`, body);
+  }
+
+  actualizarSuscripcion(slug: string, fechaInicio: string, tipoPlan: TipoCodigo): Observable<TenantResumen> {
+    return this.http.patch<TenantResumen>(`${BASE}/tenants/${slug}/suscripcion`, { fechaInicio, tipoPlan });
   }
 }

@@ -54,7 +54,16 @@
 
       <div class="sa-gen-form">
         <div class="sa-gen-field">
-          <label class="sa-gen-label">Cantidad a generar</label>
+          <label class="sa-gen-label">Tipo de plan</label>
+          <select class="sa-input sa-select" [(ngModel)]="tipoGeneracion">
+            <option value="PLAN_1M">1 mes &nbsp;(1M-XXXXX)</option>
+            <option value="PLAN_3M">3 meses (3M-XXXXXX)</option>
+            <option value="PLAN_6M">6 meses (6M-XXXXXXX)</option>
+            <option value="PLAN_12M">12 meses (12M-XXXXXXXX)</option>
+          </select>
+        </div>
+        <div class="sa-gen-field sa-gen-field--qty">
+          <label class="sa-gen-label">Cantidad</label>
           <input
             type="number"
             class="sa-input"
@@ -77,24 +86,109 @@
         <div class="sa-msg sa-msg--err">{{ errorCodigo }}</div>
       }
 
+      <!-- Filtro de lista + limpieza legacy -->
+      @if (codigos.length > 0) {
+        <div class="sa-codes-filter">
+          <select class="sa-input sa-select sa-select--filter" [(ngModel)]="filtroTipo">
+            <option value="todos">Todos los códigos</option>
+            <option value="disponibles">Solo disponibles</option>
+            <option value="PLAN_1M">1 mes</option>
+            <option value="PLAN_3M">3 meses</option>
+            <option value="PLAN_6M">6 meses</option>
+            <option value="PLAN_12M">12 meses</option>
+          </select>
+          <span class="sa-codes-count">{{ codigosFiltrados.length }} código{{ codigosFiltrados.length !== 1 ? 's' : '' }}</span>
+          @if (codigos.some(c => c.tipo === null)) {
+            <button class="sa-legacy-btn" type="button" (click)="eliminarLegacy()" [disabled]="eliminandoLegacy" title="Eliminar todos los códigos sin tipo de plan">
+              @if (eliminandoLegacy) { <span class="sa-spinner sa-spinner--sm"></span> }
+              @else { 🗑️ Limpiar legacy }
+            </button>
+          }
+        </div>
+      }
+
       <!-- Lista de códigos -->
       @if (codigos.length > 0) {
         <div class="sa-codes-list">
-          @for (c of codigos; track c.codigo) {
+          @for (c of codigosFiltrados; track c.codigo) {
             <div class="sa-code-row" [class.sa-code-row--used]="c.usado">
               <span class="sa-code-value">{{ c.codigo }}</span>
+              <span class="sa-code-type sa-code-type--{{ (c.tipo ?? 'legacy').toLowerCase() }}">{{ labelTipo(c.tipo) }}</span>
               @if (!c.usado) {
                 <button class="sa-copy-btn" type="button" (click)="copiar(c.codigo)" title="Copiar">⧉</button>
                 <span class="sa-code-badge sa-code-badge--ok">Disponible</span>
               } @else {
                 <span class="sa-code-badge sa-code-badge--used">Usado</span>
                 <span class="sa-code-by">por {{ c.usadoPorUsername }}</span>
+                @if (c.fechaVencimiento) {
+                  <span class="sa-code-exp">vence {{ c.fechaVencimiento | date:'dd/MM/yy' }}</span>
+                }
               }
             </div>
           }
         </div>
       } @else {
         <div class="sa-empty-codes">No hay códigos generados aún.</div>
+      }
+    </section>
+
+    <!-- Precios de planes -->
+    <section class="sa-card sa-card--prices">
+      <div class="sa-card-header">
+        <span class="sa-card-icon">💲</span>
+        <div>
+          <div class="sa-card-title">Precios de planes</div>
+          <div class="sa-card-sub">Se muestran en el modal de activación al registrar una barbería</div>
+        </div>
+        <button class="sa-edit-price-btn" type="button" (click)="abrirPreciosModal()" [disabled]="planPrecios.length === 0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Editar precios
+        </button>
+      </div>
+
+      @if (planPrecios.length === 0) {
+        <div class="sa-empty">Cargando precios...</div>
+      } @else {
+        <div class="sa-prices-table-wrap">
+          <table class="sa-prices-table">
+            <thead>
+              <tr>
+                <th>Plan</th>
+                <th>USD</th>
+                <th>
+                  <span>UYU</span>
+                  <span class="sa-th-sub">tasa × USD</span>
+                </th>
+                <th>
+                  <span>ARS</span>
+                  <span class="sa-th-sub">tasa × USD</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of planPrecios; track p.tipo) {
+                <tr>
+                  <td>
+                    <span class="sa-code-type sa-code-type--{{ p.tipo.toLowerCase() }}">{{ labelTipo(p.tipo) }}</span>
+                  </td>
+                  <td class="sa-price-val">$ {{ p.precioUsd | number:'1.0-2' }}</td>
+                  <td class="sa-price-val">
+                    $ {{ p.precioUyu | number:'1.0-0' }}
+                    @if (p.precioUsd > 0) {
+                      <span class="sa-tasa-tag">× {{ (p.precioUyu / p.precioUsd) | number:'1.0-2' }}</span>
+                    }
+                  </td>
+                  <td class="sa-price-val">
+                    $ {{ p.precioArs | number:'1.0-0' }}
+                    @if (p.precioUsd > 0) {
+                      <span class="sa-tasa-tag">× {{ (p.precioArs / p.precioUsd) | number:'1.0-0' }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </section>
 
@@ -121,6 +215,8 @@
                 <th>Negocio</th>
                 <th>URL de acceso</th>
                 <th>Admin</th>
+                <th>Registro</th>
+                <th>Vencimiento</th>
                 <th>Estado</th>
                 <th></th>
               </tr>
@@ -141,12 +237,36 @@
                     </button>
                   </td>
                   <td class="sa-td-admin">{{ t.adminUsername }}</td>
+                  <td class="sa-td-date">
+                    @if (t.fechaRegistro) { {{ t.fechaRegistro | date:'dd/MM/yy' }} }
+                    @else { <span class="sa-td-date--null">—</span> }
+                  </td>
+                  <td class="sa-td-date">
+                    @if (t.fechaVencimientoSuscripcion) {
+                      <span class="sa-venc-badge"
+                        [class.sa-venc-badge--ok]="t.fechaVencimientoSuscripcion >= hoy"
+                        [class.sa-venc-badge--exp]="t.fechaVencimientoSuscripcion < hoy">
+                        {{ t.fechaVencimientoSuscripcion | date:'dd/MM/yy' }}
+                      </span>
+                    } @else {
+                      <span class="sa-venc-badge sa-venc-badge--null">—</span>
+                    }
+                  </td>
                   <td>
                     <span class="sa-badge" [class.sa-badge--active]="t.activo" [class.sa-badge--inactive]="!t.activo">
                       {{ t.activo ? 'Activo' : 'Inactivo' }}
                     </span>
                   </td>
                   <td class="sa-td-actions">
+                    <button
+                      class="sa-edit-btn"
+                      type="button"
+                      (click)="abrirEditModal(t)"
+                      [disabled]="reseteandoSlug === t.slug || eliminandoSlug === t.slug || togglingSlug === t.slug"
+                      title="Editar suscripción"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </button>
                     <button
                       class="sa-reset-btn"
                       type="button"
@@ -239,6 +359,180 @@
 
   </div>
 </div>
+
+<!-- Modal: editar precios -->
+@if (preciosModal) {
+  <div class="ppm-backdrop" (click)="cerrarPreciosModal()">
+    <div class="ppm-dialog" (click)="$event.stopPropagation()">
+
+      <div class="ppm-header">
+        <div class="ppm-header-left">
+          <span class="ppm-header-icon">💲</span>
+          <div>
+            <div class="ppm-title">Editar precios de planes</div>
+            <div class="ppm-sub">Configurá precios en USD y tasas de cambio locales</div>
+          </div>
+        </div>
+        <button class="ppm-close" type="button" (click)="cerrarPreciosModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      @if (!preciosModal.pais) {
+        <div class="ppm-body">
+          <div class="ppm-step-label">
+            <span class="ppm-step-num">1</span>
+            Seleccioná el país a configurar
+          </div>
+          <div class="ppm-countries">
+            <button class="ppm-country-card" type="button" (click)="seleccionarPaisModal('UY')">
+              <span class="ppm-country-flag">🇺🇾</span>
+              <span class="ppm-country-name">Uruguay</span>
+              <span class="ppm-country-currency">Pesos uruguayos · UYU</span>
+            </button>
+            <button class="ppm-country-card" type="button" (click)="seleccionarPaisModal('AR')">
+              <span class="ppm-country-flag">🇦🇷</span>
+              <span class="ppm-country-name">Argentina</span>
+              <span class="ppm-country-currency">Pesos argentinos · ARS</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (preciosModal.pais) {
+        <div class="ppm-body">
+          <div class="ppm-country-bar">
+            <span class="ppm-country-chip">
+              {{ preciosModal.pais === 'UY' ? '🇺🇾 Uruguay' : '🇦🇷 Argentina' }}
+            </span>
+            <button class="ppm-change-country" type="button" (click)="seleccionarPaisModal(null)">
+              Cambiar país
+            </button>
+          </div>
+
+          <div class="ppm-tasa-box">
+            <div class="ppm-tasa-header">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Tasa de cambio global — 1 USD =
+            </div>
+            <div class="ppm-tasa-input-row">
+              <input class="ppm-tasa-input" type="number" min="0.01" step="0.01"
+                [value]="getTasaActual()"
+                (input)="onTasaChange(+$any($event.target).value)"
+              />
+              <span class="ppm-tasa-currency">{{ preciosModal.pais === 'UY' ? 'UYU' : 'ARS' }}</span>
+            </div>
+            <div class="ppm-tasa-hint">Cambia el valor local de todos los planes automáticamente</div>
+          </div>
+
+          <div class="ppm-plans-table-wrap">
+            <table class="ppm-plans-table">
+              <thead>
+                <tr>
+                  <th>Plan</th>
+                  <th>USD</th>
+                  <th>{{ preciosModal.pais === 'UY' ? 'Precio UYU' : 'Precio ARS' }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (plan of preciosModal.planes; track plan.tipo) {
+                  <tr>
+                    <td>
+                      <span class="sa-code-type sa-code-type--{{ plan.tipo.toLowerCase() }}">{{ labelTipo(plan.tipo) }}</span>
+                    </td>
+                    <td>
+                      <div class="ppm-usd-cell">
+                        <span class="ppm-cell-prefix">$</span>
+                        <input class="ppm-price-input" type="number" min="0" step="1"
+                          [value]="plan.usd"
+                          (input)="plan.usd = +$any($event.target).value; cdr.detectChanges()"
+                        />
+                        <span class="ppm-cell-suffix">USD</span>
+                      </div>
+                    </td>
+                    <td class="ppm-local-cell">
+                      <strong class="ppm-local-val">$ {{ calcLocal(plan.tipo) | number:'1.0-0' }}</strong>
+                      <span class="ppm-local-currency">{{ preciosModal.pais === 'UY' ? 'UYU' : 'ARS' }}</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ppm-footer">
+            <button class="ppm-cancel-btn" type="button" (click)="cerrarPreciosModal()" [disabled]="preciosModal.guardando">
+              Cancelar
+            </button>
+            <button class="ppm-save-btn" type="button" (click)="guardarPrecios()" [disabled]="preciosModal.guardando">
+              @if (preciosModal.guardando) {
+                <span class="sa-spinner sa-spinner--sm"></span>
+                Guardando...
+              } @else {
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                Guardar todos los planes
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+}
+
+<!-- Modal: editar suscripción -->
+@if (editModal) {
+  <div class="sa-modal-backdrop" (click)="cerrarEditModal()">
+    <div class="sa-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="sa-modal-header">
+        <div class="sa-modal-header-left">
+          <span class="sa-modal-icon-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </span>
+          <div>
+            <div class="sa-modal-title">Editar suscripción</div>
+            <div class="sa-modal-sub">{{ editModal.tenant.nombre }}</div>
+          </div>
+        </div>
+        <button class="sa-modal-close" type="button" (click)="cerrarEditModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="sa-modal-body">
+        <div class="sa-modal-field">
+          <label class="sa-gen-label">Fecha de inicio de suscripción</label>
+          <input class="sa-input" type="date"
+            [(ngModel)]="editModal.fechaInicio"
+            (ngModelChange)="onEditFechaChange()" />
+        </div>
+        <div class="sa-modal-field">
+          <label class="sa-gen-label">Plan</label>
+          <select class="sa-input sa-select" [(ngModel)]="editModal.tipoPlan" disabled>
+            <option value="PLAN_1M">1 mes</option>
+            <option value="PLAN_3M">3 meses</option>
+            <option value="PLAN_6M">6 meses</option>
+            <option value="PLAN_12M">12 meses</option>
+          </select>
+        </div>
+        <div class="sa-edit-calc">
+          <span class="sa-edit-calc-label">Vencimiento calculado</span>
+          <span class="sa-edit-calc-val">{{ editModal.fechaVencCalc | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+      <div class="sa-modal-footer">
+        <button class="sa-modal-cancel" type="button" (click)="cerrarEditModal()" [disabled]="editModal.guardando">Cancelar</button>
+        <button class="sa-btn sa-modal-confirm" type="button" (click)="guardarSuscripcion()" [disabled]="editModal.guardando">
+          @if (editModal.guardando) { <span class="sa-spinner"></span> }
+          @else {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Guardar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- Modal: cambiar contraseña -->
 @if (passModal) {
