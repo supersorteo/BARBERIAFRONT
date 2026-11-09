@@ -207,6 +207,9 @@
   margin-top: 4px; display: block;
 }
 
+/* Stats row: en desktop es transparente como wrapper */
+.ch-hero-stats-row { display: contents; }
+
 /* Floating scene */
 .ch-hero-visual {
   display: flex; align-items: center; justify-content: center;
@@ -500,8 +503,30 @@
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .ch-hero-inner { grid-template-columns: 1fr; }
-  .ch-hero-visual { display: none; }
+  /* Liberar el hero para que crezca con el contenido (como landing) */
+  .ch-hero { min-height: 0; }
+  .ch-hero-inner { grid-template-columns: 1fr; gap: 20px; }
+  /* Orden: copy → visual → stats */
+  .ch-hero-copy { order: 1; }
+  .ch-hero-visual { display: flex !important; min-height: 0; animation: none; order: 2; }
+  .ch-hero-stats-row { display: block; order: 3; }
+  .ch-hero-sprite { max-width: 180px; margin-bottom: 10px; }
+  .ch-scroll-hint { display: none; }
+  .ch-stats { margin-top: 20px; padding-top: 20px; animation: none; }
+  .ch-stat-num { font-size: 1.5rem; }
+  .ch-stat-sep { margin: 0 12px; }
+  .ch-stat { text-align: center; }
+  .ch-float-scene { width: 260px; height: 260px; }
+  .ch-float-glow { width: 160px; height: 160px; }
+  .ch-ring-1 { width: 180px; height: 180px; }
+  .ch-ring-2 { width: 220px; height: 220px; }
+  .ch-fc-body, .ch-fc-badge { display: none; }
+  .ch-float-card { padding: 10px !important; }
+  .ch-fc-icon { width: 48px; height: 48px; }
+  .ch-fc-img { width: 38px; height: 38px; }
+  .ch-card-1 { top: 10px; left: 0; }
+  .ch-card-2 { top: 95px; right: 0; }
+  .ch-card-3 { bottom: 10px; left: 28px; }
   .ch-hero-overlay {
     background:
       linear-gradient(to bottom, rgba(5,5,8,0.7) 0%, rgba(5,5,8,0.55) 50%, rgba(5,5,8,0.85) 100%);
