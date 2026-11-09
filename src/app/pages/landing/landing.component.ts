@@ -559,10 +559,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Services ──────────────────────────────────────────────────────
   private readonly CAT_IMGS: Record<string, string> = {
-    'Corte':      '/categorias/corte.jpg',
-    'Barba':      '/categorias/barba.jpg',
-    'Combo':      '/categorias/combo.jpg',
-    'Coloración': '/categorias/coloracion.jpg',
+    'Corte':      '/categorias/corte.webp',
+    'Barba':      '/categorias/barba.webp',
+    'Combo':      '/categorias/combo.webp',
+    'Coloración': '/categorias/coloracion.webp',
   };
 
   private reagrupar() {
