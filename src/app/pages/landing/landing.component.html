@@ -669,10 +669,20 @@
 
 <!-- ═══════════════ FOOTER ════════════════════════════════════════ -->
 <footer id="contacto" class="footer">
+  <!-- Línea decorativa dorada superior -->
+  <div class="footer-deco-top"></div>
+
   <div class="container">
-    <div class="row g-5">
-      <div class="col-12 col-md-4" data-scroll="section">
-        <p class="footer-brand">✂ {{ config.nombre }}</p>
+    <div class="footer-main-grid">
+
+      <!-- Columna marca -->
+      <div class="footer-col footer-col--brand" data-scroll="section">
+        <p class="footer-brand">
+          @if (config.logoUrl) {
+            <img [src]="config.logoUrl" [alt]="config.nombre" class="footer-brand-logo">
+          }
+          {{ config.nombre }}
+        </p>
         <p class="footer-desc">{{ config.footerDesc }}</p>
         <div class="footer-social">
           @if (config.instagramHandle) {
@@ -687,28 +697,84 @@
           }
         </div>
       </div>
-      <div class="col-12 col-md-4" data-scroll="section">
-        <p class="footer-title">Horarios</p>
-        <ul class="footer-links">
-          @if (config.horario1) { <li>{{ config.horario1 }}</li> }
-          @if (config.horario2) { <li>{{ config.horario2 }}</li> }
-          @if (config.horario3) { <li>{{ config.horario3 }}</li> }
-        </ul>
-      </div>
-      <div class="col-12 col-md-4" data-scroll="section">
-        <p class="footer-title">Contacto</p>
-        <ul class="footer-links">
-          @if (config.direccion) { <li>📍 {{ config.direccion }}</li> }
-          @if (config.telefono) { <li><a [href]="'tel:' + config.telefono">📞 {{ config.telefono }}</a></li> }
-          @if (config.email) { <li><a [href]="'mailto:' + config.email">✉️ {{ config.email }}</a></li> }
-          @if (config.instagramHandle) {
-            <li><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">📸 &#64;{{ config.instagramHandle }}</a></li>
+
+      <!-- Columna horarios -->
+      <div class="footer-col" data-scroll="section">
+        <p class="footer-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Horarios
+        </p>
+        <ul class="footer-schedule">
+          @if (config.horario1) {
+            <li class="footer-schedule-item">
+              <span class="footer-schedule-dot"></span>
+              <span>{{ config.horario1 }}</span>
+            </li>
+          }
+          @if (config.horario2) {
+            <li class="footer-schedule-item">
+              <span class="footer-schedule-dot"></span>
+              <span>{{ config.horario2 }}</span>
+            </li>
+          }
+          @if (config.horario3) {
+            <li class="footer-schedule-item">
+              <span class="footer-schedule-dot"></span>
+              <span>{{ config.horario3 }}</span>
+            </li>
           }
         </ul>
       </div>
-    </div>
+
+      <!-- Columna contacto -->
+      <div class="footer-col" data-scroll="section">
+        <p class="footer-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.18 2 2 0 0 1 3.64 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Contacto
+        </p>
+        <ul class="footer-contact-list">
+          @if (config.direccion) {
+            <li class="footer-contact-item">
+              <span class="footer-contact-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span>{{ config.direccion }}</span>
+            </li>
+          }
+          @if (config.telefono) {
+            <li class="footer-contact-item">
+              <span class="footer-contact-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.18 2 2 0 0 1 3.64 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </span>
+              <a [href]="'tel:' + config.telefono">{{ config.telefono }}</a>
+            </li>
+          }
+          @if (config.email) {
+            <li class="footer-contact-item">
+              <span class="footer-contact-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <a [href]="'mailto:' + config.email">{{ config.email }}</a>
+            </li>
+          }
+          @if (config.instagramHandle) {
+            <li class="footer-contact-item">
+              <span class="footer-contact-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </span>
+              <a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">&#64;{{ config.instagramHandle }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+
+    </div><!-- /footer-main-grid -->
+
     <div class="footer-bottom">
-      <div class="footer-bottom-brand">✂ {{ config.nombre }}</div>
+      <div class="footer-bottom-brand">
+        @if (config.logoUrl) {<img [src]="config.logoUrl" [alt]="config.nombre" class="footer-brand-logo">}
+        {{ config.nombre }}
+      </div>
       <div>© 2026 {{ config.nombre }} · Reservas online disponibles 24/7</div>
       <a routerLink="/registro" class="footer-powered-badge" title="Creá tu barbería online con Corteo">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>

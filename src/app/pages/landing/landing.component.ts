@@ -422,9 +422,9 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     if (featureGrid) {
       const cards = featureGrid.querySelectorAll('.feature-card');
       gsap.from(cards, {
-        y: 60, scale: 0.82, opacity: 0, duration: 0.72,
-        stagger: { amount: 0.38, ease: 'power1.in' },
-        ease: 'back.out(2.2)',
+        y: 40, opacity: 0, duration: 0.6,
+        stagger: { amount: 0.32, ease: 'power1.in' },
+        ease: 'power3.out',
         scrollTrigger: { trigger: featureGrid, start: 'top 85%', once: true }
       });
     }

@@ -634,12 +634,24 @@
   padding: 48px 0;
   background: var(--bg-void);
   position: relative; z-index: 2;
-  border-top: 1px solid var(--border);
+}
+.section-features::before,
+.section::before,
+.section-alt::before,
+.section-gallery::before,
+.section-testimonios::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
+  opacity: 0.6;
+  pointer-events: none;
 }
 .features-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 @media(max-width:900px){ .features-grid { grid-template-columns: repeat(2,1fr); } }
 @media(max-width:575px){ .features-grid { grid-template-columns: 1fr; } }
@@ -648,8 +660,8 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 28px 24px;
-  transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+  padding: 36px 28px;
+  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
   position: relative; overflow: hidden;
 }
 .feature-card::before {
@@ -666,19 +678,19 @@
 .feature-card:hover::before { opacity: 1; }
 
 .feature-icon {
-  width: 128px; height: 128px;
+  width: 148px; height: 148px;
   background: rgba(201,160,58,0.08);
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 24px;
   transition: transform 0.3s var(--ease-bounce), background 0.25s;
 }
 .feature-card:hover .feature-icon {
   transform: scale(1.12) rotate(-4deg);
   background: rgba(201,160,58,0.14);
 }
-.feature-icon img { width: 112px; height: 112px; object-fit: contain; display: block; }
+.feature-icon img { width: 132px; height: 132px; object-fit: contain; display: block; }
 .reserva-modal-icon-badge img { width: 100%; height: 100%; object-fit: contain; }
 
 @media(max-width:991px) {
@@ -724,8 +736,8 @@
 .feature-desc { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: center; }
 
 /* ─── SECTIONS ────────────────────────────────────────────────── */
-.section { padding: 100px 0; }
-.section-alt { background: var(--bg-surface); }
+.section { padding: 100px 0; position: relative; }
+.section-alt { background: var(--bg-surface); position: relative; }
 .section-header { text-align: center; margin-bottom: 64px; }
 
 /* ─── SERVICE CATEGORY CARDS ──────────────────────────────────── */
@@ -1299,7 +1311,24 @@
 .booking-note-icon { color: var(--gold); }
 
 /* ─── FOOTER ──────────────────────────────────────────────────── */
-.footer { background: var(--bg-base); border-top: 1px solid var(--border); padding: 80px 0 0; }
+.footer { background: var(--bg-base); padding: 0 0 0; position: relative; }
+
+.footer-deco-top {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
+  opacity: 0.6;
+}
+
+.footer-main-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 48px;
+  padding: 64px 0 56px;
+  border-bottom: 1px solid var(--border);
+}
+
+.footer-col { display: flex; flex-direction: column; gap: 0; }
+
 .footer-brand {
   font-family: var(--font-display); font-size: 22px; font-weight: 700;
   background: var(--grad-gold);
@@ -1317,9 +1346,41 @@
 .footer-social-btn:hover { border-color: var(--border-gold); color: var(--gold); background: var(--gold-glow); }
 .footer-social-btn svg { width: 16px; height: 16px; }
 .footer-title {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 24px;
 }
+.footer-title svg { opacity: 0.8; flex-shrink: 0; }
+
+/* Horarios */
+.footer-schedule { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-schedule-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+}
+.footer-schedule-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); opacity: 0.6; flex-shrink: 0; margin-top: 5px;
+}
+
+/* Contacto */
+.footer-contact-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.footer-contact-item { display: flex; align-items: flex-start; gap: 12px; }
+.footer-contact-item span:last-child,
+.footer-contact-item a {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+  text-decoration: none; transition: color var(--dur-fast);
+}
+.footer-contact-item a:hover { color: var(--gold-light); }
+.footer-contact-icon {
+  width: 30px; height: 30px; flex-shrink: 0;
+  background: rgba(201,160,58,0.08); border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold);
+}
+
+/* Compat. con la lista antigua en caso de que quede alguna referencia */
 .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .footer-links li { font-size: 13px; color: var(--text-secondary); }
 .footer-links a { color: var(--text-secondary); text-decoration: none; transition: color var(--dur-fast); }
@@ -1332,7 +1393,10 @@
 }
 .footer-bottom-brand {
   font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--gold);
+  display: flex; align-items: center; gap: 8px;
 }
+.footer-brand { display: flex; align-items: center; gap: 10px; }
+.footer-brand-logo { height: 24px; width: auto; object-fit: contain; display: inline-block; vertical-align: middle; }
 
 /* ─── SECTION SHARED ──────────────────────────────────────────── */
 .section-desc { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
@@ -1510,6 +1574,13 @@
 @media (max-width: 480px) {
   .demo-cta-dismiss { top: 10px; transform: none; }
   .demo-cta-banner  { padding-bottom: 18px; padding-top: 12px; }
+}
+
+@media(max-width: 900px) {
+  .footer-main-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+}
+@media(max-width: 575px) {
+  .footer-main-grid { grid-template-columns: 1fr; gap: 32px; padding: 48px 0 40px; }
 }
 
 /* ─── FOOTER POWERED BADGE ─────────────────────────────────────── */
