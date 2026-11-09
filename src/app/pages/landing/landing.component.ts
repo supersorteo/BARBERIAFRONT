@@ -58,25 +58,25 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   private welcomeCarouselTimer: any;
   readonly welcomeSlides = [
     {
-      image: '/icons/welcome-demo-web.png',
+      image: '/icons/welcome-demo-web.webp',
       eyebrow: 'Tu próxima barbería online',
       title: 'Esta demo puede ser tu página',
       text: 'Lo que estás por explorar es el sitio que obtendrás al registrar tu barbería en Corteo: una experiencia profesional para que tus clientes te encuentren y reserven.'
     },
     {
-      image: '/icons/welcome-demo-brand.png',
+      image: '/icons/welcome-demo-brand.webp',
       eyebrow: 'Tu marca, tu estilo',
       title: 'Personalizá cada detalle',
       text: 'Desde tu Panel de Administración podrás cargar tu logo, imágenes, colores, horarios y la información que hace única a tu barbería.'
     },
     {
-      image: '/icons/welcome-demo-panel.png',
+      image: '/icons/welcome-demo-panel.webp',
       eyebrow: 'Control simple y completo',
       title: 'Administrá tu negocio desde un solo lugar',
       text: 'Organizá servicios detallados, barberos, agenda y disponibilidad desde un panel pensado para que trabajes con claridad.'
     },
     {
-      image: '/icons/welcome-demo-reservas.png',
+      image: '/icons/welcome-demo-reservas.webp',
       eyebrow: 'Más reservas, menos mensajes',
       title: 'Conectá tu barbería con tus clientes',
       text: 'Tomá reservas online y conectá tus redes sociales para que tu comunidad llegue a tu página y agende en cualquier momento.'
