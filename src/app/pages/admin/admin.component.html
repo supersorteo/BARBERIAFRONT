@@ -1489,7 +1489,14 @@
                 </div>
                 <div class="col-12 col-sm-6">
                   <label class="form-label">Email de contacto</label>
-                  <input type="email" class="form-control form-dark" [(ngModel)]="configForm.email" placeholder="contacto@minegocio.com">
+                  <input type="email" class="form-control form-dark"
+                         [(ngModel)]="configForm.email"
+                         (blur)="emailTouched = true"
+                         [class.tel-error-border]="emailError"
+                         placeholder="contacto@minegocio.com">
+                  @if (emailError) {
+                    <small class="tel-error-msg">{{ emailError }}</small>
+                  }
                 </div>
                 <div class="col-12 col-sm-6">
                   <label class="form-label">WhatsApp del negocio</label>
@@ -1498,12 +1505,14 @@
                     <input type="tel" class="form-control form-dark tel-local-input"
                            [value]="configWaLocal"
                            (input)="onWaAdminInput($event)"
+                           (blur)="onWaAdminBlur()"
                            [placeholder]="waAdminCfg.placeholder"
                            [class.tel-error-border]="configWaLocal && !waAdminValido"
-                           maxlength="15" inputmode="numeric">
+                           [attr.maxlength]="waMaxLength"
+                           inputmode="numeric">
                   </div>
-                  @if (configWaLocal && !waAdminValido) {
-                    <small class="tel-error-msg">{{ waAdminCfg.digitos }} dígitos sin 0 inicial · ej: {{ waAdminCfg.placeholder }}</small>
+                  @if (configWaLocal && waAdminValidation.msg) {
+                    <small class="tel-error-msg">{{ waAdminValidation.msg }}</small>
                   }
                   <div class="cfg-hint">Botón de WhatsApp en el footer del sitio.</div>
                 </div>
@@ -1993,12 +2002,14 @@
                 <input type="tel" class="form-control form-dark tel-local-input"
                        [value]="rmTelLocal"
                        (input)="onRmTelInput($event)"
+                       (blur)="onRmTelBlur()"
                        [placeholder]="rmCfg.placeholder"
                        [class.tel-error-border]="rmTelLocal && !rmValido"
-                       maxlength="15" inputmode="numeric">
+                       [attr.maxlength]="rmMaxLength"
+                       inputmode="numeric">
               </div>
-              @if (rmTelLocal && !rmValido) {
-                <small class="tel-error-msg">{{ rmCfg.digitos }} dígitos sin 0 inicial · ej: {{ rmCfg.placeholder }}</small>
+              @if (rmTelLocal && rmValidation.msg) {
+                <small class="tel-error-msg">{{ rmValidation.msg }}</small>
               }
             </div>
             <div class="col-12 col-md-6">

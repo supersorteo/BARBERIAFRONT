@@ -577,13 +577,16 @@
             <div class="tel-split">
               <span class="tel-prefix-badge">{{ telefonoPrefijo }}</span>
               <input type="tel" class="form-control form-dark tel-local-input"
-                     [(ngModel)]="telefonoLocal"
+                     [value]="telefonoLocal"
+                     (input)="onTelInput($event)"
+                     (blur)="onTelBlur()"
                      [placeholder]="paisCfg.placeholder"
                      [class.tel-error-border]="telefonoLocal && !telefonoValido"
-                     maxlength="15" inputmode="numeric">
+                     [attr.maxlength]="telMaxLength"
+                     inputmode="numeric">
             </div>
-            @if (telefonoLocal && !telefonoValido) {
-              <small class="tel-error-msg">Ingresá {{ paisCfg.digitos }} dígitos sin 0 inicial · ej: {{ paisCfg.placeholder }}</small>
+            @if (telefonoLocal && telefonoValidation.msg) {
+              <small class="tel-error-msg">{{ telefonoValidation.msg }}</small>
             }
           </div>
           <div class="col-12 col-sm-6">

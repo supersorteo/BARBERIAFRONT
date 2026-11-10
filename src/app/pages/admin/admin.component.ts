@@ -10,6 +10,7 @@ import {
 import { AuthService, AuthUser } from '../../auth.service';
 import { AlertService } from '../../shared/alert.service';
 import { OnboardingService } from '../../onboarding.service';
+import { PhoneValidatorService } from '../../services/phone-validator.service';
 import { AdminAgendaComponent } from './agenda/admin-agenda.component';
 
 interface FotoSlot { file: File | null; preview: string; url: string; }
@@ -89,10 +90,25 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   get rmCfg() { return this.negocio.paisTelCfg(this.configForm.paisCodigo || 'UY'); }
   get rmPrefijo(): string { return '+' + this.rmCfg.prefijo; }
   get rmValido(): boolean {
-    const d = this.rmTelLocal.replace(/\D/g, '');
-    return !d || d.length === this.rmCfg.digitos;
+    if (!this.rmTelLocal) return true;
+    return this.phoneValidator.validate(this.rmTelLocal, this.configForm.paisCodigo || 'UY').ok;
   }
-  onRmTelInput(e: Event) { this.rmTelLocal = (e.target as HTMLInputElement).value; }
+  rmTelTouched = false;
+  get rmValidation() {
+    return this.phoneValidator.validate(this.rmTelLocal, this.configForm.paisCodigo || 'UY', this.rmTelTouched);
+  }
+  get rmMaxLength(): number {
+    return this.phoneValidator.maxLength(this.configForm.paisCodigo || 'UY');
+  }
+  onRmTelInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const val = input.value.replace(/\D/g, '');
+    const max = this.rmMaxLength;
+    this.rmTelLocal = val.length > max ? val.slice(0, max) : val;
+    input.value = this.rmTelLocal;
+    if (!this.rmTelLocal) this.rmTelTouched = false;
+  }
+  onRmTelBlur() { this.rmTelTouched = true; }
   turnoConfirmado: { paciente: string; telefono: string; fecha: string; hora: string; barberoNombre: string } | null = null;
   readonly minDate = new Date().toISOString().split('T')[0];
 
@@ -199,8 +215,21 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   get waAdminCfg() { return this.negocio.paisTelCfg(this.configForm.paisCodigo || 'UY'); }
   get waAdminPrefijo(): string { return '+' + this.waAdminCfg.prefijo; }
   get waAdminValido(): boolean {
-    const d = this.configWaLocal.replace(/\D/g, '');
-    return !d || d.length === this.waAdminCfg.digitos;
+    if (!this.configWaLocal) return true;
+    return this.phoneValidator.validate(this.configWaLocal, this.configForm.paisCodigo || 'UY').ok;
+  }
+  waTelTouched = false;
+  get waAdminValidation() {
+    return this.phoneValidator.validate(this.configWaLocal, this.configForm.paisCodigo || 'UY', this.waTelTouched);
+  }
+  get waMaxLength(): number {
+    return this.phoneValidator.maxLength(this.configForm.paisCodigo || 'UY');
+  }
+
+  emailTouched = false;
+  get emailError(): string | null {
+    if (!this.emailTouched) return null;
+    return this.phoneValidator.validateEmail(this.configForm.email || '');
   }
 
   private _syncWaLocal() {
@@ -210,8 +239,15 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onWaAdminInput(e: Event) {
-    this.configWaLocal = (e.target as HTMLInputElement).value;
+    const input = e.target as HTMLInputElement;
+    const val = input.value.replace(/\D/g, '');
+    const max = this.waMaxLength;
+    this.configWaLocal = val.length > max ? val.slice(0, max) : val;
+    input.value = this.configWaLocal;
+    this.configForm.whatsapp = this.configWaLocal ? this.waAdminCfg.prefijo + this.configWaLocal : '';
+    if (!this.configWaLocal) this.waTelTouched = false;
   }
+  onWaAdminBlur() { this.waTelTouched = true; }
 
   private _paletteOriginal = { primario: '#c9a84c', fondo: '#0A0A10', texto: '#F0ECE0' };
 
@@ -344,7 +380,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private zone: NgZone,
     private alert: AlertService,
-    private onboarding: OnboardingService
+    private onboarding: OnboardingService,
+    private phoneValidator: PhoneValidatorService
   ) {}
 
   sidebarCollapsed = false;
@@ -487,6 +524,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.usuario = this.auth.getUser();
+    this.phoneValidator.loadCodes();
     this.cargarOnboarding();
     this.cargarConfig();
     this.cargarDashboard();

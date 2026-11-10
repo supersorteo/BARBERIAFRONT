@@ -11,6 +11,7 @@ import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.co
 import { AlertService } from '../../shared/alert.service';
 import { TenantContextService } from '../../tenant-context.service';
 import { AuthService } from '../../auth.service';
+import { PhoneValidatorService } from '../../services/phone-validator.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -36,10 +37,24 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get telefonoPrefijo(): string { return '+' + this.paisCfg.prefijo; }
 
-  get telefonoValido(): boolean {
-    const d = this.telefonoLocal.replace(/\D/g, '');
-    return d.length === this.paisCfg.digitos;
+  telTouched = false;
+  get telMaxLength(): number { return this.phoneValidator.maxLength(this.config.paisCodigo || 'UY'); }
+  get telefonoValidation() {
+    return this.phoneValidator.validate(this.telefonoLocal, this.config.paisCodigo || 'UY', this.telTouched);
   }
+  get telefonoValido(): boolean {
+    if (!this.telefonoLocal) return true;
+    return this.telefonoValidation.ok;
+  }
+  onTelInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const val = input.value.replace(/\D/g, '');
+    const max = this.telMaxLength;
+    this.telefonoLocal = val.length > max ? val.slice(0, max) : val;
+    input.value = this.telefonoLocal;
+    if (!this.telefonoLocal) this.telTouched = false;
+  }
+  onTelBlur() { this.telTouched = true; }
   slotsDisponibles: SlotDisponible[] = [];
   cargandoSlots = false;
   enviando = false;
@@ -199,6 +214,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     private tenantCtx: TenantContextService,
     private auth: AuthService,
     private metaSvc: Meta,
+    private phoneValidator: PhoneValidatorService,
     private titleSvc: Title
   ) {}
 
@@ -216,6 +232,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   tenantNoExiste = false;
 
   ngOnInit() {
+    this.phoneValidator.loadCodes();
     const slug = this.route.snapshot.paramMap.get('slug');
     if (slug) { this.slugActual = slug; this.tenantCtx.setSlug(slug); }
     const desdePanelAdmin = sessionStorage.getItem('desde-panel') === '1';
@@ -526,6 +543,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reservaModalOpen = false;
     this.turnoConfirmadoData = null;
     this.telefonoLocal = '';
+    this.telTouched = false;
     document.body.style.overflow = '';
     this.cdr.detectChanges();
   }

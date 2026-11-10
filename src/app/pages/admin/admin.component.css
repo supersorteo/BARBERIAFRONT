@@ -1988,6 +1988,10 @@
   display: block; margin-top: 4px;
   font-size: 11px; color: var(--danger); opacity: 0.85;
 }
+.tel-hint-msg {
+  display: block; margin-top: 4px;
+  font-size: 11px; color: var(--text-muted);
+}
 .cat-empty-state {
   text-align: center; padding: 20px 12px;
   background: var(--bg-card); border: 1px dashed var(--border-md);
