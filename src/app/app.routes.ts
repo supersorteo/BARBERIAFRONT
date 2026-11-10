@@ -5,6 +5,8 @@ import { superAdminDeactivateGuard } from './guards/superadmin-deactivate.guard'
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./pages/corteo-home/corteo-home.component').then(m => m.CorteoHomeComponent) },
   { path: 'registro', loadComponent: () => import('./pages/registro/registro.component').then(m => m.RegistroComponent) },
+  { path: 'pago/resultado', loadComponent: () => import('./pages/pago-resultado/pago-resultado.component').then(m => m.PagoResultadoComponent) },
+  { path: 'pago/renovar', loadComponent: () => import('./pages/pago-renovar/pago-renovar.component').then(m => m.PagoRenovarComponent) },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent), canActivate: [alreadyLoggedInGuard] },
   { path: 'admin', loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent), canActivate: [adminGuard] },
   { path: 'mi-agenda', loadComponent: () => import('./pages/mi-agenda/mi-agenda.component').then(m => m.MiAgendaComponent), canActivate: [barberoGuard] },

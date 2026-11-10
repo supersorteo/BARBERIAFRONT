@@ -145,6 +145,12 @@
 
           </div>
 
+          @if (codigoListo) {
+            <div class="pago-ok" role="status">
+              Tu código ya está cargado. Completá tus datos y tocá Registrar para terminar.
+            </div>
+          }
+
           @if (error) {
             <div class="form-error" role="alert">{{ error }}</div>
           }
@@ -210,6 +216,10 @@
 
 @if (mostrarModalActivacion) {
   <app-activacion-modal
+    [codigoInicial]="codigoInicialModal"
+    [pasoInicial]="pasoInicialModal"
     (confirmar)="onCodigoConfirmado($event)"
-    (cerrar)="mostrarModalActivacion = false" />
+    (antesDePagar)="guardarBorrador()"
+    (solicitoPorWhatsapp)="marcarEsperandoCodigo()"
+    (cerrar)="cerrarModal()" />
 }

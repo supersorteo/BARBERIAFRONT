@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 
 const SLUG_KEY = 'tenantSlug';
-const NON_SLUG_SEGMENTS = new Set(['registro', 'login', 'admin', 'mi-agenda', 'superadmin', '']);
+const NON_SLUG_SEGMENTS = new Set(['registro', 'login', 'admin', 'mi-agenda', 'superadmin', 'pago', '']);
 
 @Injectable({ providedIn: 'root' })
 export class TenantContextService {

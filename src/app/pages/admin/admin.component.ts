@@ -841,10 +841,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargandoTurnos = true;
     this.errorTurnos = '';
     const fecha = this.fechaFiltro || undefined;
-    console.log('[Admin] cargarTurnos - filtro fecha:', fecha || 'SIN FILTRO (todos)');
     this.negocio.getTurnos(fecha).subscribe({
       next: t => {
-        console.log('[Admin] getTurnos response:', t.length, 'reservas', t.map(r => `#${r.id} ${r.fecha} ${r.hora} ${r.paciente}`));
         this.turnos = t; this.cargandoTurnos = false; this.cdr.detectChanges();
       },
       error: e => { this.errorTurnos = 'Error cargando reservas: ' + (e.message || e.status); this.cargandoTurnos = false; this.cdr.detectChanges(); }
@@ -1746,10 +1744,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
       barberoId: f.barberoId ? +f.barberoId : undefined
     };
     const slotElegido = this.slotsReservaManual.find(s => s.hora === f.hora && String(s.barberoId) === String(f.barberoId));
-    console.log('[Admin] crearTurno (manual):', turno);
     this.negocio.crearTurno(turno).subscribe({
       next: (resp) => {
-        console.log('[Admin] crearTurno OK:', resp);
         this.revisionAgenda++;
         this.enviandoReservaManual = false;
         this.turnoConfirmado = {

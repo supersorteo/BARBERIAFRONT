@@ -1,0 +1,99 @@
+.pr-page {
+  align-items: center;
+  background: #07070f;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.pr-card {
+  background: rgba(11, 10, 24, .92);
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 18px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, .55);
+  color: #edeaf8;
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+  max-width: 440px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.pr-title {
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.pr-text {
+  color: #a9a5c9;
+  font-size: .92rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pr-icon {
+  align-items: center;
+  align-self: center;
+  border-radius: 50%;
+  display: flex;
+  height: 56px;
+  justify-content: center;
+  width: 56px;
+}
+.pr-ok   { background: rgba(60, 190, 110, .14); color: #3cbe6e; }
+.pr-wait { background: rgba(196, 148, 32, .14); color: #c49420; }
+.pr-bad  { background: rgba(224, 86, 86, .12);  color: #e05656; }
+
+.pr-spinner {
+  align-self: center;
+  animation: pr-giro .8s linear infinite;
+  border: 3px solid rgba(196, 148, 32, .25);
+  border-radius: 50%;
+  border-top-color: #c49420;
+  height: 44px;
+  width: 44px;
+}
+@keyframes pr-giro { to { transform: rotate(360deg); } }
+
+.pr-codigo {
+  background: #15142a;
+  border: 1px dashed rgba(196, 148, 32, .55);
+  border-radius: 10px;
+  color: #e8c86e;
+  font-family: 'Sora', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  overflow-wrap: anywhere;
+  padding: .85rem 1rem;
+  user-select: all;
+}
+
+.pr-btn {
+  align-items: center;
+  background: linear-gradient(135deg, #c49420 0%, #e8b82a 50%, #c49420 100%);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(196, 148, 32, .28);
+  color: #07070f;
+  cursor: pointer;
+  display: flex;
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: .9rem;
+  font-weight: 800;
+  height: 48px;
+  justify-content: center;
+  text-decoration: none;
+  width: 100%;
+}
+.pr-btn-sec {
+  background: transparent;
+  border: 1px solid rgba(196, 148, 32, .45);
+  box-shadow: none;
+  color: #e8c86e;
+}

@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   fromRegistration = false;
   tab: 'dueno' | 'barbero' = this.loadTab();
   tenantInactivo = false;
+  suscripcionVencida = false;
   vista: 'gateway' | 'form' = 'gateway';
 
   @ViewChild('registroOption') private registroOption?: ElementRef<HTMLAnchorElement>;
@@ -42,10 +43,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private tenantCtx: TenantContextService,
     private cdr: ChangeDetectorRef
   ) {
-    // Router state existe solo durante la navegación activa — nunca llega a ningún storage
     const state = this.router.getCurrentNavigation()?.extras?.state;
     if (state?.['registroUsername']) this.form.username = state['registroUsername'];
-    if (state?.['registroPassword']) this.form.password = state['registroPassword'];
   }
 
   ngOnInit(): void {
@@ -132,8 +131,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
         }
       },
       error: (err) => {
+        this.suscripcionVencida = err?.error?.code === 'SUBSCRIPTION_EXPIRED';
         if (err?.error?.code === 'TENANT_INACTIVE') {
           this.error = 'Esta barbería está desactivada. Contactá al administrador de la plataforma.';
+        } else if (err?.error?.code === 'SUBSCRIPTION_EXPIRED') {
+          this.error = 'La suscripción de esta barbería venció. Renová tu plan para volver a ingresar.';
         } else {
           this.error = 'Usuario o contraseña incorrectos.';
         }

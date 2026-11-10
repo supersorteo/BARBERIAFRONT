@@ -24,7 +24,7 @@ export class ChatWidgetComponent {
   mensajes: Mensaje[] = [];
   inputTexto = '';
   escribiendo = false;
-  sessionId = 'session-' + Date.now();
+  sessionId = globalThis.crypto?.randomUUID?.() ?? `s-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
   get tenantId(): string {
     return this.tenantCtx.resolve(this.authService.getUser()?.tenantId);

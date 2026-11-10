@@ -150,6 +150,10 @@
           <div class="form-error" role="alert">{{ error }}</div>
         }
 
+        @if (suscripcionVencida) {
+          <a class="renovar-link" routerLink="/pago/renovar" [queryParams]="{ slug: tenantSlug }">Renovar mi suscripción</a>
+        }
+
         <button class="btn-submit" type="button" (click)="submit()" [disabled]="loading">
           @if (!loading) { <span>Ingresar al panel</span> }
           @if (loading) { <span class="spinner" aria-label="Cargando"></span> }

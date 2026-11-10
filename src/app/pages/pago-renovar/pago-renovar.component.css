@@ -1,0 +1,114 @@
+.rn-page {
+  align-items: center;
+  background: #07070f;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.rn-card {
+  background: rgba(11, 10, 24, .92);
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 18px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, .55);
+  color: #edeaf8;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  max-width: 440px;
+  padding: 2rem 1.5rem;
+  width: 100%;
+}
+
+.rn-title {
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 0;
+}
+.rn-text { color: #a9a5c9; font-size: .9rem; line-height: 1.5; margin: 0 0 .25rem; }
+.rn-label { color: #c9c5e6; font-size: .8rem; font-weight: 600; margin-top: .25rem; }
+.rn-hint { color: #6f6b94; font-size: .75rem; margin-top: -.35rem; }
+
+.rn-input {
+  background: #15142a;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 8px;
+  color: #edeaf8;
+  font-family: inherit;
+  font-size: .95rem;
+  outline: none;
+  padding: .7rem .9rem;
+}
+.rn-input:focus { border-color: rgba(196, 148, 32, .55); box-shadow: 0 0 0 3px rgba(196, 148, 32, .1); }
+
+.rn-plans { display: grid; gap: .5rem; grid-template-columns: 1fr 1fr; margin-top: .35rem; }
+.rn-plan {
+  align-items: center;
+  background: #15142a;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 10px;
+  color: #edeaf8;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  gap: .15rem;
+  padding: .7rem .5rem;
+}
+.rn-plan.selected { background: rgba(196, 148, 32, .12); border-color: #c49420; }
+.rn-plan-name { font-size: .85rem; font-weight: 700; }
+.rn-plan-price { color: #e8c86e; font-size: .78rem; }
+
+.rn-note { color: #6f6b94; font-size: .78rem; margin: 0; }
+
+.rn-error {
+  background: rgba(224, 86, 86, .08);
+  border: 1px solid rgba(224, 86, 86, .25);
+  border-radius: 8px;
+  color: #e05656;
+  font-size: .85rem;
+  padding: .55rem .85rem;
+}
+
+.rn-btn {
+  background: linear-gradient(135deg, #c49420 0%, #e8b82a 50%, #c49420 100%);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(196, 148, 32, .28);
+  color: #07070f;
+  cursor: pointer;
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: .9rem;
+  font-weight: 800;
+  height: 48px;
+  margin-top: .25rem;
+}
+.rn-btn:disabled { cursor: wait; opacity: .65; }
+
+.rn-back { color: #8a86ad; font-size: .82rem; margin-top: .25rem; text-align: center; text-decoration: none; }
+
+.rn-pay-buttons { display: grid; gap: .5rem; margin-top: .25rem; }
+.rn-btn-sec {
+  background: transparent;
+  border: 1px solid rgba(196, 148, 32, .5);
+  box-shadow: none;
+  color: #e8c86e;
+}
+.rn-btn-sec:hover:not(:disabled) { background: rgba(196, 148, 32, .1); }
+
+.rn-paises { display: grid; gap: .5rem; grid-template-columns: 1fr 1fr; }
+.rn-pais {
+  background: #15142a;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 10px;
+  color: #edeaf8;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 700;
+  padding: .65rem .5rem;
+}
+.rn-pais.selected { background: rgba(196, 148, 32, .12); border-color: #c49420; }
+.rn-plan-ahorro { color: #3cbe6e; font-size: .68rem; font-weight: 700; }

@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { AlertService } from './shared/alert.service';
+import { environment } from '../environments/environment';
+
+const apiOrigin = new URL(environment.apiBase, window.location.origin).origin;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -11,7 +14,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
 
   const token = auth.getToken();
-  if (token) {
+  const esApiPropia = !/^[a-z][a-z0-9+.-]*:/i.test(req.url) || req.url.startsWith(apiOrigin);
+  if (token && esApiPropia) {
     req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
   }
 
@@ -29,6 +33,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         } else {
           router.navigate([slug ? `/${slug}/login` : '/login']);
         }
+      } else if (err.status === 403 && err.error?.code === 'SUBSCRIPTION_EXPIRED') {
+        const slug = auth.getUser()?.tenantId;
+        auth.logout();
+        alert.error(
+          'Suscripción vencida',
+          'La suscripción de tu barbería venció. Renová tu plan para seguir usando el panel.'
+        ).then(() => {
+          router.navigate(['/pago/renovar'], { queryParams: slug ? { slug } : {} });
+        });
       } else if (err.status === 403 && err.error?.code === 'TENANT_INACTIVE') {
         const slug = auth.getUser()?.tenantId;
         auth.logout();

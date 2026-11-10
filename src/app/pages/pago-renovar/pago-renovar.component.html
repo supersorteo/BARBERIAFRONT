@@ -1,0 +1,51 @@
+<main class="rn-page">
+  <section class="rn-card">
+
+    <h1 class="rn-title">Renová tu suscripción</h1>
+    <p class="rn-text">Elegí tu país y un plan. Se suma al tiempo que te quede y se activa apenas se acredita el pago.</p>
+
+    <label class="rn-label" for="rn-slug">Identificador de tu barbería</label>
+    <input id="rn-slug" class="rn-input" type="text" [(ngModel)]="slug"
+      placeholder="mi-barberia" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60" />
+    <small class="rn-hint">Es la parte final de tu dirección web: {{ dominio }}/<strong>mi-barberia</strong></small>
+
+    <div class="rn-label">País</div>
+    <div class="rn-paises" role="radiogroup" aria-label="País">
+      @for (p of paises; track p.id) {
+        <button type="button" class="rn-pais" role="radio"
+          [attr.aria-checked]="pais.id === p.id" [class.selected]="pais.id === p.id" (click)="elegirPais(p)">
+          <span aria-hidden="true">{{ p.bandera }}</span> {{ p.nombre }}
+        </button>
+      }
+    </div>
+
+    <div class="rn-plans" role="radiogroup" aria-label="Plan">
+      @for (op of opcionesPlan; track op.tipo) {
+        <button type="button" class="rn-plan" role="radio"
+          [attr.aria-checked]="plan === op.tipo" [class.selected]="plan === op.tipo" (click)="plan = op.tipo">
+          <span class="rn-plan-name">{{ op.etiqueta }}</span>
+          <span class="rn-plan-price">{{ op.precio }}</span>
+          @if (op.ahorro) { <span class="rn-plan-ahorro">Ahorrás {{ op.ahorro }}%</span> }
+        </button>
+      }
+    </div>
+
+    @if (error) {
+      <div class="rn-error" role="alert">{{ error }}</div>
+    }
+
+    <div class="rn-pay-buttons">
+      @for (prov of proveedores; track prov; let primero = $first) {
+        <button class="rn-btn" [class.rn-btn-sec]="!primero" type="button" (click)="pagar(prov)" [disabled]="pagando">
+          <span>{{ pagando && proveedorActivo === prov ? 'Redirigiendo…' : 'Pagar con ' + nombreProveedor[prov] + ' · ' + precioDe(prov) }}</span>
+        </button>
+      }
+    </div>
+
+    @if (mercadoPagoNoDisponible) {
+      <p class="rn-note">Mercado Pago está disponible solo para Argentina.</p>
+    }
+
+    <a class="rn-back" routerLink="/login">Volver al login</a>
+  </section>
+</main>

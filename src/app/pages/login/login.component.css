@@ -508,3 +508,13 @@
   .login-title-row { gap: .6rem; }
   .login-corteo-logo { height: 48px; width: 64px; }
 }
+
+.renovar-link {
+  color: #e8c86e;
+  display: block;
+  font-size: .85rem;
+  font-weight: 700;
+  margin: -.25rem 0 .75rem;
+  text-align: center;
+  text-decoration: underline;
+}
