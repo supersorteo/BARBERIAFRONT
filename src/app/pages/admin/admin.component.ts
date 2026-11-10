@@ -37,6 +37,9 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     if (v === 'agente' && !this.agenteContextoOriginal) this.cargarContextoAgente();
     if (v === 'barberos') this.cargarUsuarios();
     if (v === 'turnos') this.cargarTurnos();
+    if (v === 'clientes') this.cargarClientes();
+    if (v === 'bloqueos') this.cargarBloqueos();
+    if (v === 'galeria') this.cargarGaleria();
     if (v === 'dashboard') this.cargarDashboard();
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
@@ -528,12 +531,9 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarOnboarding();
     this.cargarConfig();
     this.cargarDashboard();
-    this.cargarTurnos();
     this.cargarServicios();
     this.cargarCategorias();
     this.cargarBarberos();
-    this.cargarBloqueos();
-    this.cargarGaleria();
     this.manifestLink = document.querySelector('link[rel="manifest"]');
     if (this.manifestLink) this.manifestLink.href = '/manifest-panel.webmanifest';
     this.iniciarPolling();
@@ -738,7 +738,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       ({ desde, hasta } = this.calcMes());
     }
-    if (this.clientes.length === 0) this.cargarClientes();
+    if (!this.clientesResumen) this.cargarClientesResumen();
     this.cargandoRango = true;
     this.negocio.getDashboardRango(desde, hasta).subscribe({
       next: d => {
@@ -767,12 +767,25 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     return serie.reduce((best, d) => d.total > best.total ? d : best);
   }
 
+  clientesResumen: { total: number; nuevos: number; recurrentes: number } | null = null;
+
   get clientesNuevos(): number {
-    return this.clientes.filter(c => c.totalVisitas === 1).length;
+    return this.clientesResumen?.nuevos ?? 0;
   }
 
   get clientesRecurrentes(): number {
-    return this.clientes.filter(c => c.totalVisitas > 1).length;
+    return this.clientesResumen?.recurrentes ?? 0;
+  }
+
+  get clientesTotal(): number {
+    return this.clientesResumen?.total ?? 0;
+  }
+
+  cargarClientesResumen() {
+    this.negocio.getClientesResumen().subscribe({
+      next: r => { this.clientesResumen = r; this.cdr.detectChanges(); },
+      error: () => {}
+    });
   }
 
   rankingBarberoEnPeriodo(barberoId: number) {
@@ -803,18 +816,51 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Clientes ──────────────────────────────────────────────────────
 
+  clientesHayMas = false;
+  cargandoMasClientes = false;
+  private clientesPagina = 0;
+  private clientesSolicitud = 0;
+  private clientesBusquedaTimer: ReturnType<typeof setTimeout> | null = null;
+
   get clientesFiltrados(): ClienteResumen[] {
-    const q = this.clientesFiltro.toLowerCase().trim();
-    return q
-      ? this.clientes.filter(c => c.nombre.toLowerCase().includes(q) || c.telefono.includes(q))
-      : this.clientes;
+    return this.clientes;
+  }
+
+  buscarClientes() {
+    if (this.clientesBusquedaTimer) clearTimeout(this.clientesBusquedaTimer);
+    this.clientesBusquedaTimer = setTimeout(() => this.cargarClientes(), 300);
   }
 
   cargarClientes() {
+    const solicitud = ++this.clientesSolicitud;
+    this.clientesPagina = 0;
     this.cargandoClientes = true;
-    this.negocio.getClientes().subscribe({
-      next: c => { this.clientes = c; this.cargandoClientes = false; this.cdr.detectChanges(); },
-      error: () => { this.cargandoClientes = false; }
+    this.negocio.getClientes(this.clientesFiltro, 0).subscribe({
+      next: r => {
+        if (solicitud !== this.clientesSolicitud) return;
+        this.clientes = r.items;
+        this.clientesHayMas = r.hayMas;
+        this.cargandoClientes = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { if (solicitud === this.clientesSolicitud) { this.cargandoClientes = false; this.cdr.detectChanges(); } }
+    });
+  }
+
+  cargarMasClientes() {
+    if (this.cargandoMasClientes || !this.clientesHayMas) return;
+    const solicitud = this.clientesSolicitud;
+    this.cargandoMasClientes = true;
+    this.negocio.getClientes(this.clientesFiltro, this.clientesPagina + 1).subscribe({
+      next: r => {
+        if (solicitud !== this.clientesSolicitud) return;
+        this.clientesPagina++;
+        this.clientes = [...this.clientes, ...r.items];
+        this.clientesHayMas = r.hayMas;
+        this.cargandoMasClientes = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.cargandoMasClientes = false; this.cdr.detectChanges(); }
     });
   }
 

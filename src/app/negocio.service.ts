@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, concat, of } from 'rxjs';
+import { Observable, tap, concat, of, map } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AuthService } from './auth.service';
 import { TenantContextService } from './tenant-context.service';
@@ -400,8 +400,15 @@ export class NegocioService {
   }
 
   // Clientes (admin)
-  getClientes(): Observable<ClienteResumen[]> {
-    return this.http.get<ClienteResumen[]>(`${this.base}/clientes/${this.tenantId}`);
+  getClientes(busqueda = '', pagina = 0, tamano = 50): Observable<{ items: ClienteResumen[]; hayMas: boolean }> {
+    const params: Record<string, string> = { page: String(pagina), size: String(tamano) };
+    if (busqueda.trim()) params['q'] = busqueda.trim();
+    return this.http
+      .get<ClienteResumen[]>(`${this.base}/clientes/${this.tenantId}`, { params, observe: 'response' })
+      .pipe(map(r => ({ items: r.body ?? [], hayMas: r.headers.get('X-Has-More') === 'true' })));
+  }
+  getClientesResumen(): Observable<{ total: number; nuevos: number; recurrentes: number }> {
+    return this.http.get<{ total: number; nuevos: number; recurrentes: number }>(`${this.base}/clientes/${this.tenantId}/resumen`);
   }
   getHistorialCliente(nombre: string): Observable<Turno[]> {
     return this.http.get<Turno[]>(`${this.base}/clientes/${this.tenantId}/${encodeURIComponent(nombre)}/historial`);
