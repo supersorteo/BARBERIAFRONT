@@ -26,6 +26,14 @@ export class AuthService {
     );
   }
 
+  guardarToken(token: string) {
+    try {
+      localStorage.setItem(TOKEN_KEY, token);
+      const raw = localStorage.getItem(USER_KEY);
+      if (raw) localStorage.setItem(USER_KEY, JSON.stringify({ ...JSON.parse(raw), token }));
+    } catch { /* sin almacenamiento disponible: la sesión actual queda revocada y pedirá login */ }
+  }
+
   logout() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

@@ -447,8 +447,10 @@ export class NegocioService {
   eliminarUsuario(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/admin/${this.tenantId}/usuarios/${userId}`);
   }
-  cambiarMiPassword(actual: string, nueva: string): Observable<void> {
-    return this.http.patch<void>(`${this.base.replace('/api/v1', '/api/auth')}/cambiar-password`, { actual, nueva });
+  cambiarMiPassword(actual: string, nueva: string): Observable<{ ok: boolean; token?: string }> {
+    return this.http.patch<{ ok: boolean; token?: string }>(`${this.base.replace('/api/v1', '/api/auth')}/cambiar-password`, { actual, nueva }).pipe(
+      tap(r => { if (r?.token) this.auth.guardarToken(r.token); })
+    );
   }
 
   // Config dinámica del landing
