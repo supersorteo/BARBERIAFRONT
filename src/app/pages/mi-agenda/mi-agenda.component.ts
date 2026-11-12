@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DEMO_SLUG } from '../../demo-credenciales';
 import { gsap } from 'gsap';
 import { NegocioService, Turno, BloqueoHorario, Barbero } from '../../negocio.service';
 import { AuthService, AuthUser } from '../../auth.service';
@@ -270,7 +271,12 @@ export class MiAgendaComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  get esDemo(): boolean {
+    return this.usuario?.tenantId === DEMO_SLUG;
+  }
+
   abrirModalPass() {
+    if (this.esDemo) return;
     this.cambioPassForm = { actual: '', nueva: '', confirmar: '' };
     this.showPass = { actual: false, nueva: false, conf: false };
     this.mostrarModalPass = true;

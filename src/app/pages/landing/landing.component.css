@@ -1436,6 +1436,9 @@
   background: rgba(30, 26, 18, 0.95);
   box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,160,58,0.3);
 }
+.panel-fab--sobre-banner { bottom: 96px; }
+@media (max-width: 768px) { .panel-fab--sobre-banner { bottom: 156px; } }
+@media (max-width: 420px) { .panel-fab--sobre-banner { bottom: 172px; } }
 .panel-fab-icon { font-size: 15px; }
 .panel-fab-label { font-family: var(--font-display, inherit); }
 

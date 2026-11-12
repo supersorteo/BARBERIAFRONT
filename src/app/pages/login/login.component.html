@@ -115,6 +115,10 @@
 
       <div class="login-form">
 
+        @if (credencialesDemoCargadas) {
+          <p class="demo-hint">Cargamos las credenciales de prueba del panel de admin. Solo tocá <strong>Ingresar al panel</strong>.</p>
+        }
+
         <div class="form-group">
           <label for="username">Usuario</label>
           <div class="input-row">

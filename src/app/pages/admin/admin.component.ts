@@ -12,6 +12,7 @@ import { AlertService } from '../../shared/alert.service';
 import { OnboardingService } from '../../onboarding.service';
 import { PhoneValidatorService } from '../../services/phone-validator.service';
 import { AdminAgendaComponent } from './agenda/admin-agenda.component';
+import { DEMO_SLUG } from '../../demo-credenciales';
 
 interface FotoSlot { file: File | null; preview: string; url: string; }
 
@@ -158,6 +159,11 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   turnosHoy: Turno[] = [];
   cargandoTurnosHoy = false;
   // Cambio de contraseña del admin
+  // En la demo la contraseña solo la cambia el superadmin: el login muestra la que él defina
+  get esDemo(): boolean {
+    return this.usuario?.tenantId === DEMO_SLUG;
+  }
+
   mostrarCambioPassAdmin = false;
   cambioPassAdminForm = { actual: '', nueva: '', confirmar: '' };
   errorCambioPassAdmin = '';

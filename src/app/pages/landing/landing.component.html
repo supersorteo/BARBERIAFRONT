@@ -791,12 +791,12 @@
 <app-chat-widget [nombreNegocio]="config.nombre" [elevarFab]="slugActual === DEMO_SLUG && !demoBannerDismissed" (abrirReserva)="onChatReserva()" />
 
 <!-- ACCESO PANEL / LOGIN -->
-@if (panelAcceso.tipo === 'panel') {
-  <a [routerLink]="panelAcceso.ruta" class="panel-fab" [attr.aria-label]="panelAcceso.label">
+@if (fabPanel; as fab) {
+  <a [routerLink]="fab.ruta" class="panel-fab" [class.panel-fab--sobre-banner]="slugActual === DEMO_SLUG && !demoBannerDismissed" [attr.aria-label]="fab.label">
     <span class="panel-fab-icon">⚙</span>
-    <span class="panel-fab-label">{{ panelAcceso.label }}</span>
+    <span class="panel-fab-label">{{ fab.label }}</span>
   </a>
-} @else {
+} @else if (slugActual !== DEMO_SLUG) {
   <a [routerLink]="panelAcceso.ruta" class="panel-fab-ghost" [title]="panelAcceso.label" [attr.aria-label]="panelAcceso.label">
     <span>🔐</span>
   </a>

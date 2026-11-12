@@ -177,6 +177,15 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     return { tipo: 'login', label: 'Acceso staff', ruta: '/' + this.slugActual + '/login' };
   }
 
+  // Botón flotante: con sesión lleva al panel; en la demo siempre se ve y lleva al login; en otros negocios queda el candado discreto
+  get fabPanel(): { label: string; ruta: string } | null {
+    if (this.welcomeCarouselOpen || this.categoriaModal || this.reservaModalOpen || this.navOpen) return null;
+    const acceso = this.panelAcceso;
+    if (acceso.tipo === 'panel') return acceso;
+    if (this.slugActual === this.DEMO_SLUG) return { label: 'Probar el panel de admin', ruta: acceso.ruta };
+    return null;
+  }
+
   demoBannerDismissed = false;
   readonly DEMO_SLUG = 'barberia-demo';
 

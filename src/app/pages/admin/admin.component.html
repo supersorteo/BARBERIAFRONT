@@ -835,10 +835,14 @@
               <div class="bpr-admin-user">admin</div>
             </div>
           </div>
-          <button class="bpr-pass-btn" (click)="mostrarCambioPassAdmin = true; errorCambioPassAdmin = ''">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Cambiar contraseña
-          </button>
+          @if (esDemo) {
+            <span style="color:var(--text-muted);font-size:12px;max-width:230px;text-align:right">En la demo la contraseña no se puede cambiar.</span>
+          } @else {
+            <button class="bpr-pass-btn" (click)="mostrarCambioPassAdmin = true; errorCambioPassAdmin = ''">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Cambiar contraseña
+            </button>
+          }
         </div>
       </div>
 
@@ -2174,7 +2178,7 @@
 }
 
 <!-- ─── MODAL CAMBIO DE CONTRASEÑA ADMIN ─── -->
-@if (mostrarCambioPassAdmin) {
+@if (mostrarCambioPassAdmin && !esDemo) {
   <div class="modal-backdrop-custom" (click)="mostrarCambioPassAdmin=false; cambioPassAdminForm={actual:'',nueva:'',confirmar:''}"></div>
   <div class="modal-custom">
     <div class="modal-content-custom modal-cambio-pass">

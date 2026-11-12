@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { NegocioService } from '../../negocio.service';
 import { TenantContextService } from '../../tenant-context.service';
+import { DEMO_SLUG } from '../../demo-credenciales';
 
 @Component({
   selector: 'app-login',
@@ -30,6 +31,32 @@ export class LoginComponent implements OnInit, AfterViewInit {
   tenantSlug: string | null = null;
   /** Nombre legible derivado del slug para mostrar en la UI */
   nombreNegocio = '';
+
+  private credencialesDemo: { username: string; password: string } | null = null;
+
+  get credencialesDemoCargadas(): boolean {
+    const d = this.credencialesDemo;
+    return !!d && this.tenantSlug === DEMO_SLUG && this.tab === 'dueno'
+      && this.form.username === d.username && this.form.password === d.password;
+  }
+
+  // Las pide al servidor: si el superadmin cambia la contraseña de la demo, el login muestra la nueva
+  private precargarDemo(): void {
+    if (this.tenantSlug !== DEMO_SLUG || this.form.username || this.form.password) return;
+    this.tab = 'dueno';
+    const aplicar = () => {
+      const d = this.credencialesDemo;
+      if (!d || this.form.username || this.form.password || this.tab !== 'dueno') return;
+      this.form.username = d.username;
+      this.form.password = d.password;
+      this.cdr.detectChanges();
+    };
+    if (this.credencialesDemo) { aplicar(); return; }
+    this.auth.getDemoCredenciales().subscribe({
+      next: (d) => { this.credencialesDemo = d; aplicar(); },
+      error: () => { /* sin credenciales públicas disponibles: el formulario queda vacío */ }
+    });
+  }
 
   get esDemo(): boolean {
     return !this.tenantSlug || this.tenantSlug === 'barberia-demo';
@@ -63,7 +90,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
       });
     }
     // Solo mostrar gateway para la demo o login genérico
-    if (!this.esDemo) this.vista = 'form';
+    // La demo con su propio slug va directo al formulario (el botón flotante de la landing apunta aquí)
+    if (!this.esDemo || this.tenantSlug === DEMO_SLUG) this.vista = 'form';
+    this.precargarDemo();
 
     // Post-registro: detectar si el usuario viene de registrar un negocio
     const lastSlug = (() => { try { return localStorage.getItem('lastRegisteredSlug'); } catch { return null; } })();
@@ -94,10 +123,16 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.tenantCtx.setSlug('barberia-demo');
     }
     this.vista = 'form';
+    this.precargarDemo();
   }
 
   setTab(t: 'dueno' | 'barbero'): void {
+    if (t === 'barbero' && this.credencialesDemoCargadas) {
+      this.form.username = '';
+      this.form.password = '';
+    }
     this.tab = t;
+    if (t === 'dueno') this.precargarDemo();
     try { localStorage.setItem('login_tab', t); } catch { /* safari privado */ }
   }
 

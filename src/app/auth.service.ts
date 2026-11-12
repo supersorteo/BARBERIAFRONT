@@ -26,6 +26,11 @@ export class AuthService {
     );
   }
 
+  /** Credenciales públicas de la barbería demo; las actualiza el superadmin al reiniciar su contraseña */
+  getDemoCredenciales(): Observable<{ username: string; password: string }> {
+    return this.http.get<{ username: string; password: string }>(`${API_V1}/demo/credenciales`);
+  }
+
   guardarToken(token: string) {
     try {
       localStorage.setItem(TOKEN_KEY, token);
