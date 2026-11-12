@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AuthService } from './auth.service';
 import { TenantContextService } from './tenant-context.service';
-import { driver } from 'driver.js';
 
 export interface OnboardingStatus {
   tourVisto: boolean;
@@ -35,7 +34,8 @@ export class OnboardingService {
     return this.http.post<void>(`${this.base}/onboarding/${this.tenantId}/tour-visto`, {});
   }
 
-  iniciarTour(onFinish?: () => void, setTab?: (tab: string) => void): void {
+  async iniciarTour(onFinish?: () => void, setTab?: (tab: string) => void): Promise<void> {
+    const { driver } = await import('driver.js');
     const ico = (d: string) =>
       `<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#c9a03a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='display:inline;vertical-align:-3px;margin-right:6px'>${d}</svg>`;
     const I = {

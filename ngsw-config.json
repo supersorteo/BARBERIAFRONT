@@ -9,7 +9,6 @@
       "resources": {
         "files": [
           "/favicon.ico",
-          "/icons/corteo-favicon-*.png",
           "/logos/logo-black.webp",
           "/logos/apple-touch-icon.png",
           "/index.html",
@@ -26,19 +25,9 @@
       "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/icons/**"]
-      }
-    }
-  ],
-  "dataGroups": [
-    {
-      "name": "api-turnos",
-      "urls": ["/api/turnos/**", "/api/servicios/**", "/api/barberos/**"],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 50,
-        "maxAge": "5m",
-        "timeout": "3s"
+        "files": [
+          "/icons/**"
+        ]
       }
     }
   ]

@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import Swal from 'sweetalert2';
+import type { SweetAlertOptions } from 'sweetalert2';
+
+// sweetalert2 pesa decenas de kB y solo se usa al mostrar un aviso: se descarga en el primer uso
+const Swal = {
+  fire: (opciones: SweetAlertOptions) => import('sweetalert2').then(m => m.default.fire(opciones)),
+  close: () => { void import('sweetalert2').then(m => m.default.close()); },
+};
 
 export interface ConfirmDangerOptions {
   title: string;
